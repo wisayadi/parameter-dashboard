@@ -211,6 +211,12 @@
 <div class="card weather-card">
   <h2>🌤️ Prakiraan Cuaca Balikpapan</h2>
 
+  <!-- 🔍 Kotak Pencarian Kota -->
+  <div class="search-city">
+    <input type="text" id="cityInput" placeholder="Masukkan nama kota (mis. Jakarta, Surabaya, Makassar)">
+    <button onclick="searchWeather()">Cari</button>
+  </div>
+
   <!-- Ikon dan suhu berdampingan -->
   <div class="weather-row">
     <div class="weather-icon">
@@ -224,30 +230,12 @@
 
   <!-- Grid data cuaca -->
   <div class="weather-grid">
-    <div class="grid-item">
-      <h4>Deskripsi</h4>
-      <p id="w_desc">--</p>
-    </div>
-    <div class="grid-item">
-      <h4>Kelembaban</h4>
-      <p id="w_hum">--%</p>
-    </div>
-    <div class="grid-item">
-      <h4>Kecepatan Angin</h4>
-      <p id="w_wind">-- km/j</p>
-    </div>
-    <div class="grid-item">
-      <h4>Arah Angin</h4>
-      <p id="w_wdir">--</p>
-    </div>
-    <div class="grid-item">
-      <h4>Jarak Pandang</h4>
-      <p id="w_vis">-- km</p>
-    </div>
-    <div class="grid-item">
-      <h4>Tekanan</h4>
-      <p id="w_pres">-- hPa</p>
-    </div>
+    <div class="grid-item"><h4>Deskripsi</h4><p id="w_desc">--</p></div>
+    <div class="grid-item"><h4>Kelembaban</h4><p id="w_hum">--%</p></div>
+    <div class="grid-item"><h4>Kecepatan Angin</h4><p id="w_wind">-- km/j</p></div>
+    <div class="grid-item"><h4>Arah Angin</h4><p id="w_wdir">--</p></div>
+    <div class="grid-item"><h4>Jarak Pandang</h4><p id="w_vis">-- km</p></div>
+    <div class="grid-item"><h4>Tekanan</h4><p id="w_pres">-- hPa</p></div>
   </div>
 
   <!-- Info tambahan -->
@@ -278,13 +266,37 @@
   transform: translateY(-3px);
   box-shadow: 0 8px 28px rgba(0,0,0,0.12);
 }
-
 .weather-card h2 {
   font-size: 16px;
   color: brown;
-  margin-bottom: 22px;
+  margin-bottom: 15px;
   font-weight: 700;
 }
+
+/* 🔍 Kotak pencarian kota */
+.search-city {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.search-city input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 65%;
+  font-size: 13px;
+}
+.search-city button {
+  padding: 8px 12px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.search-city button:hover { background: #0d47a1; }
 
 /* Ikon dan suhu sejajar */
 .weather-row {
@@ -294,23 +306,14 @@
   gap: 25px;
   margin-bottom: 35px;
 }
-
-.weather-icon img {
-  width: 80px;
-  height: 80px;
-}
-
+.weather-icon img { width: 80px; height: 80px; }
 .temp-main {
   font-size: 23px;
   font-weight: 800;
   color: #1976d2;
   margin-bottom: 4px;
 }
-
-.temp-feels {
-  font-size: 12px;
-  color: #555;
-}
+.temp-feels { font-size: 12px; color: #555; }
 
 /* Grid biru elegan */
 .weather-grid {
@@ -322,7 +325,6 @@
   padding: 10px;
   margin-top: 35px;
 }
-
 .grid-item {
   background: #f5f6fa;
   border-radius: 10px;
@@ -330,14 +332,11 @@
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
-
 .grid-item h4 {
   font-size: 10px;
- /* color: #0277bd;*/
   color: purple;
   margin-bottom: 4px;
 }
-
 .grid-item p {
   font-size: 14px;
   font-weight: bold;
@@ -345,16 +344,8 @@
 }
 
 /* Info tambahan */
-.extra-info {
-  margin-top: 18px;
-  font-size: 13px;
-  color: #444;
-}
-.update-time {
-  margin-top: 10px;
-  font-size: 12px;
-  color: green;
-}
+.extra-info { margin-top: 18px; font-size: 13px; color: #444; }
+.update-time { margin-top: 10px; font-size: 12px; color: green; }
 </style>
 
   <!-- Kualitas Udara -->
@@ -738,23 +729,29 @@ function arahDerajat(deg) {
   return arah[Math.round(deg / 45) % 8];
 }
 
-async function update() {
+    <!-- ⚡ Script Cuaca Dinamis -->
+
+const API_KEY = "20f6d784f501f4a976a63ecf4a7a53fd";
+
+async function loadWeather(city = "Balikpapan") {
   try {
-    // 🌤️ Cuaca
-    const wres = await fetch("https://api.openweathermap.org/data/2.5/weather?q=Balikpapan,id&units=metric&appid=20f6d784f501f4a976a63ecf4a7a53fd&lang=id");
-    const w = await wres.json();
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},id&units=metric&appid=${API_KEY}&lang=id`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Kota tidak ditemukan");
+    const data = await res.json();
 
-    const suhu = w.main.temp.toFixed(1);
-    const terasa = w.main.feels_like.toFixed(1);
-    const kelembapan = w.main.humidity;
-    const tekanan = w.main.pressure;
-    const angin = w.wind.speed;
-    const arahAngin = w.wind.deg;
-    const jarakPandang = (w.visibility / 1000).toFixed(1);
-    const deskripsi = w.weather[0].description;
-    const icon = w.weather[0].icon;
-    const zonaWaktu = new Date(w.dt * 1000).toLocaleTimeString("id-ID", { timeZone: "Asia/Makassar" });
+    const suhu = data.main.temp.toFixed(1);
+    const terasa = data.main.feels_like.toFixed(1);
+    const kelembapan = data.main.humidity;
+    const tekanan = data.main.pressure;
+    const angin = data.wind.speed;
+    const arahAngin = data.wind.deg;
+    const jarakPandang = (data.visibility / 1000).toFixed(1);
+    const deskripsi = data.weather[0].description;
+    const icon = data.weather[0].icon;
+    const zonaWaktu = new Date(data.dt * 1000).toLocaleTimeString("id-ID", { timeZone: "Asia/Makassar" });
 
+    document.querySelector(".weather-card h2").textContent = `🌤️ Prakiraan Cuaca ${city}`;
     document.getElementById("weather-main").textContent = `${suhu}°C`;
     document.getElementById("weather-feels").textContent = `Terasa seperti ${terasa}°C`;
     document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
@@ -768,6 +765,20 @@ async function update() {
     document.getElementById("uv_index").textContent = "8.5";
     document.getElementById("update_time").textContent = zonaWaktu;
 
+  } catch (e) {
+    alert("⚠️ Gagal memuat data: " + e.message);
+    console.error("Gagal memuat cuaca:", e);
+  }
+}
+
+function searchWeather() {
+  const city = document.getElementById("cityInput").value.trim();
+  if (city) loadWeather(city);
+  else alert("Masukkan nama kota terlebih dahulu!");
+}
+   loadWeather();
+   async function update() {
+  try{  
     // 🌫️ Udara
     const aqiRes = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=1.242&lon=116.894&appid=20f6d784f501f4a976a63ecf4a7a53fd`);
     const a = await aqiRes.json();
@@ -868,7 +879,7 @@ async function loadGempa() {
   } catch (err) {
     console.error("Gempa error:", err);
   }
-}
+ }
 
 function getPrayerTimesFromTable(){
     const rows = Array.from(document.querySelectorAll("#jadwalSholat tr")).slice(1);
@@ -966,6 +977,7 @@ function getPrayerTimesFromTable(){
 update(); setInterval(update,60000);
   setInterval(fmtNow,1000);
   setInterval(updateCountdown, 1000);
+  loadWeather();
   loadGempa();
 </script>
 </body></html>
