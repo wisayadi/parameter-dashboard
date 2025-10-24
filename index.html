@@ -1554,6 +1554,1656 @@ async function loadGempa() {
           y: { beginAtZero: true, title: { display: true, text: "Magnitudo (SR)" } }
         }
       }
+  <!DOCTYPE html>
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Dashboard Parameter dan BMKG Nasional</title>
+<style>
+  :root { --card-w: 680px; }  
+     body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+      margin: 0;
+      padding: 16px;
+      
+    }
+    .wrap { max-width: 680px; margin: 0 auto; }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      margin: 12px 0;
+      padding: 14px;}
+     .muted{color:#666
+    }
+  
+     .card.header{
+    position: relative;
+    background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=60') no-repeat center center;
+    background-size: cover;
+    color:#fff;
+    text-shadow:1px 1px 4px rgba(0,0,0,.8);
+    min-height:180px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-start;
+  }
+  .scrolling { overflow:hidden; white-space:nowrap; width:100%; margin-bottom:6px; }
+  .scrolling span { display:inline-block; padding-left:100%; animation:marquee 18s linear infinite; font-weight:600; font-size:12px; }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-100%)} }
+   
+  /* 🌋 Info Gempa Scrolling Style */
+.info-gempa {
+  /*background: linear-gradient(90deg, #fff3e0, #fff8e1);*/
+  background: linear-gradient(180deg, #fffef7, #f5fff5);
+  /*color: #b84300;*/
+  /*color: #2e7d32;*//*hijau zamrud*/
+  /*color: #a46d00;*//*coklat emas*/
+  color: #3e3e3e;/*abu abu emas*/
+  /*color: #1e88e5;*//*biru neon*/
+  /*color: #e63946;*//*merah coral*/
+  /*color: #b02a37;*//*merah maron*/
+  /*color: #004c91;*//*biru laut*/
+  font-weight: 600;
+  font-size: 10px;
+  /*border-top: 1px solid #ffa726;*/
+  /*border-bottom: 1px solid #ffa726;*/
+  padding: 8px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  /*box-shadow: inset 0 0 10px rgba(255,165,0,0.3);*/
+  /*border-radius: 0 0 12px 12px;*/
+  margin-top: -4px;
+}
+
+.scrolling-text {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scroll-left 40s linear infinite;
+}
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+ 
+  .card.nowbox {
+  text-align: center;
+  background: lightyellow;
+  border-radius: 10px;
+  padding: 8px;               /* lebih kecil dari 12px */
+  box-shadow: 0px 2px 6px rgba(0,0,0,0.15);
+  /*max-width: 220px;           /* biar tidak terlalu lebar */
+  /*margin: auto;               /* posisikan di tengah */
+  border: 1px solid #f3d7b6;
+ }
+
+.card.nowbox h2 {
+  margin: 0;
+  font-size: 12px;            /* lebih kecil dari 18px */
+  color: #222;
+}
+
+.card.nowbox p {
+  margin: 4px 0 0;
+  font-size: 10px;            /* lebih kecil dari 14px */
+  color: #666;
+}
+  
+    /* --- Tabel Cuaca, Udara, Sholat --- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      word-wrap: break-word; /* teks panjang patah */
+    }
+    th, td {
+      border: 1px solid #e5e9ef;
+      padding: 8px 6px;
+      text-align: center;
+      font-size: 14px;
+    }
+    table.cuaca th { background:#007BFF; color:#fff; }
+    table.jadwal th { background:#28A745; color:#fff; }
+    table.udara th  { background:#f97316; color:#fff; }
+    table.cuaca td, table.jadwal td, table.udara td { background:#f9fbfd; }
+    table tr:nth-child(even) td { background:#eef3f9; }
+  
+    #countdownBox {
+    background-color: cyan;
+    color: purple;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 8px;
+    display: block;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow:0px 2px 6px rgba(0,0,0,0.15); 
+  }
+   #countdownRow{white-space:normal}
+  .ticker{display:none;overflow:hidden;white-space:nowrap;margin-bottom:6px}
+  .ticker{display:none;overflow:hidden;white-space:nowrap;margin-bottom:6px}
+  .ticker.show{display:block}
+  .ticker .text{display:inline-block;padding-left:100%;animation:marquee 12s linear infinite}
+    .social-share { margin:12px 0 0; text-align:center; }
+  .social-share a { display:inline-block; margin:0 6px; text-decoration:none; }
+  .social-share svg { width:28px; height:28px; fill:#fff; padding:6px; border-radius:50%; }
+  .facebook { background:#3b5998; }
+  .twitter  { background:#1da1f2; }
+  .whatsapp { background:#25d366; }
+
+  #enableSound{font-size:6px;font-weight:600;border:0;border-radius:6px;padding:6px 10px;margin-top:6px;
+    background:#222;color:#fff;cursor:pointer}
+
+      /* Biar semua tabel seragam */
+   .table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.card table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.card th, .card td {
+  padding: 6px;
+  border: 1px solid #ccc;
+  text-align: center;
+  font-size: 12px;
+  white-space: normal;
+  word-break: break-word;
+}   
+ 
+    /* --- Tabel Gempa --- */
+    .table-container {
+      overflow-x: auto; /* scroll horizontal */
+      margin-top: 12px;
+      color: black;
+      border: 1px solid #ddd;
+      padding: 5px;
+    }
+    .table-container table {
+      min-width: 4000px;   /* tetap lebar */
+      white-space: nowrap; /* cegah pecah huruf */
+      word-wrap: normal;   /* override */
+    }
+    .table-container th,
+    .table-container td {
+      font-size: 13px;
+      padding: 6px 8px;
+      text-align: center;
+    }
+    
+  /* Atur ukuran judul tabel */
+  .card h2 {
+    font-size: 16px;   /* ubah sesuai kebutuhan, misal 20px */
+   /*color: #1e88e5;*/
+     color: brown
+  }
+
+  /* Atur ukuran teks tabel */
+  .card table.cuaca th,
+  .card table.cuaca td {
+    font-size: 12px;   /* ubah sesuai kebutuhan */
+    padding: 6px;      /* biar lebih rapi */
+  }
+
+  /* Judul kolom tebal */
+  .card table.cuaca th {
+    font-weight: bold;
+  }
+ /* kolom sumber data */
+.card.muted {
+  font-size: 12px;          /* ukuran font kecil */
+  color: purple;            /* warna teks */
+  /*background-color: #f3e5f5;*//* warna latar ungu muda */
+  background-color: #fff8f0;
+  text-align: center;       /* posisikan teks di tengah */
+  margin-top: 6px;          /* jarak atas */
+  padding: 6px 10px;        /* beri ruang dalam box */
+  border-radius: 6px;       /* sudut tumpul */
+  border: 1px solid #f3d7b6;
+  /*border-radius: 10px;*/
+  }
+ 
+     /* Header tabel merah */
+    #gempaTable thead th {
+    background-color: #c62828; /* merah */
+    color: #fff;               /* teks putih biar kontras */
+    }
+  </style>
+</head>
+<body> 
+<div class="wrap">
+  
+  <div class="wrap">
+    <!-- Header -->
+    <div class="card header"> 
+    <div class="scrolling"><span>Dashboard Parameter & Gempa BMKG Nasional</span></div>
+    </div> 
+   
+    <!-- 🌋 Info gempa ditambahkan di sini -->
+  <div class="info-gempa">
+    <div id="gempaText" class="scrolling-text">⏳ Memuat data gempa BMKG terkini...</div>
+  </div>
+
+    <!-- NowBox -->
+    <div class="card nowbox">
+      <h2 id="nowStr">--</h2>
+      <p id="subtitle">Update otomatis</p>
+    </div>
+   
+        <div class="card-waktu">
+  <h3>🕒 Zona Waktu </h3>
+
+  <!-- Tombol Pilih Zona Waktu -->
+  <div id="zoneButtons" style="display:flex; justify-content:center; gap:10px; margin-top:10px;">
+    <button class="zone-btn active" data-zone="Asia/Makassar">WITA</button>
+    <button class="zone-btn" data-zone="Asia/Jakarta">WIB</button>
+    <button class="zone-btn" data-zone="Asia/Jayapura">WIT</button>
+  </div>
+
+  <!-- Teks waktu tampil -->
+  <h4 id="nowStr" style="margin-top:15px; font-size:16px; color:#333;"></h4>
+</div>
+
+<style>   
+  /* 🌟 Card Container */
+  .card-waktu {
+    max-width: 340px;
+    margin: 6px auto;
+    /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
+    /*background: linear-gradient(135deg,#b3e5fc,#81d4fa);*/
+    background: linear-gradient(180deg, #ffffff, #e8fff0);
+    border-radius: 20px;
+    border: 2px solid #e0f2f1;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    padding: 2px;
+    text-align: center;
+    font-family: 'Poppins', Arial, sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  .card-waktu:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  }
+
+  .card-waktu h3 {
+    color: /*#2a3d66*/silver;
+    font-size: 14px;
+    margin-bottom: 8px;
+  }
+ 
+  .zone-btn {
+    background: linear-gradient(135deg, #e0e0e0, #ffffff);
+    border: 2px solid #ccc;
+    border-radius: 50px;
+    padding: 3px 9px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 10px;
+    color: /*#333*/silver;
+  }
+
+  .zone-btn:hover {
+    background: linear-gradient(135deg, #d4e2fc, #f0f8ff);
+    transform: scale(1.08);
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  }
+
+  .zone-btn.active {
+    background: linear-gradient(135deg, #4a90e2, #5cc6ff);
+    color: white;
+    border-color: #4a90e2;
+    box-shadow: 0 0 10px rgba(0, 150, 255, 0.5);
+    transform: scale(1.05);
+  }
+</style>
+
+<!-- 🌤️ Prakiraan Cuaca Balikpapan -->
+<div class="card weather-card">
+  <h2>🌤️ Prakiraan Cuaca Balikpapan</h2>
+
+  <!-- 🔍 Kotak Pencarian Kota -->
+  <div class="search-city">
+    <input type="text" id="cityInput" placeholder="Masukkan nama kota (mis. Jakarta, Surabaya, Makassar)">
+    <button onclick="searchWeather()">🔎 </button>
+  </div>
+  <!-- Ikon dan suhu berdampingan -->
+  <div class="weather-row">
+    <div class="weather-icon">
+      <img id="weather-icon" src="" alt="Ikon Cuaca">
+    </div>
+    <div class="weather-temp">
+      <div id="weather-main" class="temp-main">--°C</div>
+      <div id="weather-feels" class="temp-feels">Terasa seperti --°C</div>
+    </div>
+  </div>
+
+  <!-- Grid data cuaca -->
+  <div class="weather-grid">
+    <div class="grid-item"><h4>Deskripsi</h4><p id="w_desc">--</p></div>
+    <div class="grid-item"><h4>Kelembaban</h4><p id="w_hum">--%</p></div>
+    <div class="grid-item"><h4>Kecepatan Angin</h4><p id="w_wind">-- km/j</p></div>
+    <div class="grid-item"><h4>Arah Angin</h4><p id="w_wdir">--</p></div>
+    <div class="grid-item"><h4>Jarak Pandang</h4><p id="w_vis">-- km</p></div>
+    <div class="grid-item"><h4>Tekanan</h4><p id="w_pres">-- hPa</p></div>
+  </div>
+
+  <!-- Info tambahan -->
+  <div class="extra-info">
+    🌡️ <b>UV Index:</b> <span id="uv_index">--</span> &nbsp; | &nbsp;
+    💧 <b>Dew Point:</b> <span id="dew_point">-- °C</span>
+  </div>
+
+  <div class="update-time">
+    ⏰ Diperbarui: <span id="update_time">--</span> WITA
+  </div>
+</div>
+
+<!-- 🌈 CSS Modern -->
+<style>
+.weather-card {
+  text-align: center;
+  padding: 50px;
+  border-radius: 18px;
+  background: #fff8f0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  margin: 20px auto;
+  border: 1px solid #f3d7b6;
+  max-width: 420px;
+}
+.weather-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+.weather-card h2 {
+  font-size: 16px;
+  color: brown;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+ /* 🔍 Kotak pencarian kota */
+.search-city {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+ 
+.search-city input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: lightgrey;
+  outline: none;
+  color: blue;
+  width: 65%;
+  font-size: 13px;
+}
+  .search-city input:hover {
+  border-color: #007bff;
+  box-shadow: 0 0 6px rgba(0,123,255,0.4);
+}
+.search-city button {
+  padding: 8px 12px;
+  background: #1976d2;
+  /*background: orange;*/
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.search-city button:hover { background: /*#0d47a1*/orange; }
+ 
+/* Ikon dan suhu sejajar */
+.weather-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 35px;
+}
+.weather-icon img { width: 80px; height: 80px; }
+.temp-main {
+  font-size: 23px;
+  font-weight: 800;
+  color: #1976d2;
+  margin-bottom: 4px;
+}
+.temp-feels { font-size: 12px; color: /*#555*/red; }
+
+/* Grid biru elegan */
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 14px;
+  padding: 10px;
+  margin-top: 35px;
+}
+ .grid-item:hover {
+  transform: scale(1.05);
+  background: /*#fef6e4*/lightyellow;
+}  
+.grid-item {
+  background: #f5f6fa;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.grid-item h4 {
+  font-size: 10px;
+  color: purple;
+  margin-bottom: 4px;
+}
+.grid-item p {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Info tambahan */
+.extra-info { margin-top: 18px; font-size: 13px; color: #444; }
+.update-time { margin-top: 10px; font-size: 12px; color: green; }
+</style>
+
+  <!-- 🌫️ Kualitas Udara -->
+<div class="card aqi-card">
+  <h2>🏭 Kualitas Udara <span id="aqiCity">Balikpapan</span> (Realtime)</h2>
+
+  <!-- 🔍 Pencarian Kota -->
+  <div class="aqi-search">
+    <input type="text" id="cityAirInput" placeholder="Cari kota lain di Indonesia...">
+    <button onclick="loadAirQuality()">🔎 </button>
+  </div>
+
+  <!-- 🟢 Badge AQI -->
+  <div id="aqiBadge" class="aqi-badge">AQI: --</div>
+
+  <!-- 🌈 Grid Parameter -->
+  <div class="aqi-grid">
+    <div class="aqi-box">
+      <div class="icon">🌫️</div>
+      <h4>AQI</h4>
+      <p id="v_aqi">--</p>
+      <span id="k_aqi">--</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🌪️</div>
+      <h4>PM<sub>2.5</sub></h4>
+      <p id="v_pm25">-- µg/m³</p>
+      <span>Kecil lebih baik</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🌬️</div>
+      <h4>PM<sub>10</sub></h4>
+      <p id="v_pm10">-- µg/m³</p>
+      <span>Kecil lebih baik</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">☁️</div>
+      <h4>O<sub>3</sub></h4>
+      <p id="v_o3">-- µg/m³</p>
+      <span>Iritasi bila tinggi</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🚗</div>
+      <h4>NO<sub>2</sub></h4>
+      <p id="v_no2">-- µg/m³</p>
+      <span>Kendaraan/Industri</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🏭</div>
+      <h4>SO<sub>2</sub></h4>
+      <p id="v_so2">-- µg/m³</p>
+      <span>Iritasi pernapasan</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🔥</div>
+      <h4>CO</h4>
+      <p id="v_co">-- µg/m³</p>
+      <span>Pembakaran</span>
+    </div>
+  </div>
+
+  <div id="updatedAt" class="aqi-update">Diperbarui: --</div>
+</div>
+
+<!-- 🌈 CSS -->
+<style>
+.aqi-card {
+  text-align: center;
+  padding: 42px;
+  border-radius: 19px;
+  /*background: #fffaf3;*/
+  /*background: #fff8f0;*/
+  /*background: #f0f8ff;*/
+  /*background: #fff0f5;*/
+  background: #f3fff6;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border: 1px solid #f3d7b6;
+  max-width: 420px;
+  margin: 20px auto;
+}
+.aqi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+.aqi-card h2 {
+  color: #a52a2a;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+/* 🔍 Search */
+.aqi-search {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.aqi-search input {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: lightgrey;
+  outline: none;
+  width: 65%;
+  font-size: 13px;
+  color: brown;
+  transition: all 0.3s ease;
+}
+.aqi-search input:hover {
+  border-color: /*#007bff*/orange;
+  box-shadow: 0 0 6px rgba(255, 165, 0, 0.6);
+}
+.aqi-search button {
+  /*background: linear-gradient(90deg,#007bff,#0056b3);*/
+  background: orange;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+   /* Ikon kaca pembesar */
+.aqi-search button i {
+  font-size: 14px;
+}   
+.aqi-search button:hover {
+  background: linear-gradient(90deg,#0056b3,#003d80);
+  transform: scale(1.05);
+}
+
+/* 🟢 Badge */
+.aqi-badge {
+  display: inline-block;
+  padding: 3px 11px;
+  border-radius: 25px;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 14px;
+  background: linear-gradient(9 0deg,#4caf50,#8bc34a);
+  transition: all 0.5s ease;
+}
+
+/* 🌈 Grid Layout */
+.aqi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  /*background: linear-gradient(135deg,#b3e5fc,#81d4fa);*/
+  /*background: linear-gradient(90deg, #4facfe, #00f2fe);*/
+  /*background: linear-gradient(90deg, #f7971e, #ffd200);*/
+  background: linear-gradient(90deg, #f6d365, #fda085);*/
+  /*background: linear-gradient(90deg, #ff9966, #ff5e62);*/
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.6);
+  margin-top: 25px;
+}
+.aqi-box {
+  background: white;
+  border-radius: 14px;
+  padding: 12px 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.25s ease, background 0.3s ease;
+}
+.aqi-box:hover {
+  transform: scale(1.05);
+  background: #fef6e4;
+}
+.aqi-box .icon {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+.aqi-box h4 {
+  color: #6a1b9a;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.aqi-box p {
+  font-size: 14px;
+  font-weight: bold;
+  color: #111;
+  margin: 0;
+}
+.aqi-box span {
+  font-size: 9px;
+  /*color: #666;*/
+  color: green;
+}
+
+/* 🕒 Update */
+.aqi-update {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #2e7d32;
+}
+</style>
+</style>
+   
+     <!-- Tambahan Card Penjelasan -->
+  <style>
+    .grid-udara {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .card-udara {
+      background: #fff8f0;
+      border: 1px solid #f3d7b6;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      color: #444;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-udara h5 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #d97706;
+    }
+  
+  /* judul keterangan tabel */
+    .table-title {
+     background: #f3e5f5;       /* abu-abu lembut */
+     text-align: center; 
+     border: 1px solid #f3d7b6;
+     border-bottom: 2px solid #ddd;
+     padding: 8px 12px;
+     border-radius: 6px 6px 0 0; /* sudut atas agak membulat */
+     font-size: 11px;
+     font-weight: 600;
+     color: brown;
+     margin-bottom: 10px;
+  }
+</style>
+
+     <!-- judul keterangan tabel -->
+<div class="table-title">Keterangan Tabel Kualitas Udara:</div>
+  <div class="grid-udara">
+    <div class="card-udara">
+      <h5>AQI</h5>
+      (Air Quality Index) - Indeks kualitas udara secara umum, makin tinggi nilainya makin buruk.
+    </div>
+    <div class="card-udara">
+      <h5>PM2.5</h5>
+      (Particulate Matter) - Partikel sangat halus (2.5 &micro;m), berbahaya karena masuk ke paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>PM10</h5>
+      (Particulate Matter) - Partikel debu (10 &micro;m), bisa mengiritasi saluran pernapasan.
+    </div>
+    <div class="card-udara">
+      <h5>O<sub>3</sub></h5>
+      Gas ozon di permukaan bumi, dapat mengiritasi paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>SO<sub>2</sub></h5>
+      (Sulfur Dioksida) - Gas dari pembakaran batu bara/minyak, penyebab iritasi pernapasan.
+    </div>
+    <div class="card-udara">
+      <h5>NO<sub>2</sub></h5>
+      (Nitrogen Dioksida) - Gas hasil pembakaran kendaraan & industri, berbahaya bagi paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>CO</h5>
+      (Karbon Monoksida) - Gas beracun tak berbau dari pembakaran tidak sempurna.
+    </div>
+  </div>
+</div>
+
+ <!-- 🌙 Jadwal Sholat GRID + Pencarian + Suara Adzan -->
+<div class="card-jadwal-grid">
+  <h2>🕌 Jadwal Sholat <span id="cityName">Balikpapan</span> Hari Ini</h2>
+
+  <!-- 🔍 Kotak Pencarian Kota -->
+<div class="search-citySholat">
+  <div class="search-wrapper">
+    <input type="text" id="cityInputSholat" placeholder="Cari kota di Indonesia...">
+    <button id ="btnSearchSholat">🔎 Cari</button>
+  </div>
+</div>
+  <!-- 🧭 GRID Waktu Sholat -->
+  <div class="jadwal-grid" id="jadwalGrid">
+    <div class="jadwal-box" id="subuhBox"><div class="icon">🌄</div><h4>Subuh</h4><p id="j_subuh">--:--</p></div>
+    <div class="jadwal-box" id="dzuhurBox"><div class="icon">☀️</div><h4>Dzuhur</h4><p id="j_dzuhur">--:--</p></div>
+    <div class="jadwal-box" id="asharBox"><div class="icon">🌇</div><h4>Ashar</h4><p id="j_ashar">--:--</p></div>
+    <div class="jadwal-box" id="maghribBox"><div class="icon">🌆</div><h4>Maghrib</h4><p id="j_maghrib">--:--</p></div>
+    <div class="jadwal-box" id="isyaBox"><div class="icon">🌃</div><h4>Isya</h4><p id="j_isya">--:--</p></div>
+   </div>
+    <div id="countdownBox">
+        <div id="ticker" class="ticker"><span id="tickerText" class="text"></span></div>
+        <div id="countdownRow">
+          Menuju <span id="nextPrayerName">--</span>: <span id="countdown">--:--:--</span>
+        </div>
+        <button id="enableSound" type="button">Aktifkan Suara Adzan</button>
+         <audio id="adhanAudio"
+src='https://www.islamcan.com/audio/adhan/azan2.mp3' type="audio/mpeg"></audio>
+        
+      </div>
+    </div>
+  </div>
+ 
+<!-- 🌿 CSS Modern -->
+<style>
+.card-jadwal-grid {
+  text-align: center;
+  padding: 42px;
+  border-radius: 19px;
+  background: linear-gradient(180deg, #fffef7, #f5fff5);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e0f2f1;
+  max-width: 420px;
+  margin: 25px auto;
+  animation: fadeIn 0.8s ease;
+  margin-top: 30px;      /* jarak luar dari kotak pencarian */
+  padding-top: 25px;     /* jarak dalam dari tepi atas bidang hijau */
+  /*background: linear-gradient(180deg, #c8e6c9, #a5d6a7);*/
+}
+.card-jadwal-grid h2 {
+  font-size: 14px;
+  /*color: #1b5e20;*/
+  color: brown;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+/* 🌿 Kotak Pencarian Hijau Gradasi (Compact & Centered) */
+/* 🌿 Kotak Pencarian Hijau Gradasi (Compact, Centered, dan Floating) */
+.search-city {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2; /* pastikan di atas bidang hijau */
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*background: linear-gradient(135deg, #e8f5e9, #c8e6c9);*/
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  /*box-shadow: 0 4px 10px rgba(76, 175, 80, 0.15),
+              0 2px 0 #a5d6a7 inset;*/ /* bayangan lembut hijau di bawah */
+  padding: 6px 8px;
+  gap: 4px;
+  width: fit-content;
+  max-width: 320px;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+}
+
+.search-wrapper:focus-within {
+  box-shadow: 0 0 12px rgba(56,142,60,0.35),
+              0 2px 0 #a5d6a7 inset;
+  transform: scale(1.02);
+}
+
+/* Input */
+.search-wrapper input {
+  width: 160px;
+  border: none;
+  outline: none;
+  /*background: #ffffff;*/
+  background: lightgrey;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #1b5e20;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+  text-align: left;
+}
+  .search-wrapper input:hover {
+  border-color: /*#007bff*/green;
+  box-shadow: 0 0 6px rgba(0,123,255,0.4);
+}
+.search-wrapper input::placeholder {
+  color: #81c784;
+  font-style: italic;
+}
+
+/* Tombol Cari */
+.search-wrapper button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #66bb6a, #2e7d32);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(76,175,80,0.25);
+}
+
+.search-wrapper button:hover {
+  background: linear-gradient(135deg, #43a047, #1b5e20);
+  transform: sca  le(1.05);
+}                                                 
+
+/* Ikon kaca pembesar */
+.search-wrapper button i {
+  font-size: 14px;
+}
+
+/* 🌱 Responsif untuk layar kecil */
+@media (max-width: 480px) {
+  .search-wrapper {
+    max-width: 270px;
+    padding: 5px 6px;
+  }
+  .search-wrapper input {
+    width: 140px;
+    font-size: 12px;
+    padding: 7px 8px;
+  }
+  .search-wrapper button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+ 
+/* 🌅 Grid Layout */
+.jadwal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  background: linear-gradient(90deg, #a8e063, #56ab2f);
+  border-radius: 18px;
+  padding: 15px;
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.5);
+}
+.jadwal-box {
+  background: white;
+  border-radius: 14px;
+  padding: 12px 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+}
+.jadwal-box:hover {
+  transform: scale(1.05);
+  background: #f1f8e9;
+}
+.jadwal-box .icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+.jadwal-box h4 {
+  /*color: #33691e;*/
+  color: silver;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.jadwal-box p {
+  font-size: 14px;
+  font-weight: bold;
+  /*color: #1b5e20;*/
+  color: purple;
+  margin: 0;
+}
+
+/* 🌟 Highlight aktif */
+.active-prayer {
+  background: linear-gradient(135deg, #c8e6c9, #a5d6a7) !important;
+  box-shadow: 0 0 15px #81c784;
+  transform: scale(1.05);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 15px #a5d6a7; }
+  50% { box-shadow: 0 0 25px #66bb6a; }
+}
+</style>
+   
+  <!-- Gempa -->
+  <div class="card-gempa">
+   <h2>Gempa Bumi Terkini di Indonesia (BMKG) 🌋</h2>
+    <p>Data resmi BMKG: 
+      <a href="https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json" target="_blank">JSON Feed</a>
+    </p>
+ <!-- Teks geser berkedip -->
+<div class="blink-text">
+  &lt;-------geser-------&gt;
+</div>
+    <div class="table-container">
+      <table id="gempaTable">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+         <div style="text-align:center; margin-top:15px; margin-bottom:15px;">
+  <canvas id="gempaChart" style="max-width:500px; width:100%; height:300px;"></canvas>
+</div>
+   
+  </div>
+</di>
+ 
+   <style>
+ .card-gempa h2 {
+  text-align: center;
+  font-size: 14px;
+  /*color: #1b5e20;*/
+  color: brown;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+  .card-gempa {
+  /*background: linear-gradient(180deg, #e3f2fd, #bbdefb);*/
+  /*background: linear-gradient(180deg, #fce4ec, #f8bbd0);*/
+  /*background: linear-gradient(180deg, #263238, #37474f);
+  color: silver;*/
+  background: linear-gradient(180deg, #efebe9, #d7ccc8);
+  /*background: linear-gradient(180deg, #f1f8e9, #e8f5e9);*/
+  /*background: linear-gradient(180deg, #fffde7, #fff9c4);*/
+  /*background: linear-gradient(180deg, #e3f2fd, #bbdefb);*/
+  /***background: linear-gradient(180deg, #f1f8e9, #e8f5e9);***/
+  /*background: linear-gradient(135deg, #e8f5e9, #f1f8e9);*/
+  /*background: linear-gradient(180deg, #fff8e1, #fff3e0);*/
+  color: purple;
+  border-radius: 18px; 
+  /*box-shadow: 0 6px 20px rgba(255, 140, 0, 0.25);*/
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid rgba(255, 183, 77, 0.4);
+  transition: all 0.3s ease;
+  }
+   /*.card-gempa:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(255, 140, 0, 0.35);
+    }*/
+  .blink-text {
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: red;
+    margin-bottom: 5px;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+  }
+</style>
+ <!-- 🌿 Hidden Double-Point Unlock System + Fade Animation -->
+<style>
+  body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #f9fff9;
+  }
+
+  /* Area titik rahasia (tak terlihat) */
+  .secret-spot {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    z-index: 9999;
+  }
+
+  #spot-left {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  #spot-right {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  /* Aktifkan untuk debugging:
+  .secret-spot {
+    background: rgba(255,0,0,0.1);
+  } */
+
+  /* Area share dengan animasi */
+  #shareSection {
+    text-align: center;
+    padding: 25px 0;
+    background: linear-gradient(180deg, #ffffff, #e8fff0);
+    border-radius: 18px;
+    margin: 25px auto;
+    width: 90%;
+    max-width: 420px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: translateY(30px);
+    pointer-events: none;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  #shareSection.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .share-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    text-decoration: none;
+    color: #333;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .share-btn img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 5px auto;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .share-btn:hover img {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  }
+
+  /* Notifikasi */
+  .info-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4caf50;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .info-toast.show {
+    opacity: 1;
+  }
+</style>
+
+<!-- 🔒 Area klik rahasia -->
+<div id="spot-left" class="secret-spot"></div>
+<div id="spot-right" class="secret-spot"></div>
+
+<!-- 🌐 Share Link Section -->
+<div id="shareSection">
+  <h4 style="margin-bottom:15px;">Bagikan ke:</h4>
+  <div class="share-container">
+    <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">Facebook
+    </a>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?url=https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter">Twitter
+    </a>
+    <a class="share-btn" href="https://wa.me/?text=Parameter%20Balikpapan%20https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">WhatsApp
+    </a>
+    <a class="share-btn" href="https://t.me/share/url?url=https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">Telegram
+    </a>
+  </div>
+</div>
+
+<!-- 🔔 Notifikasi -->
+<div id="toast" class="info-toast">🔓 Share link dibuka</div>
+
+<script>
+  let lastTapLeft = 0;
+  let lastTapRight = 0;
+  let shareVisible = false;
+
+  const shareSection = document.getElementById("shareSection");
+  const toast = document.getElementById("toast");
+
+  document.getElementById("spot-left").addEventListener("click", () => {
+    lastTapLeft = Date.now();
+    checkUnlock();
+  });
+
+  document.getElementById("spot-right").addEventListener("click", () => {
+    lastTapRight = Date.now();
+    checkUnlock();
+  });
+
+  function checkUnlock() {
+    if (Math.abs(lastTapLeft - lastTapRight) < 3000 && lastTapLeft && lastTapRight) {
+      shareVisible = !shareVisible;
+      shareSection.classList.toggle("show", shareVisible);
+      showToast(shareVisible ? "🔓 Share link dibuka" : "🔒 Share link ditutup");
+      lastTapLeft = 0;
+      lastTapRight = 0;
+    }
+  }
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+</script>
+</div>
+    <div class="card muted">Sumber data: OpenWeatherMap , MyQuran API dan BMKG Nasional</div>
+  </div>
+
+<script>
+  let zona = "Asia/Makassar"; // Default ke WITA
+
+  function fmtNow() {
+    const now = new Date();
+    const opts = { 
+      weekday:'long', 
+      year:'numeric', 
+      month:'long', 
+      day:'numeric',
+      hour:'2-digit', 
+      minute:'2-digit', 
+      second:'2-digit'
+    };
+
+    const waktu = new Intl.DateTimeFormat('id-ID', {
+      ...opts, 
+      timeZone: zona
+    }).format(now);
+
+    let label = "";
+    if (zona === "Asia/Makassar") label = " (WITA)";
+    else if (zona === "Asia/Jakarta") label = " (WIB)";
+    else if (zona === "Asia/Jayapura") label = " (WIT)";
+
+    document.getElementById('nowStr').innerText = waktu + label;
+  }
+
+  // Event listener tombol zona waktu
+  document.querySelectorAll('.zone-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Hapus status aktif dari semua tombol
+      document.querySelectorAll('.zone-btn').forEach(b => b.classList.remove('active'));
+      // Tambahkan ke tombol yang diklik
+      btn.classList.add('active');
+      // Update zona
+      zona = btn.getAttribute('data-zone');
+      fmtNow();
+    });
+  });
+
+  // Jalankan setiap detik
+  setInterval(fmtNow, 1000);
+  fmtNow();
+
+function arahDerajat(deg) {
+  const arah = ['Utara', 'Timur Laut', 'Timur', 'Tenggara', 'Selatan', 'Barat Daya', 'Barat', 'Barat Laut'];
+  return arah[Math.round(deg / 45) % 8];
+}
+
+    <!-- ⚡ Script Cuaca Dinamis -->
+const API_KEY = "20f6d784f501f4a976a63ecf4a7a53fd";
+
+async function loadWeather(city = "Balikpapan") {
+  try {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},id&units=metric&appid=${API_KEY}&lang=id`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Kota tidak ditemukan");
+    const data = await res.json();
+
+    const suhu = data.main.temp.toFixed(1);
+    const terasa = data.main.feels_like.toFixed(1);
+    const kelembapan = data.main.humidity;
+    const tekanan = data.main.pressure;
+    const angin = data.wind.speed;
+    const arahAngin = data.wind.deg;
+    const jarakPandang = (data.visibility / 1000).toFixed(1);
+    const deskripsi = data.weather[0].description;
+    const icon = data.weather[0].icon;
+    const zonaWaktu = new Date(data.dt * 1000).toLocaleTimeString("id-ID", { timeZone: "Asia/Makassar" });
+
+    document.querySelector(".weather-card h2").textContent = `🌤️ Prakiraan Cuaca ${city}`;
+    document.getElementById("weather-main").textContent = `${suhu}°C`;
+    document.getElementById("weather-feels").textContent = `Terasa seperti ${terasa}°C`;
+    document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+    document.getElementById("w_desc").textContent = deskripsi;
+    document.getElementById("w_hum").textContent = `${kelembapan}%`;
+    document.getElementById("w_wind").textContent = `${angin} km/j`;
+    document.getElementById("w_wdir").textContent = arahDerajat(arahAngin);
+    document.getElementById("w_vis").textContent = `${jarakPandang} km`;
+    document.getElementById("w_pres").textContent = `${tekanan} hPa`;
+    document.getElementById("dew_point").textContent = `${(terasa - 3).toFixed(1)} °C`;
+    document.getElementById("uv_index").textContent = "8.5";
+    document.getElementById("update_time").textContent = zonaWaktu;
+
+  } catch (e) {
+    alert("⚠️ Gagal memuat data: " + e.message);
+    console.error("Gagal memuat cuaca:", e);
+  }
+}
+
+function searchWeather() {
+  const city = document.getElementById("cityInput").value.trim();
+  if (city) loadWeather(city);
+  else alert("Masukkan nama kota terlebih dahulu!");
+}
+   loadWeather();
+
+  
+  // <!-- ⚙️ SCRIPT -->
+/*const API_KEY = "20f6d784f501f4a976a63ecf4a7a53fd";*/
+
+// 🌍 Gradasi warna berdasarkan AQI 0–500 (standar US EPA)
+function getAQIColor(aqi) {
+  if (aqi <= 50) return "#4CAF50";      // Good
+  if (aqi <= 100) return "#CDDC39";   // Moderate 
+  if (aqi <= 150) return "#FF9800";     // Unhealthy for Sensitive Groups
+  if (aqi <= 200) return "#F44336";     // Unhealthy
+  if (aqi <= 300) return "#9C27B0";     // Very Unhealthy
+  return "#7E0023";                     // Hazardous
+}
+
+function getAQIText(aqi) {
+  if (aqi <= 50) return "Baik";
+  if (aqi <= 100) return "Sedang";
+  if (aqi <= 150) return "Tidak sehat (sensitif)";
+  if (aqi <= 200) return "Tidak sehat";
+  if (aqi <= 300) return "Sangat tidak sehat";
+  return "Berbahaya";
+}
+
+async function loadAirQuality() {
+  const city = document.getElementById("cityAirInput").value.trim() || "Balikpapan";
+  try {
+    const geo = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city},id&appid=${API_KEY}`);
+    const loc = await geo.json();
+    if (!loc.length) throw new Error("Kota tidak ditemukan");
+    const { lat, lon, name } = loc[0];
+
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+    const data = await res.json();
+    const aq = data.list[0];
+    const c = aq.components;
+
+    // 🧮 Skala AQI global dikonversi dari rentang 0–500 (karena OWM hanya 1–5)
+    const aqiValue = Math.round((aq.main.aqi / 5) * 500);
+    const warna = getAQIColor(aqiValue);
+    const teks = getAQIText(aqiValue);
+
+    document.getElementById("aqiCity").textContent = name;
+    document.getElementById("v_aqi").textContent = aqiValue;
+    document.getElementById("k_aqi").textContent = teks;
+
+    document.getElementById("v_pm25").textContent = c.pm2_5.toFixed(1) + " µg/m³";
+    document.getElementById("v_pm10").textContent = c.pm10.toFixed(1) + " µg/m³";
+    document.getElementById("v_o3").textContent   = c.o3.toFixed(1) + " µg/m³";
+    document.getElementById("v_no2").textContent  = c.no2.toFixed(1) + " µg/m³";
+    document.getElementById("v_so2").textContent  = c.so2.toFixed(1) + " µg/m³";
+    document.getElementById("v_co").textContent   = c.co.toFixed(1) + " µg/m³";
+
+    const badge = document.getElementById("aqiBadge");
+    badge.textContent = `AQI: ${aqiValue} (${teks})`;
+    badge.style.background = `linear-gradient(90deg, ${warna}, ${warna}CC)`;
+
+    document.getElementById("updatedAt").textContent =
+      "Diperbarui: " + new Date(aq.dt * 1000).toLocaleString("id-ID", { timeZone: "Asia/Makassar" });
+
+  } catch (e) {
+    alert("⚠️ " + e.message);
+    console.error(e);
+  }
+}
+
+loadAirQuality();
+
+     // <!-- ⚙️ SCRIPT -->
+
+const defaultCity = "2308"; // Balikpapan
+
+/*// 🔊 Toggle suara
+let soundEnabled = false;
+document.getElementById("enableSound").addEventListener("click", () => {
+  const a = document.getElementById("adhanAudio");
+  a.play().then(() => {
+    a.pause(); a.currentTime = 0;
+    soundEnabled = true;
+    document.getElementById("enableSound").textContent = "🔊 Suara Aktif";
+  }).catch(() => {
+    alert("Izinkan audio di browser agar adzan dapat diputar otomatis.");
+  });
+});*/
+
+   let soundEnabled = false;
+   let adhanPlaying = false;
+
+const enableBtn = document.getElementById("enableSound");
+const adhanAudio = document.getElementById("adhanAudio");
+
+enableBtn.addEventListener("click", () => {
+  // Jika suara belum diizinkan, aktifkan izin dulu
+  if (!soundEnabled) {
+    adhanAudio.play().then(() => {
+      adhanAudio.pause();
+      adhanAudio.currentTime = 0;
+      soundEnabled = true;
+      /*enableBtn.textContent = "🔊 Adzan Siap (Klik untuk Play)";*/
+      enableBtn.textContent = "🔊 Adzan Aktif";  
+    }).catch(() => {
+      alert("⚠️ Izinkan audio di browser agar adzan bisa diputar otomatis.");
+    });
+    return;
+  }
+
+  // Jika sudah diizinkan → toggle play/pause
+  if (!adhanPlaying) {
+    adhanAudio.play();
+    adhanPlaying = true;
+    enableBtn.textContent = "⏸️ Pause Adzan";
+  } else {
+    adhanAudio.pause();
+    adhanAudio.currentTime = 0;
+    adhanPlaying = false;
+    enableBtn.textContent = "🔊 Adzan Aktif";
+   }
+});
+    /*adhanAudio.pause();
+    adhanPlaying = false;
+    enableBtn.textContent = "▶️ Lanjutkan Adzan";
+  }
+});*/
+
+// 🔍 Pencarian kota
+const searchInputSholat = document.getElementById("cityInputSholat");
+const searchBtnSholat = document.getElementById("btnSearchSholat");
+searchBtnSholat.addEventListener("click", () => {
+  const city = searchInputSholat.value.trim();
+  if (city) loadJadwal(city);
+});
+searchInputSholat.addEventListener("keypress", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const city = searchInputSholat.value.trim();
+    if (city) loadJadwal(city);
+  }
+});
+
+// 🕌 Ambil jadwal sholat dari API MyQuran
+async function loadJadwal(kota = "Balikpapan") {
+  try {
+    const cityId = await getCityId(kota);
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+
+    const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${cityId}/${y}/${m}/${d}`);
+    const j = await res.json();
+    if (!j.status) throw new Error("Data jadwal sholat tidak ditemukan.");
+
+    const jd = j.data.jadwal;
+    document.getElementById("cityName").textContent = j.data.lokasi;
+    document.getElementById("j_subuh").textContent = jd.subuh;
+    document.getElementById("j_dzuhur").textContent = jd.dzuhur;
+    document.getElementById("j_ashar").textContent = jd.ashar;
+    document.getElementById("j_maghrib").textContent = jd.maghrib;
+    document.getElementById("j_isya").textContent = jd.isya;
+
+    highlightWaktuSholat();
+  } catch (err) {
+    alert("⚠️ " + err.message);
+  }
+}
+
+// 🔍 Cari ID kota
+async function getCityId(namaKota) {
+  const res = await fetch("https://api.myquran.com/v2/sholat/kota/semua");
+  const data = await res.json();
+  const kota = data.data.find(k => k.lokasi.toLowerCase().includes(namaKota.toLowerCase()));
+  return kota ? kota.id : defaultCity;
+}
+
+// 🔢 Konversi waktu ke menit
+function waktuToMenit(w) {
+  if (!w || !w.includes(":")) return 0;
+  const [h, m] = w.split(":").map(Number);
+  return h * 60 + m;
+}
+
+// 🔆 Highlight waktu aktif
+function highlightWaktuSholat() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const times = getPrayerTimes();
+  document.querySelectorAll(".jadwal-box").forEach(b => b.classList.remove("active-prayer"));
+
+  const entries = Object.entries(times);
+  const active = entries.find(([_, t], i) =>
+    currentMinutes >= t && currentMinutes < (entries[i + 1]?.[1] || 1440)
+  );
+  if (active) document.getElementById(active[0] + "Box").classList.add("active-prayer");
+}
+
+// Ambil jadwal dari DOM
+function getPrayerTimes() {
+  return {
+    subuh: waktuToMenit(document.getElementById("j_subuh").textContent),
+    dzuhur: waktuToMenit(document.getElementById("j_dzuhur").textContent),
+    ashar: waktuToMenit(document.getElementById("j_ashar").textContent),
+    maghrib: waktuToMenit(document.getElementById("j_maghrib").textContent),
+    isya: waktuToMenit(document.getElementById("j_isya").textContent)
+  };
+}
+
+// 🔢 Dapatkan waktu sholat berikutnya
+function getNextPrayerStrict() {
+  const now = new Date();
+  const times = getPrayerTimes();
+  const entries = Object.entries(times).map(([name, mins]) => {
+    const t = new Date();
+    t.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
+    return { name, time: t };
+  });
+  entries.sort((a, b) => a.time - b.time);
+  for (const p of entries) if (p.time > now) return p;
+  const t = new Date(entries[0].time);
+  t.setDate(t.getDate() + 1);
+  return { name: entries[0].name, time: t };
+}
+
+// 🕰️ Countdown berjalan
+let lastTriggeredKey = "";
+function updateCountdown() {
+  const next = getNextPrayerStrict();
+  const now = new Date();
+  let diff = Math.floor((next.time - now) / 1000);
+  if (diff < 0) diff = 0;
+  const h = String(Math.floor(diff / 3600)).padStart(2, "0");
+  const m = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+  const s = String(diff % 60).padStart(2, "0");
+
+  document.getElementById("nextPrayerName").textContent = next.name;
+  const countdownEl = document.getElementById("countdown");
+  countdownEl.textContent = `${h}:${m}:${s}`;
+
+  // Warna berubah sesuai waktu
+  if (diff <= 600) countdownEl.style.color = "red";
+  else if (diff <= 3600) countdownEl.style.color = "orange";
+  else countdownEl.style.color = "green";
+
+  // Deteksi jika adzan sudah masuk
+  const due = getDuePrayer();
+  if (due) {
+    const key = due.time.toDateString() + "_" + due.name;
+    if (key !== lastTriggeredKey) {
+      lastTriggeredKey = key;
+      showTicker(`Saatnya Sholat ${due.name}`);
+      if (soundEnabled) playAdhan();
+    }
+  }
+}
+
+// Cek sholat yang tepat waktu
+function getDuePrayer() {
+  const now = new Date();
+  const times = getPrayerTimes();
+  for (const [name, mins] of Object.entries(times)) {
+    const t = new Date();
+    t.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
+    const diff = Math.abs(t - now) / 1000;
+    if (diff <= 1) return { name, time: t };
+  }
+  return null;
+}
+
+// 🎶 Pemutar adzan
+function playAdhan() {
+  const a = document.getElementById("adhanAudio");
+  a.currentTime = 0;
+  a.play().catch(() => {});
+}
+
+// 🎵 Ticker teks
+let _tickerTO = null;
+function showTicker(msg) {
+  const t = document.getElementById("ticker");
+  const tt = document.getElementById("tickerText");
+  tt.textContent = `   ${msg}   •   ${msg}   •   ${msg}   `;
+  t.classList.add("show");
+  if (_tickerTO) clearTimeout(_tickerTO);
+  _tickerTO = setTimeout(() => t.classList.remove("show"), 120000);
+}
+  
+// ===== 🌋 Fetch Data Gempa dari BMKG =====
+async function loadGempaBMKG() {
+  try {
+    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
+    const data = await res.json();
+    const g = data.Infogempa.gempa;
+
+    // 🧭 Format teks informatif
+    const text = `🌋 GEMPA ${g.Tanggal} ${g.Jam} | Magnitudo: ${g.Magnitude} SR | Kedalaman: ${g.Kedalaman} | Lokasi: ${g.Wilayah} | Koordinat: ${g.Lintang}, ${g.Bujur} | Potensi: ${g.Potensi}`;
+    document.getElementById("gempaText").innerText = text;
+    document.addEventListener("DOMContentLoaded", function() {
+    loadgempaBMKG();});
+   
+  } catch (err) {
+    console.error("Gagal memuat data gempa:", err);
+    document.getElementById("gempaText").innerText = "⚠️ Gagal memuat data gempa BMKG.";
+  }
+}
+loadGempaBMKG();
+
+// 🌎 Data Tabel GEMPA BMKG
+async function loadGempa() {
+  try {
+    const res = await fetch("https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json");
+    const data = await res.json();
+    const gempas = data.Infogempa.gempa;
+    const thead = document.querySelector("#gempaTable thead");
+    const tbody = document.querySelector("#gempaTable tbody");
+
+    // Header
+    let headerRow = "<tr><th>Data</th>";
+    gempas.forEach((g, i) => headerRow += `<th>Gempa ${i+1}</th>`);
+    headerRow += "</tr>";
+    thead.innerHTML = headerRow;
+
+    function buatBaris(label, key) {
+      let row = `<tr><td><b>${label}</b></td>`;
+      gempas.forEach(g => row += `<td>${g[key]}</td>`);
+      row += "</tr>";
+      return row;
+    }
+
+    tbody.innerHTML = "";
+    tbody.innerHTML += buatBaris("Tanggal", "Tanggal");
+    tbody.innerHTML += buatBaris("Jam", "Jam");
+    tbody.innerHTML += buatBaris("Wilayah", "Wilayah");
+    tbody.innerHTML += buatBaris("Koordinat", "Coordinates");
+    tbody.innerHTML += buatBaris("Lintang", "Lintang");
+    tbody.innerHTML += buatBaris("Bujur", "Bujur");
+    tbody.innerHTML += buatBaris("Kedalaman", "Kedalaman");
+    tbody.innerHTML += buatBaris("Magnitudo (SR)", "Magnitude");
+    tbody.innerHTML += buatBaris("Potensi", "Potensi");
+
+    // Chart
+    let labels = gempas.map(g => g.Wilayah);
+    let magnitudes = gempas.map(g => parseFloat(g.Magnitude));
+    const ctx = document.getElementById("gempaChart").getContext("2d");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Magnitudo Gempa (Skala Richter)",
+          data: magnitudes,
+          borderWidth: 1,
+          backgroundColor: "rgba(255, 99, 132, 0.5)"
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: "Magnitudo (SR)" } }
+        }
+      }
     });
   } catch (err) {
     console.error("Gempa error:", err);
