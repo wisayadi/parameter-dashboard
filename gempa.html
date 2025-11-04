@@ -6,9 +6,32 @@
       Memuat data gempa terkini dari BMKG...
     </span>
   </div>
+   <button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
+    ⬅️ Kembali ke Dashboard
+  </button>   
 </body>
 
 <style>
+      /* 🔹 Tombol kembali */
+  .back-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #ff5f6d, #ffc371);
+    color: /*white*/black;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 15px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }
+  .back-btn:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg, #ff7a7a, #ffb86b);
+  }
+
   /* 🌍 Latar dan area scroll */
   .info-gempa {
     background: linear-gradient(180deg, #fffef7, #f5fff5);
