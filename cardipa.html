@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Parameter Cardipa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ✨ Tampilan Umum */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #f5fff8, #fdfdfd);
+      margin: 0;
+      font-size: 10px;
+      text-align: center;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      animation: fadeInBody 0.8s ease-in forwards;
+    }
+
+    header {
+      background: linear-gradient(90deg, #4caf50, #81c784);
+      color: red;
+      padding: 8px 0 6px 0;
+      border-bottom-left-radius: 2px;
+      border-bottom-right-radius: 2px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+      flex: 0 0 auto;
+      animation: slideDown 0.8s ease-out;
+    }
+
+    header h1 {
+      font-size: 16px;
+      margin: 0;
+    }
+
+    header p {
+      font-size: 10px;
+      color: gold;
+      margin: 2px 0 0 0;
+    }
+
+    /* 🌸 Grid Container */
+    .container {
+      flex: 1 0 auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 30px;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      margin: auto;
+      box-sizing: border-box;
+      animation: fadeUp 1s ease-in-out;
+    }
+
+    /* 🟩 Kartu Dasar */
+    .card {
+      border-radius: 14px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      padding: 10px 5px;
+      transition: all 0.4s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100px;
+      color: white;
+      opacity: 0;
+      animation: cardFade 1s forwards;
+    }
+
+    /* ⏳ Animasi muncul bertahap */
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.4s; }
+    .card:nth-child(3) { animation-delay: 0.6s; }
+    .card:nth-child(4) { animation-delay: 0.8s; }
+
+    .card:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      filter: brightness(1.1);
+    }
+
+    .card-icon {
+      font-size: 22px;
+      margin-bottom: 5px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .card h3 {
+      font-size: 11px;
+      color: silver;
+      margin: 0;
+      line-height: 1.2;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+     
+    /* 🎨 Gradient Warna Card */
+    .cuaca {
+      background: linear-gradient(135deg, #2196f3, #64b5f6);
+    }
+    .udara {
+      background: linear-gradient(135deg, #ff9800, #ffb74d);
+    }
+    .sholat {
+      background: linear-gradient(135deg, #4caf50, #81c784);
+    }
+    .gempa {
+      background: linear-gradient(135deg, #f44336, #e57373);
+    }
+
+    footer {
+      flex: 0 0 auto;
+      font-size: 9px;
+      color: #666;
+      padding: 6px 0;
+      background: #f9fff9;
+      border-top: 1px solid #e0e0e0;
+      animation: fadeIn 1.5s ease;
+    }
+
+    /* 🪶 Animasi Halus */
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes cardFade {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* 📱 Responsif */
+    @media (min-height: 700px) {
+      .card { min-height: 120px; }
+      .card-icon { font-size: 34px; }
+      .card h3 { font-size: 12px; }
+    }
+
+    /* 🌈 Efek transisi antar halaman */
+    .fade-out {
+      animation: fadeOut 0.5s ease-in forwards;
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: scale(0.95); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Dashboard Cardipa 🌿</h1>
+    <p>Pilih salah satu data berikut</p>
+  </header>
+
+  <div class="container">
+    <div class="card cuaca" onclick="smoothGo('cuaca.html')">
+      <div class="card-icon">☀️</div>
+      <h3>Prakiraan Cuaca</h3>
+    </div>
+
+    <div class="card udara" onclick="smoothGo('udara.html')">
+      <div class="card-icon">🌫️</div>
+      <h3>Kualitas Udara</h3>
+    </div>
+
+    <div class="card sholat" onclick="smoothGo('sholat.html')">
+      <div class="card-icon">🕌</div>
+      <h3>Jadwal Sholat</h3>
+    </div>
+      
+    <div class="card gempa" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/gempa.html')">
+      <div class="card-icon">🌋</div>
+      <h3>Info Gempa</h3>
+    </div>
+  </div>
+
+  <footer>© 2025 Dashboard Cardipa</footer>
+
+  <script>
+    // 🌸 Transisi halus antar halaman
+    function smoothGo(url) {
+      document.body.classList.add("fade-out");
+      setTimeout(() => {
+        window.location.href = url;
+      }, 400);
+    }
+  </script>
+</body>
+</html>
