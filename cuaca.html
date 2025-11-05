@@ -1,0 +1,196 @@
+ <!-- 🌤️ Prakiraan Cuaca Balikpapan -->
+<div class="card weather-card">
+  <h2>🌤️ Prakiraan Cuaca Balikpapan</h2>
+
+  <!-- 🔍 Kotak Pencarian Kota -->
+  <div class="search-city">
+    <input type="text" id="cityInput" placeholder="Masukkan nama kota (mis. Jakarta, Surabaya, Makassar)">
+    <button onclick="searchWeather()">Cari</button>
+  </div>
+
+  <!-- Ikon dan suhu berdampingan -->
+  <div class="weather-row">
+    <div class="weather-icon">
+      <img id="weather-icon" src="" alt="Ikon Cuaca">
+    </div>
+    <div class="weather-temp">
+      <div id="weather-main" class="temp-main">--°C</div>
+      <div id="weather-feels" class="temp-feels">Terasa seperti --°C</div>
+    </div>
+  </div>
+
+  <!-- Grid data cuaca -->
+  <div class="weather-grid">
+    <div class="grid-item"><h4>Deskripsi</h4><p id="w_desc">--</p></div>
+    <div class="grid-item"><h4>Kelembaban</h4><p id="w_hum">--%</p></div>
+    <div class="grid-item"><h4>Kecepatan Angin</h4><p id="w_wind">-- km/j</p></div>
+    <div class="grid-item"><h4>Arah Angin</h4><p id="w_wdir">--</p></div>
+    <div class="grid-item"><h4>Jarak Pandang</h4><p id="w_vis">-- km</p></div>
+    <div class="grid-item"><h4>Tekanan</h4><p id="w_pres">-- hPa</p></div>
+  </div>
+
+  <!-- Info tambahan -->
+  <div class="extra-info">
+    🌡️ <b>UV Index:</b> <span id="uv_index">--</span> &nbsp; | &nbsp;
+    💧 <b>Dew Point:</b> <span id="dew_point">-- °C</span>
+  </div>
+
+  <div class="update-time">
+    ⏰ Diperbarui: <span id="update_time">--</span> WITA
+  </div>
+</div>
+
+<!-- 🌈 CSS Modern -->
+<style>
+.weather-card {
+  text-align: center;
+  padding: 50px;
+  border-radius: 18px;
+  background: #fff8f0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+  margin: 20px auto;
+  border: 1px solid #f3d7b6;
+  max-width: 420px;
+}
+.weather-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+.weather-card h2 {
+  font-size: 16px;
+  color: brown;
+  margin-bottom: 15px;
+  font-weight: 700;
+}
+
+/* 🔍 Kotak pencarian kota */
+.search-city {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.search-city input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 65%;
+  font-size: 13px;
+}
+.search-city button {
+  padding: 8px 12px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.search-city button:hover { background: #0d47a1; }
+
+/* Ikon dan suhu sejajar */
+.weather-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 35px;
+}
+.weather-icon img { width: 80px; height: 80px; }
+.temp-main {
+  font-size: 23px;
+  font-weight: 800;
+  color: #1976d2;
+  margin-bottom: 4px;
+}
+.temp-feels { font-size: 12px; color: #555; }
+
+/* Grid biru elegan */
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
+  border-radius: 14px;
+  padding: 10px;
+  margin-top: 35px;
+}
+.grid-item {
+  background: #f5f6fa;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+.grid-item h4 {
+  font-size: 10px;
+  color: purple;
+  margin-bottom: 4px;
+}
+.grid-item p {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Info tambahan */
+.extra-info { margin-top: 18px; font-size: 13px; color: #444; }
+.update-time { margin-top: 10px; font-size: 12px; color: green; }
+</style>
+
+<!-- ⚡ Script Cuaca Dinamis -->
+<script>
+const API_KEY = "20f6d784f501f4a976a63ecf4a7a53fd";
+
+async function loadWeather(city = "Balikpapan") {
+  try {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},id&units=metric&appid=${API_KEY}&lang=id`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Kota tidak ditemukan");
+    const data = await res.json();
+
+    const suhu = data.main.temp.toFixed(1);
+    const terasa = data.main.feels_like.toFixed(1);
+    const kelembapan = data.main.humidity;
+    const tekanan = data.main.pressure;
+    const angin = data.wind.speed;
+    const arahAngin = data.wind.deg;
+    const jarakPandang = (data.visibility / 1000).toFixed(1);
+    const deskripsi = data.weather[0].description;
+    const icon = data.weather[0].icon;
+    const zonaWaktu = new Date(data.dt * 1000).toLocaleTimeString("id-ID", { timeZone: "Asia/Makassar" });
+
+    document.querySelector(".weather-card h2").textContent = `🌤️ Prakiraan Cuaca ${city}`;
+    document.getElementById("weather-main").textContent = `${suhu}°C`;
+    document.getElementById("weather-feels").textContent = `Terasa seperti ${terasa}°C`;
+    document.getElementById("weather-icon").src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+    document.getElementById("w_desc").textContent = deskripsi;
+    document.getElementById("w_hum").textContent = `${kelembapan}%`;
+    document.getElementById("w_wind").textContent = `${angin} km/j`;
+    document.getElementById("w_wdir").textContent = arahDerajat(arahAngin);
+    document.getElementById("w_vis").textContent = `${jarakPandang} km`;
+    document.getElementById("w_pres").textContent = `${tekanan} hPa`;
+    document.getElementById("dew_point").textContent = `${(terasa - 3).toFixed(1)} °C`;
+    document.getElementById("uv_index").textContent = "8.5";
+    document.getElementById("update_time").textContent = zonaWaktu;
+
+  } catch (e) {
+    alert("⚠️ Gagal memuat data: " + e.message);
+    console.error("Gagal memuat cuaca:", e);
+  }
+}
+
+function arahDerajat(deg) {
+  const arah = ['Utara','Timur Laut','Timur','Tenggara','Selatan','Barat Daya','Barat','Barat Laut'];
+  return arah[Math.round(deg / 45) % 8];
+}
+
+function searchWeather() {
+  const city = document.getElementById("cityInput").value.trim();
+  if (city) loadWeather(city);
+  else alert("Masukkan nama kota terlebih dahulu!");
+}
+
+loadWeather(); // Default Balikpapan
+</script>
