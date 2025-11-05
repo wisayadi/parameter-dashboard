@@ -1,0 +1,465 @@
+
+<button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
+    ⬅️ Kembali ke Dashboard
+  </button>   
+</body>
+
+<style>
+      /* 🔹 Tombol kembali */
+  .back-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #ff5f6d, #ffc371);
+    color: /*white*/black;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    /*margin: 15px;*/
+    margin-top: 3px;    
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }
+  .back-btn:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg, #ff7a7a, #ffb86b);
+  }
+</style>
+
+<body>
+  <div class="card-waktu">
+  <h3>🕒 Zona Waktu</h3>
+
+  <!-- Tombol Zona Waktu -->
+  <div style="text-align:center; margin:10px;">
+    <button class="btnZona" onclick="setZona('WIB')">WIB</button>
+    <button class="btnZona" onclick="setZona('WITA')">WITA</button>
+    <button class="btnZona" onclick="setZona('WIT')">WIT</button>
+  </div>
+
+   <div id="waktuSekarang" class="waktu-display">Memuat waktu...</div>
+</div>
+  </div>
+
+  <script>
+  // 🔧 Simpan zona waktu ke localStorage
+  function setZona(zona) {
+    localStorage.setItem('zonaWaktu', zona);
+    tampilkanWaktu();
+  }
+
+  // 🔄 Tampilkan waktu sesuai zona
+  function tampilkanWaktu() {
+    let zona = localStorage.getItem('zonaWaktu') || 'WIB'; // default WIB
+    let now = new Date();
+
+    // Konversi offset zona waktu
+    let offset = 7; // WIB default
+    if (zona === 'WITA') offset = 8;
+    if (zona === 'WIT') offset = 9;
+
+    // Hitung waktu lokal
+    let utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    let waktuZona = new Date(utc + (3600000 * offset));
+
+    // Format tanggal dan waktu
+    const hari = waktuZona.toLocaleDateString('id-ID', { weekday: 'long' });
+    const tanggal = waktuZona.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const jam = waktuZona.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    document.getElementById('waktuSekarang').innerHTML =
+      `${hari}, ${tanggal} pukul ${jam} (${zona})`;
+
+    // Simpan zona aktif di tombol
+    document.querySelectorAll('.btnZona').forEach(btn => {
+      btn.style.background = (btn.textContent === zona) ? '#7B61FF' : '#ddd';
+      btn.style.color = (btn.textContent === zona) ? '#fff' : '#000';
+    });
+  }
+
+  // Jalankan otomatis
+  setInterval(tampilkanWaktu, 1000);
+  tampilkanWaktu();
+  </script>
+
+  <style>
+     /* 🌟 Card Container */
+  .card-waktu {
+    max-width: 285px;
+    margin: 25px auto;
+    /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
+    background: #f3fff6;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #f3d7b6;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Poppins', Arial, sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  .card-waktu:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  }
+
+  .card-waktu h3 {
+    color: /*#2a3d66*/brown;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  /*.btnZona {
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 10px;
+    border: none;
+    margin: 3px;
+    cursor: pointer;
+    background: #ddd;
+    transition: 0.3s;
+  }
+  .btnZona:hover {
+    background: #7B61FF;
+    color: white;
+  }*/
+     /* 🧭 Tombol Zona */
+  .Zona-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .btnZona {
+    background: linear-gradient(135deg, #e0e0e0, #ffffff);
+    border: 2px solid #ccc;
+    border-radius: 50px;
+    padding: 3px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 11px;
+    color: /*#333*/silver;
+  }
+
+  .btnZona:hover {
+    background: linear-gradient(135deg, #d4e2fc, #f0f8ff);
+    transform: scale(1.08);
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  }
+
+  .btnZona.active {
+    background: linear-gradient(135deg, #4a90e2, #5cc6ff);
+    color: white;
+    border-color: #4a90e2;
+    box-shadow: 0 0 12px rgba(0, 150, 255, 0.6);
+    transform: scale(1.05);
+  }
+   
+  /* ⏰ Teks Waktu */
+  .waktu-display {
+  font-weight: bold;
+  color: /*#111*/blue;
+  font-size: 10px;
+  background: /*linear-gradient(90deg, #eef5ff, #ffffff)*/lightyellow;
+  border-radius: 10px;
+  padding: /*8px*/10px 12px;
+  display: inline-block;
+  border: 1px solid /*#eee*/#f3d7b6;
+}
+    
+  </style>
+</body>
+
+
+<!-- 🌫️ Kualitas Udara -->
+<div class="card aqi-card">
+  <h2>🏭 Kualitas Udara <span id="aqiCity">Balikpapan</span> (Realtime)</h2>
+
+  <!-- 🔍 Pencarian Kota -->
+  <div class="aqi-search">
+    <input type="text" id="cityAirInput" placeholder="Cari kota lain di Indonesia...">
+    <button onclick="loadAirQuality()">Cari</button>
+  </div>
+
+  <!-- 🟢 Badge AQI -->
+  <div id="aqiBadge" class="aqi-badge">AQI: --</div>
+
+  <!-- 🌈 Grid Parameter -->
+  <div class="aqi-grid">
+    <div class="aqi-box">
+      <div class="icon">🌫️</div>
+      <h4>AQI</h4>
+      <p id="v_aqi">--</p>
+      <span id="k_aqi">--</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🌪️</div>
+      <h4>PM<sub>2.5</sub></h4>
+      <p id="v_pm25">-- µg/m³</p>
+      <span>Kecil lebih baik</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🌬️</div>
+      <h4>PM<sub>10</sub></h4>
+      <p id="v_pm10">-- µg/m³</p>
+      <span>Kecil lebih baik</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">☁️</div>
+      <h4>O<sub>3</sub></h4>
+      <p id="v_o3">-- µg/m³</p>
+      <span>Iritasi bila tinggi</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🚗</div>
+      <h4>NO<sub>2</sub></h4>
+      <p id="v_no2">-- µg/m³</p>
+      <span>Kendaraan/Industri</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🏭</div>
+      <h4>SO<sub>2</sub></h4>
+      <p id="v_so2">-- µg/m³</p>
+      <span>Iritasi pernapasan</span>
+    </div>
+
+    <div class="aqi-box">
+      <div class="icon">🔥</div>
+      <h4>CO</h4>
+      <p id="v_co">-- µg/m³</p>
+      <span>Pembakaran</span>
+    </div>
+  </div>
+
+  <div id="updatedAt" class="aqi-update">Diperbarui: --</div>
+</div>
+
+<!-- 🌈 CSS -->
+<style>
+.aqi-card {
+  text-align: center;
+  padding: 25px;
+  border-radius: 20px;
+  /*background: #fffaf3;*/
+  /*background: #fff8f0;*/
+  /*background: #f0f8ff;*/
+  /*background: #fff0f5;*/
+  background: #f3fff6;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  border: 1px solid #f3d7b6;
+  max-width: 275px;
+  margin: 20px auto;
+}
+.aqi-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+}
+.aqi-card h2 {
+  color: #a52a2a;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+  /* 🔍 Search */
+.aqi-search {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+.aqi-search input {
+  padding: 9px 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: lightgrey;
+  outline: none;
+  width: 65%;
+  font-size: 13px;
+  color: brown;
+  transition: all 0.3s ease;
+}
+.aqi-search input:hover {
+  border-color: /*#007bff*/orange;
+  box-shadow: 0 0 6px rgba(255, 165, 0, 0.6);
+}
+.aqi-search button {
+  /*background: linear-gradient(90deg,#007bff,#0056b3);*/
+  background: orange;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+   /* Ikon kaca pembesar */
+.aqi-search button i {
+  font-size: 14px;
+}   
+.aqi-search button:hover {
+  background: linear-gradient(90deg,#0056b3,#003d80);
+  transform: scale(1.05);
+}
+
+/* 🟢 Badge */
+.aqi-badge {
+  display: inline-block;
+  padding: 3px 11px;
+  border-radius: 25px;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 14px;
+  background: linear-gradient(90deg,#4caf50,#8bc34a);
+  transition: all 0.5s ease;
+}
+
+/* 🌈 Grid Layout */
+.aqi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  /*background: linear-gradient(135deg,#b3e5fc,#81d4fa);*/
+  /*background: linear-gradient(90deg, #4facfe, #00f2fe);*/
+  /*background: linear-gradient(90deg, #f7971e, #ffd200);*/
+  background: linear-gradient(90deg, #f6d365, #fda085);*/
+  /*background: linear-gradient(90deg, #ff9966, #ff5e62);*/
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.6);
+  margin-top: 25px;
+}
+.aqi-box {
+  background: white;
+  border-radius: 14px;
+  padding: 12px 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  transition: transform 0.25s ease, background 0.3s ease;
+}
+.aqi-box:hover {
+  transform: scale(1.05);
+  background: #fef6e4;
+}
+.aqi-box .icon {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+.aqi-box h4 {
+  color: #6a1b9a;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.aqi-box p {
+  font-size: 14px;
+  font-weight: bold;
+  color: #111;
+  margin: 0;
+}
+.aqi-box span {
+  font-size: 9px;
+  /*color: #666;*/
+  color: green;
+}
+
+/* 🕒 Update */
+.aqi-update {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #2e7d32;
+}
+</style>
+
+<!-- ⚙️ SCRIPT -->
+<script>
+const API_KEY = "20f6d784f501f4a976a63ecf4a7a53fd";
+
+// 🌍 Gradasi warna berdasarkan AQI 0–500 (standar US EPA)
+function getAQIColor(aqi) {
+  if (aqi <= 50) return "#4CAF50";      // Good
+  if (aqi <= 100) return "#CDDC39";   // Moderate 
+  if (aqi <= 150) return "#FF9800";     // Unhealthy for Sensitive Groups
+  if (aqi <= 200) return "#F44336";     // Unhealthy
+  if (aqi <= 300) return "#9C27B0";     // Very Unhealthy
+  return "#7E0023";                     // Hazardous
+}
+
+function getAQIText(aqi) {
+  if (aqi <= 50) return "Baik";
+  if (aqi <= 100) return "Sedang";
+  if (aqi <= 150) return "Tidak sehat (sensitif)";
+  if (aqi <= 200) return "Tidak sehat";
+  if (aqi <= 300) return "Sangat tidak sehat";
+  return "Berbahaya";
+}
+
+async function loadAirQuality() {
+  const city = document.getElementById("cityAirInput").value.trim() || "Balikpapan";
+  try {
+    const geo = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city},id&appid=${API_KEY}`);
+    const loc = await geo.json();
+    if (!loc.length) throw new Error("Kota tidak ditemukan");
+    const { lat, lon, name } = loc[0];
+
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+    const data = await res.json();
+    const aq = data.list[0];
+    const c = aq.components;
+
+    // 🧮 Skala AQI global dikonversi dari rentang 0–500 (karena OWM hanya 1–5)
+    const aqiValue = Math.round((aq.main.aqi / 5) * 500);
+    const warna = getAQIColor(aqiValue);
+    const teks = getAQIText(aqiValue);
+
+    document.getElementById("aqiCity").textContent = name;
+    document.getElementById("v_aqi").textContent = aqiValue;
+    document.getElementById("k_aqi").textContent = teks;
+
+    document.getElementById("v_pm25").textContent = c.pm2_5.toFixed(1) + " µg/m³";
+    document.getElementById("v_pm10").textContent = c.pm10.toFixed(1) + " µg/m³";
+    document.getElementById("v_o3").textContent   = c.o3.toFixed(1) + " µg/m³";
+    document.getElementById("v_no2").textContent  = c.no2.toFixed(1) + " µg/m³";
+    document.getElementById("v_so2").textContent  = c.so2.toFixed(1) + " µg/m³";
+    document.getElementById("v_co").textContent   = c.co.toFixed(1) + " µg/m³";
+
+    const badge = document.getElementById("aqiBadge");
+    badge.textContent = `AQI: ${aqiValue} (${teks})`;
+    badge.style.background = `linear-gradient(90deg, ${warna}, ${warna}CC)`;
+
+    document.getElementById("updatedAt").textContent =
+      "Diperbarui: " + new Date(aq.dt * 1000).toLocaleString("id-ID", { timeZone: "Asia/Makassar" });
+
+  } catch (e) {
+    alert("⚠️ " + e.message);
+    console.error(e);
+  }
+}
+
+loadAirQuality();
+</script>
+
+<!--  sumber data -->
+  <div class="card muted">Sumber data: OpenWeatherMap</div>
+  </div>
+  
+<!-- kolom sumber data -->
+  <style>
+.card.muted {
+  font-size: 12px;          /* ukuran font kecil */
+  color: purple;            /* warna teks */
+  /*background-color: #f3e5f5;*//* warna latar ungu muda */
+  background-color: #fff8f0;
+  text-align: center;       /* posisikan teks di tengah */
+  margin-top: 6px;          /* jarak atas */
+  padding: 8px 12px;        /* beri ruang dalam box */
+  border-radius: 6px;       /* sudut tumpul */
+  border: 1px solid #f3d7b6;
+  /*border-radius: 10px;*/
+  }
+  </style>
