@@ -1,32 +1,48 @@
 
-<button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
-    ⬅️ Kembali ke Dashboard
-  </button>   
+<body>
+  <div class="back-container">
+    <button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
+      ⬅️ Kembali ke Dashboard
+    </button>
+  </div>
 </body>
 
 <style>
-      /* 🔹 Tombol kembali */
+  /* 🌿 Latar belakang dan tata letak halaman */
+  body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(180deg, #f5fff8, #fdfdfd);
+  }
+
+  /* 📍 Pembungkus tombol agar di tengah atas */
+  .back-container {
+    display: flex;
+    justify-content: center; /* posisi tengah horizontal */
+    align-items: flex-start; /* tetap di atas */
+    padding-top: 10px; /* jarak sedikit dari atas */
+    width: 100%;
+  }
+
+  /* 🔹 Tombol kembali */
   .back-btn {
-    display: inline-block;
     background: linear-gradient(90deg, #ff5f6d, #ffc371);
-    color: /*white*/black;
+    color: black;
     border: none;
-    padding: 6px 12px;
+    padding: 6px 14px;
     border-radius: 12px;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 600;
     cursor: pointer;
-    /*margin: 15px;*/
-    margin-top: 3px;    
     box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
   }
+
   .back-btn:hover {
     transform: scale(1.07);
     background: linear-gradient(90deg, #ff7a7a, #ffb86b);
   }
 </style>
-
 <body>
   <div class="card-waktu">
   <h3>🕒 Zona Waktu</h3>
