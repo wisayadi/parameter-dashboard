@@ -43,9 +43,10 @@
 
     /* 🕒 Card Zona Waktu */
     .card-waktu {
-      max-width: 330px;
+      max-width: /*330px*/285px;
       margin: 25px auto 10px;
-      background: linear-gradient(180deg, #ffffff, #f8fbff);
+      /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
+      background: #f3fff6;
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       border: 1px solid #f3d7b6;
@@ -92,7 +93,7 @@
       margin-top: 10px;
     }
 
-    /* 🌫️ Card Kualitas Udara */
+ /* 🌫️ Card Kualitas Udara */
     .aqi-card {
       text-align: center;
       padding: 30px;
@@ -100,7 +101,7 @@
       background: linear-gradient(180deg, #f8fff9, #fff8f3);
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
       border: 1px solid #f3d7b6;
-      max-width: 420px;
+      max-width: /*420px*/270px;
       margin: 15px auto 20px;
       transition: all 0.3s ease;
     }
@@ -123,12 +124,21 @@
       padding: 9px 14px;
       border-radius: 8px;
       border: 1px solid #ccc;
-      background: #f7f7f7;
+      background: /*#f7f7f7*/lightgrey;
       outline: none;
       width: 65%;
       font-size: 13px;
       color: brown;
+      transition: all 0.3s ease;
     }
+     .aqi-search input:hover {
+     border-color: /*#007bff*/orange;
+     box-shadow: 0 0 6px rgba(255, 165, 0, 0.6);
+   }
+    .aqi-search button:hover {
+    background: linear-gradient(90deg,#0056b3,#003d80);
+    transform: scale(1.05);
+   }
     .aqi-search button {
       background: orange;
       color: white;
@@ -196,7 +206,7 @@
     }
 
     /* 🧾 Penjelasan tabel */
-    .table-title {
+    /*.table-title {
       background: #f3e5f5;
       text-align: center;
       border: 1px solid #f3d7b6;
@@ -227,7 +237,46 @@
       font-size: 13px;
       font-weight: bold;
       color: #d97706;
+    }*/
+   /*<!-- Tambahan Card Penjelasan -->*/
+  
+    .grid-udara {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
     }
+    .card-udara {
+      background: #fff8f0;
+      border: 1px solid #f3d7b6;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      color: /*#444*/brown;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-udara h5 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      text-align: center; 
+      font-weight: bold;
+      color: #d97706;
+    }
+  
+  /* judul keterangan tabel */
+    .table-title {
+     background: #f3e5f5;       /* abu-abu lembut */
+     text-align: center; 
+     border: 1px solid #f3d7b6;
+     border-bottom: 2px solid #ddd;
+     padding: 8px 17px;
+     border-radius: 6px 6px 0 0; /* sudut atas agak membulat */
+     font-size: 11px;
+     font-weight: 600;
+     color: brown;
+     margin-bottom: 10px;
+     /*margin-top: 20px;*/
+  }
   </style>
 </head>
 <body>
@@ -271,16 +320,39 @@
     <div id="updatedAt" class="aqi-update">Diperbarui: --</div>
   </div>
 
-  <div class="table-title">Keterangan Tabel Kualitas Udara:</div>
+     <!-- judul keterangan tabel -->
+<div class="table-title">Keterangan Tabel Kualitas Udara:</div>
   <div class="grid-udara">
-    <div class="card-udara"><h5>AQI</h5>Indeks umum kualitas udara, makin tinggi makin buruk.</div>
-    <div class="card-udara"><h5>PM2.5</h5>Partikel sangat halus, bisa masuk paru-paru.</div>
-    <div class="card-udara"><h5>PM10</h5>Debu kasar yang bisa mengiritasi saluran napas.</div>
-    <div class="card-udara"><h5>O₃</h5>Ozon permukaan bumi, dapat mengiritasi paru-paru.</div>
-    <div class="card-udara"><h5>SO₂</h5>Gas pembakaran batu bara/minyak, iritasi napas.</div>
-    <div class="card-udara"><h5>NO₂</h5>Hasil pembakaran kendaraan & industri.</div>
-    <div class="card-udara"><h5>CO</h5>Gas beracun dari pembakaran tidak sempurna.</div>
+    <div class="card-udara">
+      <h5>AQI</h5>
+      (Air Quality Index) - Indeks kualitas udara secara umum, makin tinggi nilainya makin buruk.
+    </div>
+    <div class="card-udara">
+      <h5>PM2.5</h5>
+      (Particulate Matter) - Partikel sangat halus (2.5 &micro;m), berbahaya karena masuk ke paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>PM10</h5>
+      (Particulate Matter) - Partikel debu (10 &micro;m), bisa mengiritasi saluran pernapasan.
+    </div>
+    <div class="card-udara">
+      <h5>O<sub>3</sub></h5>
+      Gas ozon di permukaan bumi, dapat mengiritasi paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>SO<sub>2</sub></h5>
+      (Sulfur Dioksida) - Gas dari pembakaran batu bara/minyak, penyebab iritasi pernapasan.
+    </div>
+    <div class="card-udara">
+      <h5>NO<sub>2</sub></h5>
+      (Nitrogen Dioksida) - Gas hasil pembakaran kendaraan & industri, berbahaya bagi paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>CO</h5>
+      (Karbon Monoksida) - Gas beracun tak berbau dari pembakaran tidak sempurna.
+    </div>
   </div>
+</div>
 
      <script>
   // 🔧 Simpan zona waktu ke localStorage
@@ -291,12 +363,12 @@
 
   // 🔄 Tampilkan waktu sesuai zona
   function tampilkanWaktu() {
-    let zona = localStorage.getItem('zonaWaktu') || 'WIB'; // default WIB
+    let zona = localStorage.getItem('zonaWaktu') || 'WITA'; // default WIB
     let now = new Date();
 
     // Konversi offset zona waktu
-    let offset = 7; // WIB default
-    if (zona === 'WITA') offset = 8;
+    let offset = 8; // WIB default
+    if (zona === 'WIB') offset = 7;
     if (zona === 'WIT') offset = 9;
 
     // Hitung waktu lokal
@@ -387,8 +459,26 @@ async function loadAirQuality() {
 }
 
 loadAirQuality();
-
-  
-  </script>
+ </script>
 </body>
 </html>
+
+<div class="card muted">Sumber data: OpenWeatherMap</div>
+  </div>
+<!-- kolom sumber data -->
+  <style>
+.card.muted {
+  font-size: 12px;          /* ukuran font kecil */
+  color: purple;            /* warna teks */
+  /*background-color: #f3e5f5;*//* warna latar ungu muda */
+  background-color: #fff8f0;
+  text-align: center;       /* posisikan teks di tengah */
+  margin-top: 6px;          /* jarak atas */
+  padding: 6px 10px;        /* beri ruang dalam box */
+  border-radius: 6px;       /* sudut tumpul */
+  border: 1px solid #f3d7b6;
+  /*border-radius: 10px;*/
+  max-width: 300px;
+  margin: 20px auto;
+  }
+  </style>
