@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard Waktu & Kualitas Udara</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- 🌿 CSS Modern -->
+<style>
+  body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f5fff8, #fffef9);
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 🔙 Tombol kembali */
+    .back-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-top: 12px;
+    }
+    .back-btn {
+      background: linear-gradient(90deg, #ff5f6d, #ffc371);
+      color: #111;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 12px;
+      font-size: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    .back-btn:hover {
+      transform: scale(1.08);
+      background: linear-gradient(90deg, #ff7a7a, #ffb86b);
+    }
+
+    /* 🕒 Card Zona Waktu */
+    .card-waktu {
+      max-width: /*330px*/285px;
+      margin: 25px auto 10px;
+      /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
+      background: #f3fff6;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #f3d7b6;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+    .card-waktu h3 {
+      color: brown;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .btnZona {
+      background: linear-gradient(135deg, #e0e0e0, #ffffff);
+      border: 2px solid #ccc;
+      border-radius: 50px;
+      padding: 4px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 11px;
+      color: #555;
+      margin: 0 5px;
+    }
+    .btnZona:hover {
+      background: linear-gradient(135deg, #d4e2fc, #f0f8ff);
+      transform: scale(1.08);
+    }
+    .btnZona.active {
+      background: linear-gradient(135deg, #4a90e2, #5cc6ff);
+      color: white;
+      border-color: #4a90e2;
+      box-shadow: 0 0 12px rgba(0, 150, 255, 0.6);
+    }
+    .waktu-display {
+      font-weight: bold;
+      color: blue;
+      font-size: 11px;
+      background: lightyellow;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: inline-block;
+      border: 1px solid #f3d7b6;
+      margin-top: 10px;
+    }
+
+.card-jadwal-grid {
+  text-align: center;
+  padding: 42px;
+  border-radius: 19px;
+  background: linear-gradient(180deg, #fffef7, #f5fff5);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+  border: 2px solid #e0f2f1;
+  max-width: 250px;
+  margin: 25px auto;
+  animation: fadeIn 0.8s ease;
+  margin-top: 30px;      /* jarak luar dari kotak pencarian */
+  padding-top: 25px;     /* jarak dalam dari tepi atas bidang hijau */
+  /*background: linear-gradient(180deg, #c8e6c9, #a5d6a7);*/
+}
+.card-jadwal-grid h2 {
+  font-size: 14px;
+  /*color: #1b5e20;*/
+  color: brown;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+/* 🌿 Kotak Pencarian Hijau Gradasi (Compact & Centered) */
+/* 🌿 Kotak Pencarian Hijau Gradasi (Compact, Centered, dan Floating) */
+.search-city {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 2; /* pastikan di atas bidang hijau */
+}
+
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*background: linear-gradient(135deg, #e8f5e9, #c8e6c9);*/
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  /*box-shadow: 0 4px 10px rgba(76, 175, 80, 0.15),
+              0 2px 0 #a5d6a7 inset;*/ /* bayangan lembut hijau di bawah */
+  padding: 6px 8px;
+  gap: 4px;
+  width: fit-content;
+  max-width: 320px;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+}
+
+.search-wrapper:focus-within {
+  box-shadow: 0 0 12px rgba(56,142,60,0.35),
+              0 2px 0 #a5d6a7 inset;
+  transform: scale(1.02);
+}
+
+/* Input */
+.search-wrapper input {
+  width: 160px;
+  border: none;
+  outline: none;
+  /*background: #ffffff;*/
+  background: lightgrey;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #1b5e20;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.08);
+  text-align: left;
+}
+  .search-wrapper input:hover {
+  border-color: /*#007bff*/green;
+  box-shadow: 0 0 6px rgba(0,123,255,0.4);
+}
+.search-wrapper input::placeholder {
+  color: #81c784;
+  font-style: italic;
+}
+
+/* Tombol Cari */
+.search-wrapper button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #66bb6a, #2e7d32);
+  border: none;
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(76,175,80,0.25);
+}
+
+.search-wrapper button:hover {
+  background: linear-gradient(135deg, #43a047, #1b5e20);
+  transform: sca  le(1.05);
+}                                                 
+
+/* Ikon kaca pembesar */
+.search-wrapper button i {
+  font-size: 14px;
+}
+
+/* 🌱 Responsif untuk layar kecil */
+@media (max-width: 480px) {
+  .search-wrapper {
+    max-width: 270px;
+    padding: 5px 6px;
+  }
+  .search-wrapper input {
+    width: 140px;
+    font-size: 12px;
+    padding: 7px 8px;
+  }
+  .search-wrapper button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+ 
+/* 🌅 Grid Layout */
+.jadwal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  background: linear-gradient(90deg, #a8e063, #56ab2f);
+  border-radius: 18px;
+  padding: 15px;
+  box-shadow: inset 0 0 8px rgba(255,255,255,0.5);
+}
+.jadwal-box {
+  background: white;
+  border-radius: 14px;
+  padding: 12px 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: all 0.25s ease;
+}
+.jadwal-box:hover {
+  transform: scale(1.05);
+  background: #f1f8e9;
+}
+.jadwal-box .icon {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+.jadwal-box h4 {
+  /*color: #33691e;*/
+  color: silver;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.jadwal-box p {
+  font-size: 14px;
+  font-weight: bold;
+  /*color: #1b5e20;*/
+  color: purple;
+  margin: 0;
+}
+ #countdownBox {
+    background-color: cyan;
+    color: purple;
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 8px;
+    display: block;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow:0px 2px 6px rgba(0,0,0,0.15); 
+  }
+   #countdownRow{white-space:normal}
+  .ticker{display:none;overflow:hidden;white-space:nowrap;margin-bottom:6px}
+  .ticker{display:none;overflow:hidden;white-space:nowrap;margin-bottom:6px}
+  .ticker.show{display:block}
+  .ticker .text{display:inline-block;padding-left:100%;animation:marquee 12s linear infinite}
+ 
+ #enableSound{font-size:6px;font-weight:600;border:0;border-radius:6px;padding:6px 10px;margin-top:6px;
+    background:#222;color:#fff;cursor:pointer}
+
+/* 🌟 Highlight aktif */
+.active-prayer {
+  background: linear-gradient(135deg, #c8e6c9, #a5d6a7) !important;
+  box-shadow: 0 0 15px #81c784;
+  transform: scale(1.08);
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: 0 0 15px #a5d6a7; }
+  50% { box-shadow: 0 0 25px #66bb6a; }
+}
+</style>
+    <!-- 🔙 Tombol kembali -->
+  <div class="back-container">
+    <button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
+      ⬅️ Kembali ke Dashboard
+    </button>
+  </div>
+
+  <!-- 🕒 Card Zona Waktu -->
+  <div class="card-waktu">
+    <h3>🕒 Zona Waktu</h3>
+    <div>
+      <button class="btnZona active" onclick="setZona('WIB')">WIB</button>
+      <button class="btnZona" onclick="setZona('WITA')">WITA</button>
+      <button class="btnZona" onclick="setZona('WIT')">WIT</button>
+    </div>
+    <div id="waktuSekarang" class="waktu-display">Memuat waktu...</div>
+  </div>
+  
+<!-- 🌙 Jadwal Sholat GRID + Pencarian + Suara Adzan -->
+<div class="card-jadwal-grid">
+  <h2>🕌 Jadwal Sholat <span id="cityName">Balikpapan</span> Hari Ini</h2>
+<div id="nowStr" style="text-align:center; font-size: 5px; font-weight:bold; color:darkgreen; margin-bottom:10px;"></div>
+
+  <!-- 🔍 Kotak Pencarian Kota -->
+<div class="search-citySholat">
+  <div class="search-wrapper">
+    <input type="text" id="cityInputSholat" placeholder="Cari kota di Indonesia...">
+    <button id ="btnSearchSholat">🔎 Cari</button>
+  </div>
+</div>
+    <!-- Teks waktu tampil -->
+
+  
+  <!-- 🧭 GRID Waktu Sholat -->
+  <div class="jadwal-grid" id="jadwalGrid">
+    <div class="jadwal-box" id="subuhBox"><div class="icon">🌄</div><h4>Subuh</h4><p id="j_subuh">--:--</p></div>
+    <div class="jadwal-box" id="dzuhurBox"><div class="icon">☀️</div><h4>Dzuhur</h4><p id="j_dzuhur">--:--</p></div>
+    <div class="jadwal-box" id="asharBox"><div class="icon">🌇</div><h4>Ashar</h4><p id="j_ashar">--:--</p></div>
+    <div class="jadwal-box" id="maghribBox"><div class="icon">🌆</div><h4>Maghrib</h4><p id="j_maghrib">--:--</p></div>
+    <div class="jadwal-box" id="isyaBox"><div class="icon">🌃</div><h4>Isya</h4><p id="j_isya">--:--</p></div>
+   </div>
+    <div id="countdownBox">
+        <div id="ticker" class="ticker"><span id="tickerText" class="text"></span></div>
+        <div id="countdownRow">
+          Menuju <span id="nextPrayerName">--</span>: <span id="countdown">--:--:--</span>
+        </div>
+        <button id="enableSound" type="button">Aktifkan Suara Adzan</button>
+         <audio id="adhanAudio"
+src='https://www.islamcan.com/audio/adhan/azan2.mp3' type="audio/mpeg"></audio>
+        
+      </div>
+    </div>
+  </div>
+
+   <script>
+ // 🔧 Simpan zona waktu ke localStorage
+  function setZona(zona) {
+    localStorage.setItem('zonaWaktu', zona);
+    tampilkanWaktu();
+  }
+
+  // 🔄 Tampilkan waktu sesuai zona
+  function tampilkanWaktu() {
+    let zona = localStorage.getItem('zonaWaktu') || 'WITA'; // default WIB
+    let now = new Date();
+
+    // Konversi offset zona waktu
+    let offset = 8; // WIB default
+    if (zona === 'WIB') offset = 7;
+    if (zona === 'WIT') offset = 9;
+
+    // Hitung waktu lokal
+    let utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    let waktuZona = new Date(utc + (3600000 * offset));
+
+    // Format tanggal dan waktu
+    const hari = waktuZona.toLocaleDateString('id-ID', { weekday: 'long' });
+    const tanggal = waktuZona.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const jam = waktuZona.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    document.getElementById('waktuSekarang').innerHTML =
+      `${hari}, ${tanggal} pukul ${jam} (${zona})`;
+
+    // Simpan zona aktif di tombol
+    document.querySelectorAll('.btnZona').forEach(btn => {
+      btn.style.background = (btn.textContent === zona) ? '#7B61FF' : '#ddd';
+      btn.style.color = (btn.textContent === zona) ? '#fff' : '#000';
+    });
+  }
+
+  // Jalankan otomatis
+  setInterval(tampilkanWaktu, 1000);
+  tampilkanWaktu();
+
+  let zona = "Asia/Makassar"; // Default ke WITA
+
+  function fmtNow() {
+    const now = new Date();
+    const opts = { 
+      weekday:'long', 
+      year:'numeric', 
+      month:'long', 
+      day:'numeric',
+      hour:'2-digit', 
+      minute:'2-digit', 
+      second:'2-digit'
+    };
+
+    const waktu = new Intl.DateTimeFormat('id-ID', {
+      ...opts, 
+      timeZone: zona
+    }).format(now);
+
+    let label = "";
+    if (zona === "Asia/Makassar") label = " (WITA)";
+    else if (zona === "Asia/Jakarta") label = " (WIB)";
+    else if (zona === "Asia/Jayapura") label = " (WIT)";
+
+    document.getElementById('nowStr').innerText = waktu + label;
+  }
+
+  // Event listener tombol zona waktu
+  document.querySelectorAll('.zone-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Hapus status aktif dari semua tombol
+      document.querySelectorAll('.zone-btn').forEach(b => b.classList.remove('active'));
+      // Tambahkan ke tombol yang diklik
+      btn.classList.add('active');
+      // Update zona
+      zona = btn.getAttribute('data-zone');
+      fmtNow();
+    });
+  });
+
+  // Jalankan setiap detik
+  setInterval(fmtNow, 1000);
+  fmtNow();
+
+    // <!-- ⚙️ SCRIPT -->
+
+const defaultCity = "2308"; // Balikpapan
+
+/*// 🔊 Toggle suara
+let soundEnabled = false;
+document.getElementById("enableSound").addEventListener("click", () => {
+  const a = document.getElementById("adhanAudio");
+  a.play().then(() => {
+    a.pause(); a.currentTime = 0;
+    soundEnabled = true;
+    document.getElementById("enableSound").textContent = "🔊 Suara Aktif";
+  }).catch(() => {
+    alert("Izinkan audio di browser agar adzan dapat diputar otomatis.");
+  });
+});*/
+
+   let soundEnabled = false;
+   let adhanPlaying = false;
+
+const enableBtn = document.getElementById("enableSound");
+const adhanAudio = document.getElementById("adhanAudio");
+
+enableBtn.addEventListener("click", () => {
+  // Jika suara belum diizinkan, aktifkan izin dulu
+  if (!soundEnabled) {
+    adhanAudio.play().then(() => {
+      adhanAudio.pause();
+      adhanAudio.currentTime = 0;
+      soundEnabled = true;
+      /*enableBtn.textContent = "🔊 Adzan Siap (Klik untuk Play)";*/
+      enableBtn.textContent = "🔊 Adzan Aktif";  
+    }).catch(() => {
+      alert("⚠️ Izinkan audio di browser agar adzan bisa diputar otomatis.");
+    });
+    return;
+  }
+
+  // Jika sudah diizinkan → toggle play/pause
+  if (!adhanPlaying) {
+    adhanAudio.play();
+    adhanPlaying = true;
+    enableBtn.textContent = "⏸️ Pause Adzan";
+  } else {
+    adhanAudio.pause();
+    adhanAudio.currentTime = 0;
+    adhanPlaying = false;
+    enableBtn.textContent = "🔊 Adzan Aktif";
+   }
+});
+    /*adhanAudio.pause();
+    adhanPlaying = false;
+    enableBtn.textContent = "▶️ Lanjutkan Adzan";
+  }
+});*/
+
+// 🔍 Pencarian kota
+const searchInputSholat = document.getElementById("cityInputSholat");
+const searchBtnSholat = document.getElementById("btnSearchSholat");
+searchBtnSholat.addEventListener("click", () => {
+  const city = searchInputSholat.value.trim();
+  if (city) loadJadwal(city);
+});
+searchInputSholat.addEventListener("keypress", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const city = searchInputSholat.value.trim();
+    if (city) loadJadwal(city);
+  }
+});
+
+// 🕌 Ambil jadwal sholat dari API MyQuran
+async function loadJadwal(kota = "Balikpapan") {
+  try {
+    const cityId = await getCityId(kota);
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+
+    const res = await fetch(`https://api.myquran.com/v2/sholat/jadwal/${cityId}/${y}/${m}/${d}`);
+    const j = await res.json();
+    if (!j.status) throw new Error("Data jadwal sholat tidak ditemukan.");
+
+    const jd = j.data.jadwal;
+    document.getElementById("cityName").textContent = j.data.lokasi;
+    document.getElementById("j_subuh").textContent = jd.subuh;
+    document.getElementById("j_dzuhur").textContent = jd.dzuhur;
+    document.getElementById("j_ashar").textContent = jd.ashar;
+    document.getElementById("j_maghrib").textContent = jd.maghrib;
+    document.getElementById("j_isya").textContent = jd.isya;
+
+    highlightWaktuSholat();
+  } catch (err) {
+    alert("⚠️ " + err.message);
+  }
+}
+
+// 🔍 Cari ID kota
+async function getCityId(namaKota) {
+  const res = await fetch("https://api.myquran.com/v2/sholat/kota/semua");
+  const data = await res.json();
+  const kota = data.data.find(k => k.lokasi.toLowerCase().includes(namaKota.toLowerCase()));
+  return kota ? kota.id : defaultCity;
+}
+
+// 🔢 Konversi waktu ke menit
+function waktuToMenit(w) {
+  if (!w || !w.includes(":")) return 0;
+  const [h, m] = w.split(":").map(Number);
+  return h * 60 + m;
+}
+
+// 🔆 Highlight waktu aktif
+function highlightWaktuSholat() {
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const times = getPrayerTimes();
+  document.querySelectorAll(".jadwal-box").forEach(b => b.classList.remove("active-prayer"));
+
+  const entries = Object.entries(times);
+  const active = entries.find(([_, t], i) =>
+    currentMinutes >= t && currentMinutes < (entries[i + 1]?.[1] || 1440)
+  );
+  if (active) document.getElementById(active[0] + "Box").classList.add("active-prayer");
+}
+
+// Ambil jadwal dari DOM
+function getPrayerTimes() {
+  return {
+    subuh: waktuToMenit(document.getElementById("j_subuh").textContent),
+    dzuhur: waktuToMenit(document.getElementById("j_dzuhur").textContent),
+    ashar: waktuToMenit(document.getElementById("j_ashar").textContent),
+    maghrib: waktuToMenit(document.getElementById("j_maghrib").textContent),
+    isya: waktuToMenit(document.getElementById("j_isya").textContent)
+  };
+}
+
+// 🔢 Dapatkan waktu sholat berikutnya
+function getNextPrayerStrict() {
+  const now = new Date();
+  const times = getPrayerTimes();
+  const entries = Object.entries(times).map(([name, mins]) => {
+    const t = new Date();
+    t.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
+    return { name, time: t };
+  });
+  entries.sort((a, b) => a.time - b.time);
+  for (const p of entries) if (p.time > now) return p;
+  const t = new Date(entries[0].time);
+  t.setDate(t.getDate() + 1);
+  return { name: entries[0].name, time: t };
+}
+
+// 🕰️ Countdown berjalan
+let lastTriggeredKey = "";
+function updateCountdown() {
+  const next = getNextPrayerStrict();
+  const now = new Date();
+  let diff = Math.floor((next.time - now) / 1000);
+  if (diff < 0) diff = 0;
+  const h = String(Math.floor(diff / 3600)).padStart(2, "0");
+  const m = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+  const s = String(diff % 60).padStart(2, "0");
+
+  document.getElementById("nextPrayerName").textContent = next.name;
+  const countdownEl = document.getElementById("countdown");
+  countdownEl.textContent = `${h}:${m}:${s}`;
+
+  // Warna berubah sesuai waktu
+  if (diff <= 600) countdownEl.style.color = "red";
+  else if (diff <= 3600) countdownEl.style.color = "orange";
+  else countdownEl.style.color = "green";
+
+  // Deteksi jika adzan sudah masuk
+  const due = getDuePrayer();
+  if (due) {
+    const key = due.time.toDateString() + "_" + due.name;
+    if (key !== lastTriggeredKey) {
+      lastTriggeredKey = key;
+      showTicker(`Saatnya Sholat ${due.name}`);
+      if (soundEnabled) playAdhan();
+    }
+  }
+}
+
+// Cek sholat yang tepat waktu
+function getDuePrayer() {
+  const now = new Date();
+  const times = getPrayerTimes();
+  for (const [name, mins] of Object.entries(times)) {
+    const t = new Date();
+    t.setHours(Math.floor(mins / 60), mins % 60, 0, 0);
+    const diff = Math.abs(t - now) / 1000;
+    if (diff <= 1) return { name, time: t };
+  }
+  return null;
+}
+
+// 🎶 Pemutar adzan
+function playAdhan() {
+  const a = document.getElementById("adhanAudio");
+  a.currentTime = 0;
+  a.play().catch(() => {});
+}
+
+// 🎵 Ticker teks
+let _tickerTO = null;
+function showTicker(msg) {
+  const t = document.getElementById("ticker");
+  const tt = document.getElementById("tickerText");
+  tt.textContent = `   ${msg}   •   ${msg}   •   ${msg}   `;
+  t.classList.add("show");
+  if (_tickerTO) clearTimeout(_tickerTO);
+  _tickerTO = setTimeout(() => t.classList.remove("show"), 120000);
+}
+// 🚀 Jalankan semua fungsi
+window.addEventListener("DOMContentLoaded", () => {
+  loadJadwal();
+  updateCountdown();
+  highlightWaktuSholat();
+  //loadGempa();
+  //fetchGempa();
+  //setInterval(fetchGempa, 5 * 60 * 1000);
+  setInterval(fmtNow,1000);
+  setInterval(updateCountdown, 1000);
+  setInterval(highlightWaktuSholat, 60000);
+  //setInterval(loadGempa, 3600000); // update gempa tiap jam
+});
+</script>
+</html>
+
+<div class="card muted">Sumber data: OpenWeatherMap</div>
+  </div>
+<!-- kolom sumber data -->
+  <style>
+.card.muted {
+  font-size: 12px;          /* ukuran font kecil */
+  color: purple;            /* warna teks */
+  /*background-color: #f3e5f5;*//* warna latar ungu muda */
+  background-color: #fff8f0;
+  text-align: center;       /* posisikan teks di tengah */
+  margin-top: 6px;          /* jarak atas */
+  padding: 6px 10px;        /* beri ruang dalam box */
+  border-radius: 6px;       /* sudut tumpul */
+  border: 1px solid #f3d7b6;
+  /*border-radius: 10px;*/
+  max-width: 300px;
+  margin: 20px auto;
+  }
+  </style>
