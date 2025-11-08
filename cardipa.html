@@ -5,16 +5,11 @@
   <title>Dashboard Parameter Cardipa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ✨ Tampilan Umum */
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(180deg, #f5fff8, #fdfdfd);
       margin: 0;
-      font-size: 10px;
       text-align: center;
-      height: /*100vh*/15px;
-      display: flex;
-      flex-direction: column;
       opacity: 0;
       animation: fadeInBody 0.8s ease-in forwards;
     }
@@ -22,46 +17,163 @@
     header {
       background: linear-gradient(90deg, #4caf50, #81c784);
       color: red;
-      padding: 8px 0 6px 0;
-      border-bottom-left-radius: 2px;
-      border-bottom-right-radius: 2px;
+      padding: 8px 0;
       box-shadow: 0 3px 15px rgba(0,0,0,0.2);
-      flex: 0 0 auto;
-      animation: slideDown 0.8s ease-out;
     }
 
-    header h1 {
-      font-size: 16px;
-      margin: 0;
+    header h1 { font-size: 16px; margin: 0; }
+    header p { font-size: 10px; color: gold; margin: 2px 0 0 0; }
+
+    /* 🌿 Slideshow */
+    .illustration {
+      position: relative;
+      width: 97%;
+      max-width: 380px;
+      height: 210px;
+      margin: 18px auto 15px auto;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    header p {
-      font-size: 10px;
-      color: gold;
-      margin: 2px 0 0 0;
+    .slide {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 2s ease-in-out, transform 6s ease;
     }
 
-    /* 🌸 Grid Container */
+    .slide.active {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .illustration img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* 🔹 Teks berjalan */
+    .scrolling-text {
+      position: absolute;
+      top: 5px;
+      left: 0;
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      color: purple;
+      font-size: 11px;
+      z-index: 5;
+    }
+
+    .scrolling-text span {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scrollText 20s linear infinite;
+    }
+
+    @keyframes scrollText {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* 🔸 Dot navigation */
+    .dots {
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 5px;
+      z-index: 10;
+    }
+
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      opacity: 0.6;
+    }
+
+    .dot:nth-child(1){background: #4caf50;}
+    .dot:nth-child(2){background: #2196f3;}
+    .dot:nth-child(3){background: #ff9800;}
+    .dot:nth-child(4){background: #f44336;}
+
+    .dot.active {
+      transform: scale(1.3);
+      opacity: 1;
+      box-shadow: 0 0 8px rgba(255,255,255,0.8);
+    }
+
+    /* 🌿 Bingkai pembungkus dengan efek cahaya */
+    .wrapper {
+      position: relative;
+      display: inline-block;
+      padding: 8px;
+      border-radius: 20px;
+      margin: 10px auto 20px auto;
+      overflow: hidden;
+      background: rgba(255,255,255,0.3);
+    }
+
+    .wrapper::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        from 0deg,
+        #4caf50,
+        #2196f3,
+        #ff9800,
+        #f44336,
+        #4caf50
+      );
+      animation: rotateGlow 2s linear infinite;
+      z-index: 0;
+    }
+
+    @keyframes rotateGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .wrapper::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      background: linear-gradient(180deg, #f5fff8, #fdfdfd);
+      border-radius: 18px;
+      z-index: 1;
+    }
+
+    /* 🔹 Grid kartu */
     .container {
-      flex: 1 0 auto;
+      position: relative;
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: repeat(2, 1fr);
-      gap: 30px;
-      padding: 30px;
-      width: 90%;
+      gap: 25px;
+      padding: 25px;
+      width: 220px;
       max-width: 600px;
       margin: auto;
-      box-sizing: border-box;
-      animation: fadeUp 1s ease-in-out;
+      z-index: 2;
     }
 
-    /* 🟩 Kartu Dasar */
     .card {
       border-radius: 14px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.1);
       padding: 10px 5px;
-      transition: all 0.4s ease;
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -71,105 +183,81 @@
       color: white;
       opacity: 0;
       animation: cardFade 1s forwards;
+      border: 0.5px solid orange;
     }
 
-    /* ⏳ Animasi muncul bertahap */
-    .card:nth-child(1) { animation-delay: 0.2s; }
-    .card:nth-child(2) { animation-delay: 0.4s; }
-    .card:nth-child(3) { animation-delay: 0.6s; }
-    .card:nth-child(4) { animation-delay: 0.8s; }
+    .card:nth-child(1){animation-delay:0.2s;}
+    .card:nth-child(2){animation-delay:0.4s;}
+    .card:nth-child(3){animation-delay:0.6s;}
+    .card:nth-child(4){animation-delay:0.8s;}
 
     .card:hover {
       transform: translateY(-5px) scale(1.05);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-      filter: brightness(1.1);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
     }
 
-    .card-icon {
-      font-size: 22px;
-      margin-bottom: 5px;
-      animation: float 3s ease-in-out infinite;
+    .card-icon { font-size: 22px; margin-bottom: 5px; animation: float 3s ease-in-out infinite; }
+    .card h3 { font-size: 11px; color: silver; margin: 0; }
+
+    .cuaca { background: linear-gradient(135deg, #2196f3, #64b5f6); }
+    .udara { background: linear-gradient(135deg, #ff9800, #ffb74d); }
+    .sholat { background: linear-gradient(135deg, #4caf50, #81c784); }
+    .gempa { background: linear-gradient(135deg, #f44336, #e57373); }
+
+    /* 🔊 Tombol suara */
+    .sound-btn {
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      font-size: 10px;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+      transition: all 0.3s ease;
+      display: inline-block;
+      margin: 10px auto 15px auto;
     }
 
-    .card h3 {
-      font-size: 11px;
-      color: silver;
-      margin: 0;
-      line-height: 1.2;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-    }
-     
-    /* 🎨 Gradient Warna Card */
-    .cuaca {
-      background: linear-gradient(135deg, #2196f3, #64b5f6);
-    }
-    .udara {
-      background: linear-gradient(135deg, #ff9800, #ffb74d);
-    }
-    .sholat {
-      background: linear-gradient(135deg, #4caf50, #81c784);
-    }
-    .gempa {
-      background: linear-gradient(135deg, #f44336, #e57373);
+    .sound-btn:hover {
+      background: linear-gradient(90deg, #00f2fe, #4facfe);
+      transform: scale(1.05);
     }
 
     footer {
-      flex: 0 0 auto;
       font-size: 9px;
       color: #666;
       padding: 6px 0;
       background: #f9fff9;
       border-top: 1px solid #e0e0e0;
-      animation: fadeIn 1.5s ease;
     }
 
-    /* 🪶 Animasi Halus */
-    @keyframes fadeInBody {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    /* ⚠️ Popup */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, #ff5252, #ff8a80);
+      color: white;
+      padding: 18px 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 9999;
+      animation: pulse 1.5s infinite;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    @keyframes pulse {
+      0%, 100% { transform: translate(-50%, -50%) scale(1); }
+      50% { transform: translate(-50%, -50%) scale(1.05); }
     }
 
-    @keyframes slideDown {
-      from { transform: translateY(-40px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @keyframes fadeUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @keyframes cardFade {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    /* 📱 Responsif */
-    @media (min-height: 700px) {
-      .card { min-height: 120px; }
-      .card-icon { font-size: 34px; }
-      .card h3 { font-size: 12px; }
-    }
-
-    /* 🌈 Efek transisi antar halaman */
-    .fade-out {
-      animation: fadeOut 0.5s ease-in forwards;
-    }
-
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; transform: scale(0.95); }
-    }
+    @keyframes fadeInBody { from{opacity:0;} to{opacity:1;} }
+    @keyframes cardFade { from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
+    @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
   </style>
 </head>
 <body>
@@ -178,38 +266,87 @@
     <p>Pilih salah satu data berikut</p>
   </header>
 
-  <div class="container">
-    <div class="card cuaca" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/cuaca.html')">
-      <div class="card-icon">☀️</div>
-      <h3>Prakiraan Cuaca</h3>
+  <!-- Slideshow -->
+  <div class="illustration">
+    <div class="scrolling-text">
+      <span>🌿 Cardipa - Kartu Parameter Cuaca, Udara, Sholat dan Gempa 🌍</span>
     </div>
 
-    <div class="card udara" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/udara.html')">
-      <div class="card-icon">🌫️</div>
-      <h3>Kualitas Udara</h3>
-    </div>
+    <div class="slide active"><img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800" alt=""></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800" alt=""></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1470770903676-69b98201ea1c?w=800" alt=""></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800" alt=""></div>
 
-    <div class="card sholat" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/sholat.html')">
-      <div class="card-icon">🕌</div>
-      <h3>Jadwal Sholat</h3>
-    </div>
-      
-    <div class="card gempa" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/gempa.html')">
-      <div class="card-icon">🌋</div>
-      <h3>Info Gempa</h3>
+    <div class="dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
     </div>
   </div>
 
+  <!-- 🌿 Grid dalam bingkai -->
+  <div class="wrapper">
+    <div class="container">
+      <div class="card cuaca" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/cuaca.html')">
+        <div class="card-icon">🌦️</div><h3>Prakiraan Cuaca</h3>
+      </div>
+      <div class="card udara" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/udara.html')">
+        <div class="card-icon">🏭</div><h3>Kualitas Udara</h3>
+      </div>
+      <div class="card sholat" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/sholat.html')">
+        <div class="card-icon">🕌</div><h3>Jadwal Sholat</h3>
+      </div>
+      <div class="card gempa" onclick="smoothGo('https://wisayadi.github.io/parameter-dashboard/gempa.html')">
+        <div class="card-icon">🌋</div><h3>Info Gempa</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔊 Tombol Suara -->
+  <button class="sound-btn" onclick="enableSound()">🔊 Aktifkan Suara</button>
+
   <footer>© 2025 Dashboard Cardipa</footer>
 
+  <div id="popup" class="popup">⚠️ Jaringan internet terputus. Periksa koneksi Anda!</div>
+
   <script>
-    // 🌸 Transisi halus antar halaman
-    function smoothGo(url) {
-      document.body.classList.add("fade-out");
-      setTimeout(() => {
-        window.location.href = url;
-      }, 400);
+    let soundEnabled = false;
+    let audioBeep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+
+    function enableSound() {
+      soundEnabled = true;
+      audioBeep.play().catch(()=>{});
+      alert("✅ Suara aktif!");
     }
+
+    function smoothGo(url) {
+      document.body.style.opacity = 0;
+      setTimeout(() => window.location.href = url, 400);
+    }
+
+    // Slideshow
+    let slides = document.querySelectorAll('.slide');
+    let dots = document.querySelectorAll('.dot');
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+    }, 6000);
+
+    // Popup koneksi
+    function showPopup() {
+      document.getElementById("popup").style.display = "block";
+      if (soundEnabled) audioBeep.play();
+    }
+    function hidePopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+    window.addEventListener("offline", showPopup);
+    window.addEventListener("online", hidePopup);
   </script>
 </body>
 </html>
