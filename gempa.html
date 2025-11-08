@@ -279,6 +279,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Peta Gempa BMKG Interaktif</title>
+  <!-- ✅ Izinkan akses semua sumber HTTPS (supaya aman di AppsGeyser WebView) -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src * 'self' data: blob: filesystem: https: 'unsafe-inline' 'unsafe-eval';
+                 img-src * data: blob:;">  
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
 
 <style>
