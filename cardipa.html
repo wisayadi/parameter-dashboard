@@ -44,6 +44,29 @@
   .slide.active { opacity: 1; transform: scale(1.05); }
   .illustration img { width: 100%; height: 100%; object-fit: cover; }
 
+  /* 🕒 Jam Digital Neon */
+  #clock {
+    position: relative;
+    margin-bottom: 10px;
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #00ffff;
+    text-shadow: 0 0 5px #00ffff,
+                 0 0 10px #00ffff,
+                 0 0 20px #00ffff,
+                 0 0 40px #00ffff;
+    background: rgba(0, 0, 0, 0.70)/*#ffffff4D*/;
+    padding: 5px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.25);
+    animation: glowPulse 1.5s ease-in-out infinite alternate;
+  }
+  @keyframes glowPulse {
+    from { text-shadow: 0 0 8px #00ffff; }
+    to { text-shadow: 0 0 18px #00ffff; }
+  }
+
   .scrolling-text {
     position: absolute; top: 5px; left: 0; width: 100%;
     white-space: nowrap; overflow: hidden;
@@ -77,7 +100,7 @@
     display: inline-block;
     padding: 8px;
     border-radius: 20px;
-    margin: 10px auto 10px auto;
+    margin: 10px auto;
     overflow: hidden;
     background: rgba(255,255,255,0.3);
   }
@@ -87,7 +110,7 @@
     top: -50%; left: -50%;
     width: 200%; height: 200%;
     background: conic-gradient(from 0deg,#4caf50,#2196f3,#ff9800,#f44336,#4caf50);
-    animation: rotateGlow 2s linear infinite;
+    animation: rotateGlow 3s linear infinite;
     z-index: 0;
   }
   @keyframes rotateGlow { 0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
@@ -137,7 +160,6 @@
     border-radius: 50%;
     width: 18px; height: 18px;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 0 3px rgba(0,0,0,0.3);
   }
 
   .card:nth-child(1){animation-delay:0.2s;}
@@ -156,7 +178,7 @@
 
   /* Tombol suara */
   #soundBtn {
-    margin-bottom: 10px;
+    margin-bottom:10px;
     background: linear-gradient(90deg, #4facfe, #00f2fe);
     color: purple;
     border: none;
@@ -193,7 +215,6 @@
   @keyframes fadeInBody { from{opacity:0;} to{opacity:1;} }
   @keyframes cardFade { from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
   @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
-
 </style>
 </head>
 <body>
@@ -213,49 +234,43 @@
       <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
     </div>
   </div>
-  
-  <p style="font-size:12px; color:/*#2e7d32*/brown; text-align:center;">
-  🌿 Pilih kartu Parameter 🌿
-</p>
 
-  <!-- 🌿 Grid -->
+  <!-- Jam Digital -->
+  <div id="clock">00:00:00</div>
+
+  <!-- Grid Cards -->
+  <p style="font-size:12px; color:brown; text-align:center;">🌿 Pilih kartu Parameter 🌿</p>
   <div class="wrapper">
     <div class="container">
       <div class="card cuaca" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/cuaca.html')">
-        <div class="card-number">1</div>
-        <div class="card-icon">🌦️</div><h3>Prakiraan Cuaca</h3>
+        <div class="card-number">1</div><div class="card-icon">🌦️</div><h3>Prakiraan Cuaca</h3>
       </div>
       <div class="card udara" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/udara.html')">
-        <div class="card-number">2</div>
-        <div class="card-icon">🏭</div><h3>Kualitas Udara</h3>
+        <div class="card-number">2</div><div class="card-icon">🏭</div><h3>Kualitas Udara</h3>
       </div>
       <div class="card sholat" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/sholat.html')">
-        <div class="card-number">3</div>
-        <div class="card-icon">🕌</div><h3>Jadwal Sholat</h3>
+        <div class="card-number">3</div><div class="card-icon">🕌</div><h3>Jadwal Sholat</h3>
       </div>
       <div class="card gempa" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/gempa.html')">
-        <div class="card-number">4</div>
-        <div class="card-icon">🌋</div><h3>Info Gempa</h3>
+        <div class="card-number">4</div><div class="card-icon">🌋</div><h3>Info Gempa</h3>
       </div>
     </div>
   </div>
 
+  <!-- Tombol Suara -->
   <button id="soundBtn" onclick="toggleSound()">🔊 Aktifkan Suara</button>
 
   <footer>© 2025 Dashboard Cardipa</footer>
-
   <div id="popup" class="popup">⚠️ Jaringan internet terputus. Periksa koneksi Anda!</div>
 
 <script>
 let audioBeep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 let soundEnabled = localStorage.getItem("soundEnabled") === "true";
 
-// Tampilkan status awal
 window.addEventListener("load", () => {
   if (soundEnabled) document.getElementById("soundBtn").innerText = "✅ Suara Aktif";
 });
 
-// Tombol toggle suara
 function toggleSound() {
   soundEnabled = !soundEnabled;
   localStorage.setItem("soundEnabled", soundEnabled);
@@ -267,14 +282,12 @@ function toggleSound() {
   }
 }
 
-// Navigasi antar halaman
 function cardClick(url) {
   if (soundEnabled) audioBeep.play().catch(()=>{});
   document.body.style.opacity = 0;
   setTimeout(() => window.location.href = url, 800);
 }
 
-// Slideshow
 let slides = document.querySelectorAll(".slide");
 let dots = document.querySelectorAll(".dot");
 let current = 0;
@@ -286,11 +299,25 @@ setInterval(() => {
   dots[current].classList.add("active");
 }, 6000);
 
-// Popup koneksi
 function showPopup(){document.getElementById("popup").style.display="block";if(soundEnabled)audioBeep.play();}
 function hidePopup(){document.getElementById("popup").style.display="none";}
 window.addEventListener("offline", showPopup);
 window.addEventListener("online", hidePopup);
+
+function updateClockLocal() {
+  const t = new Date();
+  const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][t.getDay()];
+  const tanggal = String(t.getDate()).padStart(2,'0');
+  const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][t.getMonth()];
+  const tahun = t.getFullYear();
+  const jam = String(t.getHours()).padStart(2,'0');
+  const menit = String(t.getMinutes()).padStart(2,'0');
+  const detik = String(t.getSeconds()).padStart(2,'0');
+  document.getElementById("clock").textContent =
+    `${hari}, ${tanggal} ${bulan} ${tahun} | ${jam}:${menit}-${detik}`;
+}
+setInterval(updateClockLocal, 1000);
+updateClockLocal();
 </script>
 </body>
 </html>
