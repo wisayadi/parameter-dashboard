@@ -30,7 +30,7 @@
       border: none;
       padding: 7px 16px;
       border-radius: 12px;
-      font-size: 11px;
+      font-size: 7px;
       font-weight: 600;
       cursor: pointer;
       box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
@@ -62,12 +62,12 @@
     .btnZona {
       background: linear-gradient(135deg, #e0e0e0, #ffffff);
       border: 2px solid #ccc;
-      border-radius: 50px;
-      padding: 4px 12px;
+      border-radius: 12px;
+      padding: 7px 12px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 11px;
+      font-size: 7px;
       color: #555;
       margin: 0 5px;
     }
@@ -75,17 +75,17 @@
       background: linear-gradient(135deg, #d4e2fc, #f0f8ff);
       transform: scale(1.08);
     }
-    .btnZona.active {
+    /*.btnZona.active {
       background: linear-gradient(135deg, #4a90e2, #5cc6ff);
       color: white;
       border-color: #4a90e2;
       box-shadow: 0 0 12px rgba(0, 150, 255, 0.6);
-    }
+    }*/
     .waktu-display {
       font-weight: bold;
-      color: blue;
+      color: abu-abu emas;
       font-size: 12px;
-      background: lightyellow;
+      background: lightblue;
       border-radius: 10px;
       padding: 10px 12px;
       display: inline-block;
@@ -240,7 +240,7 @@
     }*/
    /*<!-- Tambahan Card Penjelasan -->*/
   
-    .grid-udara {
+     .grid-udara {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
@@ -251,14 +251,17 @@
       border: 1px solid #f3d7b6;
       border-radius: 10px;
       padding: 12px;
-      font-size: 12px;
-      color: /*#444*/brown;
+      text-align: center;
+      font-size: 10px;
+      color: /*#444*/black;
+      max-width: 310px;
+      min-height: 40px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .card-udara h5 {
       margin: 0 0 6px;
       font-size: 13px;
-      text-align: center; 
+      text-align: center;
       font-weight: bold;
       color: #d97706;
     }
@@ -269,13 +272,13 @@
      text-align: center; 
      border: 1px solid #f3d7b6;
      border-bottom: 2px solid #ddd;
-     padding: 8px 17px;
+     padding: 8px 12px;
      border-radius: 6px 6px 0 0; /* sudut atas agak membulat */
      font-size: 11px;
      font-weight: 600;
      color: brown;
-     margin-bottom: 10px;
-     /*margin-top: 20px;*/
+     width: 310px;
+     margin-bottom: 3px;
   }
   </style>
 </head>
@@ -384,7 +387,7 @@
       `${hari}, ${tanggal} pukul ${jam} (${zona})`;
 
     // Simpan zona aktif di tombol
-    document.querySelectorAll('.btnZona').forEach(btn => {
+     document.querySelectorAll('.btnZona').forEach(btn => {
       btn.style.background = (btn.textContent === zona) ? '#7B61FF' : '#ddd';
       btn.style.color = (btn.textContent === zona) ? '#fff' : '#000';
     });
@@ -463,22 +466,66 @@ loadAirQuality();
 </body>
 </html>
 
-<div class="card muted">Sumber data: OpenWeatherMap</div>
-  </div>
-<!-- kolom sumber data -->
-  <style>
-.card.muted {
-  font-size: 12px;          /* ukuran font kecil */
-  color: purple;            /* warna teks */
-  /*background-color: #f3e5f5;*//* warna latar ungu muda */
-  background-color: #fff8f0;
-  text-align: center;       /* posisikan teks di tengah */
-  margin-top: 6px;          /* jarak atas */
-  padding: 6px 10px;        /* beri ruang dalam box */
-  border-radius: 6px;       /* sudut tumpul */
-  border: 1px solid #f3d7b6;
-  /*border-radius: 10px;*/
-  max-width: 300px;
-  margin: 20px auto;
+<div class="card muted">
+  <span class="dot-gradient left-dot">•</span>
+  <span class="muted-text">Sumber data: OpenWeatherMap</span>
+  <span class="dot-gradient right-dot">•</span>
+</div>
+
+<style>
+  .card.muted {
+    position: relative;
+    text-align: center;
+    font-size: 11px;
+    color: /*#555*/purple;
+    /*background: #fdecea;*/
+    background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);
+    border-radius: 8px;
+    margin-top: 12px;
+    margin-bottom: 10px;
+    width: 270px;
+    padding: 8px 35px; /* memberi jarak agar titik tidak menempel pada teks */
   }
-  </style>
+
+  .muted-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .dot-gradient {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    font-size: 18px;
+    /*background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);*/
+    background: white;
+    background-size: 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glow 2s infinite ease-in-out, colorShift 6s infinite linear;
+  }
+
+  .left-dot { left: 12px; }
+  .right-dot { right: 12px; }
+
+  /* ✨ Berkedip lembut */
+  @keyframes glow {
+    0%, 100% {
+      opacity: 0.4;
+      text-shadow: 0 0 6px rgba(255,255,255,0.3);
+    }
+    50% {
+      opacity: 1;
+      text-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+  }
+
+  /* 🌈 Pergerakan warna gradient */
+  @keyframes colorShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style> 
