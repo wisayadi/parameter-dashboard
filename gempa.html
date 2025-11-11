@@ -45,7 +45,7 @@
   .scrolling-text {
     display: inline-block;
     padding-left: 100%;
-    animation: scroll-left 40s linear infinite;
+    animation: scroll-left 50s linear infinite;
     transition: opacity 1s ease;
     font-weight: 600;
     font-size: 10px;
@@ -65,8 +65,15 @@
     background: linear-gradient(90deg, #800000, #b02a37, #800000);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: pulse-gradient 3s ease-in-out infinite, scroll-left 40s linear infinite;
+    animation: pulse-gradient 3s ease-in-out infinite, scroll-left 40s linear infinite;}
+ 
+    /* Efek berdenyut */
+  @keyframes pulse-bg {
+    0% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0.5); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 50, 50, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0); }
   }
+  .pulse-bg { animation: pulse 2s infinite; }
 
   /* 💥 Efek gradient berdenyut untuk magnitudo ≥6 */
   @keyframes pulse-gradient {
@@ -94,10 +101,11 @@
     setTimeout(() => {
       scrollElem.textContent = teks;
       scrollElem.className = 'scrolling-text';
+          
       if (magnitudo < 4.0) scrollElem.classList.add('warna-hijau');
-      else if (magnitudo < 5.0) scrollElem.classList.add('warna-abu-emas'/*'warna-hijau'*/);
+      else if (magnitudo < 5.0) scrollElem.classList.add('warna-abu-emas');
       else if (magnitudo >= 5.0 && magnitudo < 6.0) scrollElem.classList.add('warna-orange');
-      else scrollElem.classList.add('warna-merah-maron');
+      else scrollElem.classList.add('warna-merah-maron');       
       scrollElem.style.opacity = 1;
     }, 800);
   }
@@ -262,7 +270,7 @@
   /* ⏰ Teks Waktu */
   .waktu-display {
   font-weight: bold;
-  color: /*#111*/blue;
+  color: /*#111*/red;
   font-size: 10px;
   background: /*linear-gradient(90deg, #eef5ff, #ffffff)*/lightyellow;
   border-radius: 10px;
@@ -766,21 +774,67 @@ loadGempa();
 </body>
 </html>
   
- <div class="card muted">Sumber data: BMKG Nasional</div>
-  </div>
-  
-<!-- kolom sumber data -->
-  <style>
-.card.muted {
-  font-size: 12px;          /* ukuran font kecil */
-  color: purple;            /* warna teks */
-  /*background-color: #f3e5f5;*//* warna latar ungu muda */
-  background-color: #fff8f0;
-  text-align: center;       /* posisikan teks di tengah */
-  margin-top: 6px;          /* jarak atas */
-  padding: 6px 10px;        /* beri ruang dalam box */
-  border-radius: 6px;       /* sudut tumpul */
-  border: 1px solid #f3d7b6;
-  /*border-radius: 10px;*/
+  <div class="card muted">
+  <span class="dot-gradient left-dot">•</span>
+  <span class="muted-text">Sumber data: BMKG Nasional</span>
+  <span class="dot-gradient right-dot">•</span>
+</div>
+
+<style>
+  .card.muted {
+    position: relative;
+    text-align: center;
+    font-size: 11px;
+    color: /*#555*/purple;
+    /*background: #fdecea;*/
+    background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);
+    border-radius: 8px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    /*margin-right: 20px;*/
+    width: 258px;
+    padding: 8px 35px; /* memberi jarak agar titik tidak menempel pada teks */
   }
-  </style>
+
+  .muted-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .dot-gradient {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    font-size: 18px;
+    /*background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);*/
+    background: white;
+    background-size: 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glow 2s infinite ease-in-out, colorShift 6s infinite linear;
+  }
+
+  .left-dot { left: 12px; }
+  .right-dot { right: 12px; }
+
+  /* ✨ Berkedip lembut */
+  @keyframes glow {
+    0%, 100% {
+      opacity: 0.4;
+      text-shadow: 0 0 6px rgba(255,255,255,0.3);
+    }
+    50% {
+      opacity: 1;
+      text-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+  }
+
+  /* 🌈 Pergerakan warna gradient */
+  @keyframes colorShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style> 
