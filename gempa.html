@@ -1,7 +1,7 @@
   
  <body>
   <!-- 🔹 Info Gempa Berjalan -->
-  <div class="info-gempa">
+  <div class="info-gempa pulse-bg">
     <span id="scrollGempa" class="scrolling-text warna-abu-emas">
       Memuat data gempa terkini dari BMKG...
     </span>
@@ -23,7 +23,8 @@
     font-size: 6px;
     font-weight: 600;
     cursor: pointer;
-    margin: 15px;
+    margin-bottom: 1px;
+    margin-top: 25px;
     box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     transition: all 0.3s ease;
   }
@@ -33,24 +34,51 @@
   }
 
   /* 🌍 Latar dan area scroll */
-  .info-gempa {
+  /**.info-gempa {
     background: linear-gradient(180deg, #fffef7, #f5fff5);
     padding: 8px 0;
     overflow: hidden;
     white-space: nowrap;
     text-align: center;
-  }
+  }**/
 
   /* ✨ Teks berjalan */
-  .scrolling-text {
+  /**.scrolling-text {
     display: inline-block;
     padding-left: 100%;
     animation: scroll-left 50s linear infinite;
     transition: opacity 1s ease;
     font-weight: 600;
     font-size: 10px;
+  }**/
+
+/* 🌍 Latar belakang dan area scroll */
+  .info-gempa {
+    background: linear-gradient(90deg, /*#00c853,*/ #2196f3/*, #ff9800, #f44336*/);
+    /*background: linear-gradient(180deg, #fffef7, #f5fff5);*/
+    background-size: 400% 400%;
+    padding: 8px 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    animation: gradientFlow 6s ease infinite, pulse-bg 2.5s infinite;
+    border-radius: 2px;
   }
 
+  /* ✨ Teks berjalan */
+  .scrolling-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 45s linear infinite;
+    transition: opacity 1s ease;
+    font-weight: 600;
+    font-size: 11px;
+    color: white;
+    text-shadow: 0 0 6px rgba(0,0,0,0.3);
+  }
   @keyframes scroll-left {
     0% { transform: translateX(0); }
     100% { transform: translateX(-100%); }
@@ -68,15 +96,28 @@
     animation: pulse-gradient 3s ease-in-out infinite, scroll-left 40s linear infinite;}
  
     /* Efek berdenyut */
+   /* 🌈 Efek berdenyut lembut */
   @keyframes pulse-bg {
     0% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0.5); }
     70% { box-shadow: 0 0 0 15px rgba(255, 50, 50, 0); }
     100% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0); }
   }
-  .pulse-bg { animation: pulse 2s infinite; }
+/*.pulse-bg { animation: pulse 2s infinite; }*/
+
+  /* 🔮 Animasi gradien bergerak */
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+ /* Warna alternatif teks */
+  .warna-hijau { color: #00c853; }
+  .warna-abu-emas { color: #fdf5c4; }
+  .warna-orange { color: #ff8c00; }
+  .warna-merah-maron { color: #b71c1c; }
 
   /* 💥 Efek gradient berdenyut untuk magnitudo ≥6 */
-  @keyframes pulse-gradient {
+  /*@keyframes pulse-gradient {
     0% {
       background-position: 0% 50%;
       text-shadow: 0 0 6px rgba(176, 42, 55, 0.4);
@@ -89,7 +130,7 @@
       background-position: 0% 50%;
       text-shadow: 0 0 6px rgba(176, 42, 55, 0.4);
     }
-  }
+  }*/
 </style>
 
 <script>
