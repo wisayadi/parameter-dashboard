@@ -1,5 +1,14 @@
   
  <body>
+   <script>
+// 🚫 Nonaktifkan tombol "Back" sistem HP
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  // Cegah aksi kembali
+  history.go(1);
+};
+</script>
+   
   <!-- 🔹 Info Gempa Berjalan -->
   <div class="info-gempa pulse-bg">
     <span id="scrollGempa" class="scrolling-text warna-abu-emas">
@@ -809,6 +818,7 @@ async function loadGempa() {
   } catch (err) {
     console.error("Gagal memuat data gempa:", err);
   }
+    
 }
 loadGempa();
 </script>
