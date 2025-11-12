@@ -1,16 +1,5 @@
   
- <body>
-  <script>
-// 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom
-history.pushState(null, null, location.href);
-window.onpopstate = function (event) {
-  // Jika pengguna menekan tombol "back", tetap di halaman ini
-  if (!window.ignoreBack) {
-    history.pushState(null, null, location.href);
-  }
-};
-</script>
-   
+ <body>   
   <!-- 🔹 Info Gempa Berjalan -->
   <div class="info-gempa pulse-bg">
     <span id="scrollGempa" class="scrolling-text warna-abu-emas">
