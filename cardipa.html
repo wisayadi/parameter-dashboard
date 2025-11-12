@@ -1,323 +1,891 @@
-<!DOCTYPE html>
+  
+ <body>
+   <script>
+// 🚫 Nonaktifkan tombol "Back" sistem HP
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  // Cegah aksi kembali
+  history.go(1);
+};
+</script>
+   
+  <!-- 🔹 Info Gempa Berjalan -->
+  <div class="info-gempa pulse-bg">
+    <span id="scrollGempa" class="scrolling-text warna-abu-emas">
+      Memuat data gempa terkini dari BMKG...
+    </span>
+  </div>
+   <button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
+    ⬅️ Kembali ke Dashboard
+  </button>   
+</body>
+
+<style>
+      /* 🔹 Tombol kembali */
+  .back-btn {
+    display: inline-block;
+    background: linear-gradient(90deg, #ff5f6d, #ffc371);
+    color: /*white*/black;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 1px;
+    margin-top: 25px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+  }
+  .back-btn:hover {
+    transform: scale(1.07);
+    background: linear-gradient(90deg, #ff7a7a, #ffb86b);
+  }
+
+  /* 🌍 Latar dan area scroll */
+  /**.info-gempa {
+    background: linear-gradient(180deg, #fffef7, #f5fff5);
+    padding: 8px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+  }**/
+
+  /* ✨ Teks berjalan */
+  /**.scrolling-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 50s linear infinite;
+    transition: opacity 1s ease;
+    font-weight: 600;
+    font-size: 10px;
+  }**/
+
+/* 🌍 Latar belakang dan area scroll */
+  .info-gempa {
+    background: linear-gradient(90deg, /*#00c853,*/ #2196f3/*, #ff9800, #f44336*/);
+    /*background: linear-gradient(180deg, #fffef7, #f5fff5);*/
+    background-size: 400% 400%;
+    padding: 8px 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+    animation: gradientFlow 6s ease infinite, pulse-bg 2.5s infinite;
+    border-radius: 2px;
+  }
+
+  /* ✨ Teks berjalan */
+  .scrolling-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 45s linear infinite;
+    transition: opacity 1s ease;
+    font-weight: 600;
+    font-size: 11px;
+    color: white;
+    text-shadow: 0 0 6px rgba(0,0,0,0.3);
+  }
+  @keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* 🌈 Warna berdasarkan magnitudo */
+  .warna-hijau { color: /*#3e3e3e*/green; } /* <4.0 */
+  .warna-abu-emas { color: #3e3e3e; } /* <5.0 */
+  .warna-orange { color: #ff8c00; }   /* 5.0–5.9 */
+  .warna-merah-maron { 
+    color: #800000; 
+    background: linear-gradient(90deg, #800000, #b02a37, #800000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: pulse-gradient 3s ease-in-out infinite, scroll-left 40s linear infinite;}
+ 
+    /* Efek berdenyut */
+   /* 🌈 Efek berdenyut lembut */
+  @keyframes pulse-bg {
+    0% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0.5); }
+    70% { box-shadow: 0 0 0 15px rgba(255, 50, 50, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0); }
+  }
+/*.pulse-bg { animation: pulse 2s infinite; }*/
+
+  /* 🔮 Animasi gradien bergerak */
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+ /* Warna alternatif teks */
+  .warna-hijau { color: #00c853; }
+  .warna-abu-emas { color: #fdf5c4; }
+  .warna-orange { color: #ff8c00; }
+  .warna-merah-maron { color: #b71c1c; }
+
+  /* 💥 Efek gradient berdenyut untuk magnitudo ≥6 */
+  /*@keyframes pulse-gradient {
+    0% {
+      background-position: 0% 50%;
+      text-shadow: 0 0 6px rgba(176, 42, 55, 0.4);
+    }
+    50% {
+      background-position: 100% 50%;
+      text-shadow: 0 0 18px rgba(255, 50, 50, 0.8);
+    }
+    100% {
+      background-position: 0% 50%;
+      text-shadow: 0 0 6px rgba(176, 42, 55, 0.4);
+    }
+  }*/
+</style>
+
+<script>
+  const scrollElem = document.getElementById('scrollGempa');
+
+  // 🔁 Efek ganti teks halus
+  function updateGempa(teks, magnitudo) {
+    scrollElem.style.opacity = 0;
+    setTimeout(() => {
+      scrollElem.textContent = teks;
+      scrollElem.className = 'scrolling-text';
+          
+      if (magnitudo < 4.0) scrollElem.classList.add('warna-hijau');
+      else if (magnitudo < 5.0) scrollElem.classList.add('warna-abu-emas');
+      else if (magnitudo >= 5.0 && magnitudo < 6.0) scrollElem.classList.add('warna-orange');
+      else scrollElem.classList.add('warna-merah-maron');       
+      scrollElem.style.opacity = 1;
+    }, 800);
+  }
+
+  // 🌍 Ambil data gempa dari API BMKG
+  async function fetchGempa() {
+    try {
+      const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
+      const data = await res.json();
+
+      const g = data.Infogempa.gempa;
+      const magnitudo = parseFloat(g.Magnitude);
+      const lokasi = g.Wilayah;
+      const waktu = g.Tanggal + ' ' + g.Jam;
+      const dirasakan = g.Dirasakan;
+      const teks = `🌋 GEMPA ${g.Tanggal} pukul ${g.Jam} | Magnitudo: ${g.Magnitude} SR | Kedalaman: ${g.Kedalaman} | Lokasi: ${g.Wilayah} | Koordinat: ${g.Lintang}, ${g.Bujur} | Dirasakan: ${dirasakan} | Potensi: ${g.Potensi}`;
+      
+      updateGempa(teks, magnitudo);
+    } catch (e) {
+      console.error('Gagal ambil data BMKG:', e);
+      updateGempa('⚠️ Gagal memuat data gempa dari BMKG.', 0);
+    }
+  }
+
+  // ⏱ Jalankan pertama kali & perbarui tiap 5 menit
+  fetchGempa();
+  setInterval(fetchGempa, 5 * 60 * 1000);
+</script>
+
+    <!-- wilayah Zona Waktu -->
+  <body>
+  <div class="card-waktu">
+  <h3>🕒 Zona Waktu</h3>
+
+  <!-- Tombol Zona Waktu -->
+  <div style="text-align:center; margin:10px;">
+    <button class="btnZona" onclick="setZona('WIB')">WIB</button>
+    <button class="btnZona" onclick="setZona('WITA')">WITA</button>
+    <button class="btnZona" onclick="setZona('WIT')">WIT</button>
+  </div>
+
+   <div id="waktuSekarang" class="waktu-display">Memuat waktu...</div>
+</div>
+  </div>
+
+  <script>
+  // 🔧 Simpan zona waktu ke localStorage
+  function setZona(zona) {
+    localStorage.setItem('zonaWaktu', zona);
+    tampilkanWaktu();
+  }
+
+  // 🔄 Tampilkan waktu sesuai zona
+  function tampilkanWaktu() {
+    let zona = localStorage.getItem('zonaWaktu') || 'WIB'; // default WIB
+    let now = new Date();
+
+    // Konversi offset zona waktu
+    let offset = 7; // WIB default
+    if (zona === 'WITA') offset = 8;
+    if (zona === 'WIT') offset = 9;
+
+    // Hitung waktu lokal
+    let utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    let waktuZona = new Date(utc + (3600000 * offset));
+
+    // Format tanggal dan waktu
+    const hari = waktuZona.toLocaleDateString('id-ID', { weekday: 'long' });
+    const tanggal = waktuZona.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const jam = waktuZona.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    document.getElementById('waktuSekarang').innerHTML =
+      `${hari}, ${tanggal} pukul ${jam} (${zona})`;
+
+    // Simpan zona aktif di tombol
+    document.querySelectorAll('.btnZona').forEach(btn => {
+      btn.style.background = (btn.textContent === zona) ? '#7B61FF' : '#ddd';
+      btn.style.color = (btn.textContent === zona) ? '#fff' : '#000';
+    });
+  }
+
+  // Jalankan otomatis
+  setInterval(tampilkanWaktu, 1000);
+  tampilkanWaktu();
+  </script>
+
+  <style>
+     /* 🌟 Card Container */
+  .card-waktu {
+    max-width: 285px;
+    margin: 25px auto;
+    /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
+    background: #f3fff6;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    border: 1px solid #f3d7b6;
+    padding: 20px;
+    text-align: center;
+    font-family: 'Poppins', Arial, sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  .card-waktu:hover {
+    transform: scale(1.02);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+  }
+
+  .card-waktu h3 {
+    color: /*#2a3d66*/brown;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  /*.btnZona {
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 10px;
+    border: none;
+    margin: 3px;
+    cursor: pointer;
+    background: #ddd;
+    transition: 0.3s;
+  }
+  .btnZona:hover {
+    background: #7B61FF;
+    color: white;
+  }*/
+     /* 🧭 Tombol Zona */
+  .Zona-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .btnZona {
+    background: linear-gradient(135deg, #e0e0e0, #ffffff);
+    border: 2px solid #ccc;
+    border-radius: 50px;
+    padding: 3px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 11px;
+    color: /*#333*/silver;
+  }
+
+  .btnZona:hover {
+    background: linear-gradient(135deg, #d4e2fc, #f0f8ff);
+    transform: scale(1.08);
+    box-shadow: 0 0 6px rgba(0,0,0,0.2);
+  }
+
+  .btnZona.active {
+    background: linear-gradient(135deg, #4a90e2, #5cc6ff);
+    color: white;
+    border-color: #4a90e2;
+    box-shadow: 0 0 12px rgba(0, 150, 255, 0.6);
+    transform: scale(1.05);
+  }
+   
+  /* ⏰ Teks Waktu */
+  .waktu-display {
+  font-weight: bold;
+  color: /*#111*/red;
+  font-size: 10px;
+  background: /*linear-gradient(90deg, #eef5ff, #ffffff)*/lightyellow;
+  border-radius: 10px;
+  padding: /*8px*/10px 12px;
+  display: inline-block;
+  border: 1px solid /*#eee*/#f3d7b6;
+}
+    
+  </style>
+</body>
+    <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Parameter Cardipa</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Peta Gempa BMKG Interaktif</title>
+
+<!-- ✅ Izinkan semua sumber HTTPS agar aman di AppsGeyser WebView -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src * 'self' data: blob: filesystem: https: 'unsafe-inline' 'unsafe-eval';
+               img-src * data: blob:;">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
 <style>
   body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(180deg, #f5fff8, #fdfdfd);
+    background: linear-gradient(180deg, #eef5ff, #ffffff);
     margin: 0;
+    padding: 0;
     text-align: center;
-    opacity: 0;
-    animation: fadeInBody 0.8s ease-in forwards;
   }
 
-  header {
-    background: linear-gradient(90deg, #4caf50, #81c784);
-    color: red;
-    padding: 8px 0;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+  h2 {
+    color: brown;
+    font-size: 13px;
+    margin-top: 10px;
   }
-  header h1 { font-size: 16px; margin: 0; }
-  header p { font-size: 10px; color: gold; margin: 2px 0 0 0; }
 
-  /* 🌿 Slideshow */
-  .illustration {
-    position: relative;
-    width: 97%;
-    max-width: 380px;
-    height: 210px;
-    margin: 18px auto 10px auto;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  .slide {
-    position: absolute;
+  /* 🔹 Kontainer peta */
+  #mapContainer {
     width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 2s ease-in-out, transform 6s ease;
+    opacity: 1;
+    transform: scale(1);
+    transition: all 0.8s ease;
   }
-  .slide.active { opacity: 1; transform: scale(1.05); }
-  .illustration img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* 🕒 Jam Digital Neon */
-  #clock {
-    position: relative;
-    margin-bottom: 10px;
-    display: inline-block;
-    font-family: 'Courier New', monospace;
-    font-size: 10px;
-    color: #00ffff;
-    text-shadow: 0 0 5px #00ffff,
-                 0 0 10px #00ffff,
-                 0 0 20px #00ffff,
-                 0 0 40px #00ffff;
-    background: rgba(0, 0, 0, 0.70)/*#ffffff4D*/;
-    padding: 5px 12px;
+  #map {
+    height: 420px;
+    width: 96%;
+    margin: 12px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  /* 🔹 Legenda warna */
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: /*#ffffffd0*/#ffffff4D;
+    padding: 6px 10px;
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.25);
-    animation: glowPulse 1.5s ease-in-out infinite alternate;
-  }
-  @keyframes glowPulse {
-    from { text-shadow: 0 0 8px #00ffff; }
-    to { text-shadow: 0 0 18px #00ffff; }
-  }
-
-  .scrolling-text {
-    position: absolute; top: 5px; left: 0; width: 100%;
-    white-space: nowrap; overflow: hidden;
-    color: purple; font-size: 11px; z-index: 5;
-  }
-  .scrolling-text span {
-    display: inline-block; padding-left: 100%;
-    animation: scrollText 20s linear infinite;
-  }
-  @keyframes scrollText { 0%{transform:translateX(0);}100%{transform:translateX(-100%);} }
-
-  /* 🔸 Dot navigation */
-  .dots {
-    position: absolute; bottom: 8px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 5px; z-index: 10;
-  }
-  .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    transition: all 0.3s ease; opacity: 0.6;
-  }
-  .dot:nth-child(1){background: #4caf50;}
-  .dot:nth-child(2){background: #2196f3;}
-  .dot:nth-child(3){background: #ff9800;}
-  .dot:nth-child(4){background: #f44336;}
-  .dot.active { transform: scale(1.3); opacity: 1; box-shadow: 0 0 8px rgba(255,255,255,0.8); }
-
-  /* 🌿 Bingkai pembungkus */
-  .wrapper {
-    position: relative;
-    display: inline-block;
-    padding: 8px;
-    border-radius: 20px;
-    margin: 10px auto;
-    overflow: hidden;
-    background: rgba(255,255,255,0.3);
-  }
-  .wrapper::before {
-    content: "";
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: conic-gradient(from 0deg,#4caf50,#2196f3,#ff9800,#f44336,#4caf50);
-    animation: rotateGlow 3s linear infinite;
-    z-index: 0;
-  }
-  @keyframes rotateGlow { 0%{transform:rotate(0deg);}100%{transform:rotate(360deg);} }
-  .wrapper::after {
-    content: "";
-    position: absolute;
-    top: 4px; left: 4px; right: 4px; bottom: 4px;
-    background: linear-gradient(180deg,#f5fff8,#fdfdfd);
-    border-radius: 18px; z-index: 1;
-  }
-
-  /* 🔹 Grid */
-  .container {
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px;
-    padding: 25px;
-    width: 220px;
-    max-width: 600px;
-    margin: auto;
-    z-index: 2;
-  }
-  .card {
-    position: relative;
-    border-radius: 14px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    padding: 10px 5px;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100px;
-    color: white;
-    opacity: 0;
-    animation: cardFade 1s forwards;
-    border: 0.5px solid orange;
-  }
-  .card-number {
-    position: absolute;
-    top: 5px; left: 7px;
-    background: rgba(255,255,255,0.25);
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-    border-radius: 50%;
-    width: 18px; height: 18px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
-  .card:nth-child(1){animation-delay:0.2s;}
-  .card:nth-child(2){animation-delay:0.4s;}
-  .card:nth-child(3){animation-delay:0.6s;}
-  .card:nth-child(4){animation-delay:0.8s;}
-  .card:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
-
-  .card-icon { font-size: 22px; margin-bottom: 5px; animation: float 3s ease-in-out infinite; }
-  .card h3 { font-size: 11px; color: silver; margin: 0; }
-
-  .cuaca { background: linear-gradient(135deg, #2196f3, #64b5f6); }
-  .udara { background: linear-gradient(135deg, #ff9800, #ffb74d); }
-  .sholat { background: linear-gradient(135deg, #4caf50, #81c784); }
-  .gempa { background: linear-gradient(135deg, #f44336, #e57373); }
-
-  /* Tombol suara */
-  #soundBtn {
-    margin-bottom:10px;
-    background: linear-gradient(90deg, #4facfe, #00f2fe);
-    color: purple;
-    border: none;
-    border-radius: 20px;
-    padding: 6px 14px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     font-size: 9px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+    line-height: 12px;
+    color: #333;
+    z-index: 1000;
   }
-  #soundBtn:hover { transform: scale(1.05); }
+  .legend i {
+    width: 10px;
+    height: 10px;
+    float: left;
+    margin-right: 8px;
+    border-radius: 3px;
+  }
 
-  footer { font-size: 9px; color: #666; padding: 6px 0; background: #f9fff9; border-top: 1px solid #e0e0e0; }
+  /* 🔹 Efek marker */
+  .marker-icon {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+  .green { background-color: #00c853; }
+  .yellow { background-color: #ffeb3b; }
+  .orange { background-color: #ff9800; }
+  .red { background-color: #e53935; }
 
-  .popup {
-    display: none;
+  /* 🔹 Efek berdenyut */
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.6; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .pulse { animation: pulse 1.5s infinite; }
+
+  /* 🔹 Efek getar */
+  @keyframes shake {
+    0%,100% { transform: translate(0,0); }
+    20% { transform: translate(-3px, 2px); }
+    40% { transform: translate(3px, -2px); }
+    60% { transform: translate(-2px, 2px); }
+    80% { transform: translate(2px, -1px); }
+  }
+  .shake { animation: shake 0.5s ease-in-out infinite; }
+
+  /* 🔹 Popup peringatan */
+  #popup {
     position: fixed;
     top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, #ff5252, #ff8a80);
-    color: white;
-    padding: 18px 25px;
-    border-radius: 14px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    font-size: 12px; font-weight: 600;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: radial-gradient(circle at top left, #ff4d4d, #b30000);
+    color: #fff;
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+    opacity: 0;
+    transition: all 0.5s ease;
     z-index: 9999;
-    animation: pulse 1.5s infinite;
   }
-
-  @keyframes pulse {
-    0%,100%{transform:translate(-50%,-50%) scale(1);}
-    50%{transform:translate(-50%,-50%) scale(1.05);}
+  #popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
   }
-
-  @keyframes fadeInBody { from{opacity:0;} to{opacity:1;} }
-  @keyframes cardFade { from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
-  @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+  #popup button {
+    margin-top: 10px;
+    background: #fff;
+    color: #b30000;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    cursor: pointer;
+  }
+  /* Popup info marker */
+  .leaflet-popup-content-wrapper {
+    border-radius: 10px;
+    padding: 6px;
+    background: /*#ffffffcc*/#ffffff4D;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    font-size: 5px;
+    color: brown;
+  }
+  .leaflet-popup-content { margin: 6px 8px; }
 </style>
 </head>
+
 <body>
-  <header>
-    <h1>Dashboard Cardipa 🌿</h1>
-    <p>Pilih salah satu data berikut</p>
-  </header>
+  <h2>🌋 Peta Gempa BMKG Terkini</h2>
 
-  <!-- Slideshow -->
-  <div class="illustration">
-    <div class="scrolling-text"><span>🌿 Cardipa - Kartu Parameter Cuaca, Udara, Sholat dan Gempa 🌍</span></div>
-    <div class="slide active"><img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800"></div>
-    <div class="slide"><img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800"></div>
-    <div class="slide"><img src="https://images.unsplash.com/photo-1470770903676-69b98201ea1c?w=800"></div>
-    <div class="slide"><img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800"></div>
-    <div class="dots">
-      <div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  <!-- 🔹 Peta -->
+  <div id="mapContainer">
+    <div id="map"></div>
+    <audio id="gemuruhAudio" src="https://cdn.pixabay.com/download/audio/2023/03/15/audio_2abce8c9c7.mp3?filename=rumble-low-earthquake-143076.mp3"></audio>
+
+    <div id="popup">
+      <h3>⚠️ Peringatan Gempa Besar!</h3>
+      <p id="popupText"></p>
+      <button onclick="closePopup()">Tutup</button>
+    </div>
+
+    <div class="legend">
+      <strong>Magnitudo</strong><br>
+      <i style="background:#00c853"></i> < 3<br>
+      <i style="background:#ffeb3b"></i> 3 – 4.9<br>
+      <i style="background:#ff9800"></i> 5 – 5.9<br>
+      <i style="background:#e53935"></i> ≥ 6
     </div>
   </div>
 
-  <!-- Jam Digital -->
-  <div id="clock">00:00:00</div>
-
-  <!-- Grid Cards -->
-  <p style="font-size:12px; color:brown; text-align:center;">🌿 Pilih kartu Parameter 🌿</p>
-  <div class="wrapper">
-    <div class="container">
-      <div class="card cuaca" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/cuaca.html')">
-        <div class="card-number">1</div><div class="card-icon">🌦️</div><h3>Prakiraan Cuaca</h3>
-      </div>
-      <div class="card udara" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/udara.html')">
-        <div class="card-number">2</div><div class="card-icon">🏭</div><h3>Kualitas Udara</h3>
-      </div>
-      <div class="card sholat" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/sholat.html')">
-        <div class="card-number">3</div><div class="card-icon">🕌</div><h3>Jadwal Sholat</h3>
-      </div>
-      <div class="card gempa" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/gempa.html')">
-        <div class="card-number">4</div><div class="card-icon">🌋</div><h3>Info Gempa</h3>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tombol Suara -->
-  <button id="soundBtn" onclick="toggleSound()">🔊 Aktifkan Suara</button>
-
-  <footer>© 2025 Dashboard Cardipa</footer>
-  <div id="popup" class="popup">⚠️ Jaringan internet terputus. Periksa koneksi Anda!</div>
-
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <script>
-let audioBeep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
-let soundEnabled = localStorage.getItem("soundEnabled") === "true";
+let map, marker, circle;
+const audio = document.getElementById('gemuruhAudio');
+const popup = document.getElementById('popup');
+const popupText = document.getElementById('popupText');
 
-window.addEventListener("load", () => {
-  if (soundEnabled) document.getElementById("soundBtn").innerText = "✅ Suara Aktif";
-});
+function showPopup(teks) {
+  popupText.innerHTML = teks;
+  popup.classList.add('show');
+}
+function closePopup() {
+  popup.classList.remove('show');
+}
 
-function toggleSound() {
-  soundEnabled = !soundEnabled;
-  localStorage.setItem("soundEnabled", soundEnabled);
-  if (soundEnabled) {
-    audioBeep.play().catch(()=>{});
-    document.getElementById("soundBtn").innerText = "✅ Suara Aktif";
-  } else {
-    document.getElementById("soundBtn").innerText = "🔊 Aktifkan Suara";
+function initMap() {
+  map = L.map('map').setView([-2.5, 118], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 10
+  }).addTo(map);
+  fetchGempa();
+}
+
+function createColoredMarker(colorClass) {
+  const div = document.createElement('div');
+  div.className = `marker-icon ${colorClass} pulse`;
+  return L.divIcon({
+    className: '',
+    html: div.outerHTML,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10]
+  });
+}
+
+async function updateGempa(magnitudo, lat, lon, lokasi, waktu, kedalaman, potensi) {
+  let color = 'green';
+  if (magnitudo >= 3.0 && magnitudo < 5.0) color = 'yellow';
+  else if (magnitudo >= 5.0 && magnitudo < 6.0) color = 'orange';
+  else if (magnitudo >= 6.0) color = 'red';
+
+  const icon = createColoredMarker(color);
+
+  if (magnitudo >= 5.0) {
+    document.body.classList.add('shake');
+    setTimeout(() => document.body.classList.remove('shake'), 3000);
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+  }
+
+  if (magnitudo >= 6.0) {
+    showPopup(`Terjadi gempa besar <b>${magnitudo} SR</b><br>${lokasi}<br>Waktu: ${waktu}<br>Kedalaman: ${kedalaman}<br>${potensi}`);
+  }
+
+  if (marker) map.removeLayer(marker);
+  if (circle) map.removeLayer(circle);
+
+  marker = L.marker([lat, lon], { icon }).addTo(map)
+    .bindPopup(`
+      <b>📍 Lokasi:</b> ${lokasi}<br>
+      <b>🧭 Koordinat:</b> ${lat}, ${lon}<br>
+      <b>💥 Magnitudo:</b> ${magnitudo} SR<br>
+      <b>🌊 Kedalaman:</b> ${kedalaman}<br>
+      <b>🕒 Waktu:</b> ${waktu}<br>
+      <b>⚠️ Potensi:</b> ${potensi}
+    `).openPopup();
+
+  // 🔵 Tambahkan lingkaran radius sekitar episentrum
+  let radius = 30000;
+  if (magnitudo >= 5 && magnitudo < 6) radius = 50000;
+  else if (magnitudo >= 6 && magnitudo < 7) radius = 75000;
+  else if (magnitudo >= 7) radius = 100000;
+
+  circle = L.circle([lat, lon], {
+    color: color,
+    fillColor: color,
+    fillOpacity: 0.15,
+    radius: radius
+  }).addTo(map);
+
+  map.setView([lat, lon], 6);
+}
+
+async function fetchGempa() {
+  try {
+    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
+    const data = await res.json();
+    const g = data.Infogempa.gempa;
+
+    const magnitudo = parseFloat(g.Magnitude);
+    const lokasi = g.Wilayah;
+    const waktu = `${g.Tanggal} pukul ${g.Jam}`;
+    const kedalaman = g.Kedalaman;
+    const potensi = g.Potensi || "Tidak ada potensi tsunami.";
+
+    let latText = g.Lintang.trim();
+    let lonText = g.Bujur.trim();
+
+    let lat = parseFloat(latText);
+    let lon = parseFloat(lonText);
+
+    if (latText.includes("LS")) lat = -lat;
+    if (lonText.includes("BB")) lon = -lon;
+
+    updateGempa(magnitudo, lat, lon, lokasi, waktu, kedalaman, potensi);
+  } catch (e) {
+    console.error('Gagal ambil data BMKG:', e);
   }
 }
 
-function cardClick(url) {
-  if (soundEnabled) audioBeep.play().catch(()=>{});
-  document.body.style.opacity = 0;
-  setTimeout(() => window.location.href = url, 800);
-}
-
-let slides = document.querySelectorAll(".slide");
-let dots = document.querySelectorAll(".dot");
-let current = 0;
-setInterval(() => {
-  slides[current].classList.remove("active");
-  dots[current].classList.remove("active");
-  current = (current + 1) % slides.length;
-  slides[current].classList.add("active");
-  dots[current].classList.add("active");
-}, 6000);
-
-function showPopup(){document.getElementById("popup").style.display="block";if(soundEnabled)audioBeep.play();}
-function hidePopup(){document.getElementById("popup").style.display="none";}
-window.addEventListener("offline", showPopup);
-window.addEventListener("online", hidePopup);
-
-function updateClockLocal() {
-  const t = new Date();
-  const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][t.getDay()];
-  const tanggal = String(t.getDate()).padStart(2,'0');
-  const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][t.getMonth()];
-  const tahun = t.getFullYear();
-  const jam = String(t.getHours()).padStart(2,'0');
-  const menit = String(t.getMinutes()).padStart(2,'0');
-  const detik = String(t.getSeconds()).padStart(2,'0');
-  document.getElementById("clock").textContent =
-    `${hari}, ${tanggal} ${bulan} ${tahun} | ${jam}:${menit}-${detik}`;
-}
-setInterval(updateClockLocal, 1000);
-updateClockLocal();
+// 🌍 Inisialisasi otomatis saat halaman dimuat
+window.addEventListener('load', initMap);
 </script>
 </body>
 </html>
+  
+   <!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard Data Indonesia</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+      html, body {
+  overflow-x: visible !important;
+}
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+      margin: 0;
+      padding: 16px;
+    }
+    .wrap { max-width: 680px; margin: 0 auto; }
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      margin: 12px 0;
+      padding: 14px;
+    }
+
+    /* --- Tabel Cuaca, Udara, Sholat --- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+      word-wrap: break-word; /* biar teks panjang bisa patah */
+    }
+    th, td {
+      border: 1px solid #e5e9ef;
+      padding: 8px 6px;
+      text-align: center;
+      font-size: 14px;
+    }
+    table.cuaca th { background:#007BFF; color:#fff; }
+    table.jadwal th { background:#28A745; color:#fff; }
+    table.udara th  { background:#f97316; color:#fff; }
+    table.cuaca td, table.jadwal td, table.udara td { background:#f9fbfd; }
+    table tr:nth-child(even) td { background:#eef3f9; }
+
+    /* --- Tabel Gempa --- */
+    .table-container {
+      overflow-x: auto; /* scroll horizontal */
+      margin-top: 12px;
+      border: 1px solid #ddd;
+      padding: 5px;
+    }
+    .table-container table {
+      min-width: 800px;   /* tetap lebar */
+      white-space: nowrap; /* cegah pecah huruf */
+      word-wrap: normal;   /* override */
+    }
+    .table-container th,
+    .table-container td {
+      font-size: 13px;
+      padding: 6px 8px;
+      text-align: center;
+    }
+      
+ .card-gempa h2 {
+  text-align: center;
+  font-size: 14px;
+  /*color: #1b5e20;*/
+  color: brown;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+  /* Header tabel merah */
+    #gempaTable thead th {
+    background-color: #c62828; /* merah */
+    color: #fff;               /* teks putih biar kontras */
+    }  
+  .card-gempa {
+  /*background: linear-gradient(180deg, #e3f2fd, #bbdefb);*/
+  /*background: linear-gradient(180deg, #fce4ec, #f8bbd0);*/
+  /*background: linear-gradient(180deg, #263238, #37474f);
+  color: silver;*/
+  background: linear-gradient(180deg, #efebe9, #d7ccc8);
+  /*background: linear-gradient(180deg, #f1f8e9, #e8f5e9);*/
+  /*background: linear-gradient(180deg, #fffde7, #fff9c4);*/
+  /*background: linear-gradient(180deg, #e3f2fd, #bbdefb);*/
+  /***background: linear-gradient(180deg, #f1f8e9, #e8f5e9);***/
+  /*background: linear-gradient(135deg, #e8f5e9, #f1f8e9);*/
+  /*background: linear-gradient(180deg, #fff8e1, #fff3e0);*/
+  color: black;
+  border-radius: 18px; 
+  /*box-shadow: 0 6px 20px rgba(255, 140, 0, 0.25);*/
+  padding: 20px;
+  margin: 20px 0;
+  border: 1px solid rgba(255, 183, 77, 0.4);
+  transition: all 0.3s ease;
+  }
+   /*.card-gempa:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(255, 140, 0, 0.35);
+    }*/
+  .blink-text {
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: red;
+    margin-bottom: 5px;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+  }
+    .table-container {
+  overflow-x: auto !important;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Gempa -->
+  <div class="card-gempa">
+   <h2>Tabel Gempa Bumi (BMKG) diatas 5 SR 🌋</h2>
+    <p>Data resmi BMKG: 
+      <a href="https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json" target="_blank">JSON Feed</a>
+    </p>
+ <!-- Teks geser berkedip -->
+<div class="blink-text">
+  &lt;-------geser-------&gt;
+</div>
+    <div class="table-container">
+      <table id="gempaTable">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+         <div style="text-align:center; margin-top:15px; margin-bottom:15px;">
+  <canvas id="gempaChart" style="max-width:500px; width:100%; height:300px;"></canvas>
+</div>
+   
+  </div>
+</div>
+  <script>
+async function loadGempa() {
+  try {
+    const res = await fetch("https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json");
+    const data = await res.json();
+
+    const gempas = data.Infogempa.gempa;
+    const thead = document.querySelector("#gempaTable thead");
+    const tbody = document.querySelector("#gempaTable tbody");
+
+    // Header jadi Gempa 1,2,3...
+    let headerRow = "<tr><th>Data</th>";
+    gempas.forEach((g, i) => {
+      headerRow += `<th>Gempa ${i+1}</th>`;
+    });
+    headerRow += "</tr>";
+    thead.innerHTML = headerRow;
+
+    function buatBaris(label, key) {
+      let row = `<tr><td><b>${label}</b></td>`;
+      gempas.forEach(g => {
+        row += `<td>${g[key]}</td>`;
+      });
+      row += "</tr>";
+      return row;
+    }
+
+    tbody.innerHTML += buatBaris("Tanggal", "Tanggal");
+    tbody.innerHTML += buatBaris("Jam", "Jam");
+    tbody.innerHTML += buatBaris("Wilayah", "Wilayah");
+    tbody.innerHTML += buatBaris("Lintang", "Lintang");
+    tbody.innerHTML += buatBaris("Bujur", "Bujur");
+    tbody.innerHTML += buatBaris("Kedalaman", "Kedalaman");
+    tbody.innerHTML += buatBaris("Magnitudo (SR)", "Magnitude");
+
+    // Chart
+    let labels = gempas.map(g => g.Wilayah);
+    let magnitudes = gempas.map(g => parseFloat(g.Magnitude));
+
+    const ctx = document.getElementById("gempaChart").getContext("2d");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Magnitudo Gempa (Skala Richter)",
+          data: magnitudes,
+          borderWidth: 1,
+          backgroundColor: "rgba(255, 99, 132, 0.5)"
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Magnitudo (SR)" }
+          }
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("Gagal memuat data gempa:", err);
+  }
+    
+}
+loadGempa();
+</script>
+</body>
+</html>
+  
+  <div class="card muted">
+  <span class="dot-gradient left-dot">•</span>
+  <span class="muted-text">Sumber data: BMKG Nasional</span>
+  <span class="dot-gradient right-dot">•</span>
+</div>
+
+<style>
+  .card.muted {
+    position: relative;
+    text-align: center;
+    font-size: 11px;
+    color: /*#555*/purple;
+    /*background: #fdecea;*/
+    background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);
+    border-radius: 8px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+    /*margin-right: 20px;*/
+    width: 258px;
+    padding: 8px 35px; /* memberi jarak agar titik tidak menempel pada teks */
+  }
+
+  .muted-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .dot-gradient {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: bold;
+    font-size: 18px;
+    /*background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);*/
+    background: white;
+    background-size: 300%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: glow 2s infinite ease-in-out, colorShift 6s infinite linear;
+  }
+
+  .left-dot { left: 12px; }
+  .right-dot { right: 12px; }
+
+  /* ✨ Berkedip lembut */
+  @keyframes glow {
+    0%, 100% {
+      opacity: 0.4;
+      text-shadow: 0 0 6px rgba(255,255,255,0.3);
+    }
+    50% {
+      opacity: 1;
+      text-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+  }
+
+  /* 🌈 Pergerakan warna gradient */
+  @keyframes colorShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style> 
