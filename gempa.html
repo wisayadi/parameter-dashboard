@@ -1,11 +1,13 @@
   
  <body>
-   <script>
-// 🚫 Nonaktifkan tombol "Back" sistem HP
+  <script>
+// 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom
 history.pushState(null, null, location.href);
-window.onpopstate = function () {
-  // Cegah aksi kembali
-  history.go(1);
+window.onpopstate = function (event) {
+  // Jika pengguna menekan tombol "back", tetap di halaman ini
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+  }
 };
 </script>
    
@@ -15,9 +17,16 @@ window.onpopstate = function () {
       Memuat data gempa terkini dari BMKG...
     </span>
   </div>
-   <button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
-    ⬅️ Kembali ke Dashboard
+   <button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard
   </button>   
+  
+<script>
+function goDashboard() {
+  // Izinkan pindah halaman sementara
+  window.ignoreBack = true;
+  window.location.href = 'https://wisayadi.github.io/parameter-dashboard/cardipa.html';
+}
+</script>
 </body>
 
 <style>
