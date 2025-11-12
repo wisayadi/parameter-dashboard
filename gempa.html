@@ -1,14 +1,33 @@
   
- <body>   
+ <body>  
+   <!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
+<script>
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    // Jika pengguna tekan tombol back sistem, tetap di halaman ini
+    if (!window.ignoreBack) {
+      history.pushState(null, null, location.href);
+    }
+  };
+
+  // Fungsi aman untuk kembali ke dashboard
+  function goDashboard() {
+    // Aktifkan flag agar sistem back tidak di-block
+    window.ignoreBack = true;
+    window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }
+</script>
+
   <!-- 🔹 Info Gempa Berjalan -->
   <div class="info-gempa pulse-bg">
     <span id="scrollGempa" class="scrolling-text warna-abu-emas">
       Memuat data gempa terkini dari BMKG...
     </span>
   </div>
-   <button class="back-btn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/cardipa.html'">
-    ⬅️ Kembali ke Dashboard
-  </button>   
+     
+<!-- 🔹 Tombol kembali -->
+<button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
+
 </body>
 
 <style>
