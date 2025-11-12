@@ -46,7 +46,10 @@
       max-width: /*330px*/285px;
       margin: 25px auto 10px;
       /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
-      background: #f3fff6;
+      /*background: #f3fff6;*/
+      /*background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);*/
+      /*background: linear-gradient(90deg, #56ab2f, #a8e063, #f3e7b3, #ffd89b, #ff9a9e);*/
+      background: linear-gradient(90deg, #6a11cb, #2575fc, #43cea2, #f9d423, #ff4b2b);   
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       border: 1px solid #f3d7b6;
@@ -123,7 +126,7 @@
   align-items: center;
   margin-bottom: 20px;
   position: relative;
-  z-index: 2; /* pastikan di atas bidang hijau */
+  z-index: 3; /* pastikan di atas bidang hijau */
 }
 
 .search-wrapper {
@@ -140,7 +143,7 @@
   width: fit-content;
   max-width: 320px;
   transition: all 0.3s ease;
-  margin: 0 auto;
+  margin-bottom: 10px/*0 auto*/;
 }
 
 .search-wrapper:focus-within {
@@ -244,7 +247,7 @@
 }
 .jadwal-box h4 {
   /*color: #33691e;*/
-  color: silver;
+  color: grey;
   font-size: 12px;
   margin-bottom: 6px;
 }
@@ -257,9 +260,9 @@
 }
  #countdownBox {
     background-color: cyan;
-    color: purple;
+    color: brown;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     padding: 8px;
     border-radius: 8px;
     display: block;
@@ -274,6 +277,10 @@
   .ticker{display:none;overflow:hidden;white-space:nowrap;margin-bottom:6px}
   .ticker.show{display:block}
   .ticker .text{display:inline-block;padding-left:100%;animation:marquee 12s linear infinite}
+    @keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
  
  #enableSound{font-size:6px;font-weight:600;border:0;border-radius:6px;padding:6px 10px;margin-top:6px;
     background:#222;color:#fff;cursor:pointer}
@@ -342,7 +349,7 @@
   <!-- 🧭 GRID Waktu Sholat -->
   <div class="jadwal-grid" id="jadwalGrid">
     <div class="jadwal-box" id="subuhBox"><div class="icon">🌄</div><h4>Subuh</h4><p id="j_subuh">--:--</p></div>
-    <div class="jadwal-box" id="dzuhurBox"><div class="icon">☀️</div><h4>Dzuhur</h4><p id="j_dzuhur">--:--</p></div>
+    <div class="jadwal-box" id="dzuhurBox"><div class="icon">🌇</div><h4>Dzuhur</h4><p id="j_dzuhur">--:--</p></div>
     <div class="jadwal-box" id="asharBox"><div class="icon">🌇</div><h4>Ashar</h4><p id="j_ashar">--:--</p></div>
     <div class="jadwal-box" id="maghribBox"><div class="icon">🌆</div><h4>Maghrib</h4><p id="j_maghrib">--:--</p></div>
     <div class="jadwal-box" id="isyaBox"><div class="icon">🌃</div><h4>Isya</h4><p id="j_isya">--:--</p></div>
