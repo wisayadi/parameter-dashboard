@@ -136,7 +136,7 @@
   .warna-merah-maron { color: #b71c1c; }
 
   /* 💥 Efek gradient berdenyut untuk magnitudo ≥6 */
-  /*@keyframes pulse-gradient {
+  @keyframes pulse-gradient {
     0% {
       background-position: 0% 50%;
       text-shadow: 0 0 6px rgba(176, 42, 55, 0.4);
@@ -149,7 +149,7 @@
       background-position: 0% 50%;
       text-shadow: 0 0 6px rgba(176, 42, 55, 0.4);
     }
-  }*/
+  }
 </style>
 
 <script>
@@ -258,7 +258,9 @@
     max-width: 285px;
     margin: 25px auto;
     /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
-    background: #f3fff6;
+    /*background: #f3fff6;*/
+    /***background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);***/
+    background: linear-gradient(90deg, /*#f5f5f5, #e0e0e0,*/ #bdbdbd, #757575, #424242);
     border-radius: 20px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     border: 1px solid #f3d7b6;
@@ -330,7 +332,7 @@
   /* ⏰ Teks Waktu */
   .waktu-display {
   font-weight: bold;
-  color: /*#111*/red;
+  color: /*#111*/brown;
   font-size: 10px;
   background: /*linear-gradient(90deg, #eef5ff, #ffffff)*/lightyellow;
   border-radius: 10px;
@@ -698,7 +700,8 @@ window.addEventListener('load', initMap);
   /*background: linear-gradient(180deg, #fce4ec, #f8bbd0);*/
   /*background: linear-gradient(180deg, #263238, #37474f);
   color: silver;*/
-  background: linear-gradient(180deg, #efebe9, #d7ccc8);
+  /***background: linear-gradient(180deg, #efebe9, #d7ccc8);***/
+  background: linear-gradient(90deg, #efebe9, #d7ccc8, #a1887f/*, #795548, #3e2723*/);
   /*background: linear-gradient(180deg, #f1f8e9, #e8f5e9);*/
   /*background: linear-gradient(180deg, #fffde7, #fff9c4);*/
   /*background: linear-gradient(180deg, #e3f2fd, #bbdefb);*/
