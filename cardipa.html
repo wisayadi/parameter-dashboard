@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Dashboard Parameter Cardipa</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
+<style> 
   body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(180deg, #f5fff8, #fdfdfd);
@@ -13,7 +13,6 @@
     opacity: 0;
     animation: fadeInBody 0.8s ease-in forwards;
   }
-
   header {
     background: linear-gradient(90deg, #4caf50, #81c784);
     color: red;
@@ -236,10 +235,144 @@
   @keyframes fadeInBody { from{opacity:0;} to{opacity:1;} }
   @keyframes cardFade { from{opacity:0;transform:scale(0.9);} to{opacity:1;transform:scale(1);} }
   @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-5px);} }
+  
+  .title-card {
+  font-size: 12px;
+  font-weight: 600;
+  color: /*#4a2f00*/brown;
+  background: linear-gradient(90deg, #e0ffcd, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff);  text-align: center;
+  padding: 8px 16px;
+  border: 0.5px solid silver;
+  margin: 10px auto 18px auto;
+  width: 250px;
+
+  /* Glassmorphism */
+  /*background: rgba(255, 255, 255, 0.35);*/
+  backdrop-filter: blur(10px);
+  /*border: 1px solid rgba(255, 255, 255, 0.45);*/
+
+  border-radius: 14px;
+
+  /* Shadow glow smooth */
+  box-shadow: 0 0 12px rgba(0, 200, 120, 0.25), 0 0 22px rgba(0, 200, 120, 0.15);
+
+  animation: glowCard 3s ease-in-out infinite alternate;
+}
+
+/* Animasi glow halus */
+@keyframes glowCard {
+  from { box-shadow: 0 0 8px rgba(0, 200, 120, 0.25); }
+  to   { box-shadow: 0 0 22px rgba(0, 200, 120, 0.45); }
+}
+  
+  /* ================= SPLASH SCREEN FUTURISTIK ================= */
+#splash {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999999;
+  /*animation: splashFadeOut 0.7s ease 3.5s forwards;*/
+  animation: splashFadeOut 0.7s ease 8.5s forwards;
+}
+
+.splash-bg {
+  position: absolute;
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, #4facfe, #00f2fe, #8e2de2, #ff512f);
+  background-size: 400% 400%;
+  filter: blur(35px);
+  animation: splashBgMove 6s ease-in-out infinite;
+  opacity: 0.45;
+}
+
+@keyframes splashBgMove {
+  0% { background-position: 0% 50%; }
+  50%{ background-position: 100% 50%; }
+  100%{background-position: 0% 50%; }
+}
+
+.splash-content {
+  text-align: center;
+  position: relative;
+  z-index: 5;
+  animation: fadeIn 1.2s ease-out forwards;
+  opacity: 0;
+}
+
+.splash-title {
+  font-size: 42px;
+  color: cyan;
+  text-shadow: 0 0 12px cyan, 0 0 25px cyan;
+  font-weight: 700;
+  margin-bottom: 18px;
+  animation: glowTitle 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes glowTitle {
+  from { text-shadow: 0 0 10px cyan; }
+  to   { text-shadow: 0 0 30px cyan; }
+}
+
+.splash-icons {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.sicon {
+  font-size: 32px;
+  animation: floatIcon 3s ease-in-out infinite;
+  text-shadow: 0 0 12px white;
+}
+
+@keyframes floatIcon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.splash-sub {
+  font-size: 11px;
+  color: /*#eee*/orange;
+  text-shadow: 0 0 8px rgba(255,255,255,0.6);
+}
+
+/* Fade out ke dashboard */
+@keyframes splashFadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* Fade in awal */
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+  
 </style>
 </head>
 
 <body>
+   <!-- 🌟 FUTURISTIC SPLASH SCREEN -->
+<div id="splash">
+  <div class="splash-bg"></div>
+
+  <div class="splash-content">
+    <h1 class="splash-title">CARDIPA</h1>
+
+    <div class="splash-icons">
+      <div class="sicon">🌦️</div>
+      <div class="sicon">🏭</div>
+      <div class="sicon">🕌</div>
+      <div class="sicon">🌋</div>
+    </div>
+
+    <p class="splash-sub">Card Parameter</p>
+  </div>
+</div>
+  
   <header>
     <h1>Dashboard Cardipa 🌿</h1>
     <p>Pilih salah satu data berikut</p>
@@ -256,7 +389,8 @@
 
   <div id="clock">00:00:00</div>
 
-  <p style="font-size:12px; color:brown; text-align:center;">🌿 Pilih kartu Parameter 🌿</p>
+<p style="height:5px;"></p> <!-- Spasi opsional -->
+<div class="title-card"> Kartu Parameter </div> 
   
   <!-- 🌈 Wrapper dinamis -->
   <div class="wrapper">
@@ -333,6 +467,16 @@ function updateClockLocal() {
   document.getElementById("clock").textContent =
     `${hari}, ${tanggal} ${bulan} ${tahun} | ${jam}:${menit}-${detik}`;
 }
+
+  // Hilangkan scroll & interaksi saat Splash aktif
+  document.body.style.overflow = "hidden";
+
+  setTimeout(() => {
+    document.getElementById("splash").style.display = "none";
+    document.body.style.overflow = "auto"; // aktifkan kembali scroll normal
+  }, /*4200*/10000);
+
+  
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
 </script>
