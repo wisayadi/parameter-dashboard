@@ -49,6 +49,7 @@
       /*background: #f3fff6;*/
       /*background: linear-gradient(90deg, #6a11cb, #2575fc, #43cea2, #f9d423, #ff4b2b);*/
       background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);
+      /**background: linear-gradient(90deg, #f5f5f5, #e0e0e0, #bdbdbd, #757575, #424242);**/
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       border: 1px solid #f3d7b6;
@@ -57,7 +58,7 @@
       transition: all 0.3s ease;
     }
     .card-waktu h3 {
-      color: brown;
+      color: blue;
       font-size: 13px;
       margin-bottom: 10px;
     }
@@ -103,7 +104,9 @@
   /*box-shadow: 0 6px 20px rgba(0,0,0,0.08);*/
   /*background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);*/
   /*background: linear-gradient(90deg, #fff3e0, #ffe0b2, #ffb74d, #fb8c00, #e65100);*/ /*gradasi oranye*/  
-  background: linear-gradient(90deg, #ccff90, #b2ff59, #76ff03, #64dd17, #33691e);     
+  background: linear-gradient(90deg, #ccff90, #b2ff59, #76ff03, #64dd17, #33691e);
+  /**background: linear-gradient(90deg, #e9f5db, #b5e48c, #76c893, #34a0a4, #168aad);**/
+  /**background: linear-gradient(90deg, #e8f5e9, #c8e6c9, #a5d6a7, #66bb6a, #388e3c);**/  
   transition: all 0.3s ease;
   margin: 20px auto;
   border: 1px solid #f3d7b6;
@@ -208,12 +211,36 @@
     /* Info tambahan */
     .extra-info { margin-top: 18px; font-size: 13px; color: /*#444*/red; }
     .update-time { margin-top: 10px; font-size: 12px; color: green; }
+  
+  .net-popup {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 99999;
+  display: none;
+  animation: fadeInOut 3s ease;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+  
   </style>
 </head>
 <body>
     <!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
 <script>
-  history.pushState(null, null, location.href);
+  /*history.pushState(null, null, location.href);
   window.onpopstate = function () {
     // Jika pengguna tekan tombol back sistem, tetap di halaman ini
     if (!window.ignoreBack) {
@@ -226,13 +253,44 @@
     // Aktifkan flag agar sistem back tidak di-block
     window.ignoreBack = true;
     window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }*/
+  
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    if (!window.ignoreBack) {
+      history.pushState(null, null, location.href);
+    }
+  };
+
+  function goDashboard() {
+    const beepClick = document.getElementById("beepClick");
+    beepClick.play();                    // 🔊 bunyikan beep
+
+    setTimeout(() => {                   // ⏳ tunggu 250ms sebelum pindah
+      window.ignoreBack = true;
+      window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+    }, 250);
   }
+  
 </script>
   
    <!-- Tombol Kembali ke dashboard -->
     <div class="back-container">
    
 <button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
+      
+       <audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+</audio>
+      
+      <audio id="beepDisconnect">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3" type="audio/mpeg">
+</audio>
+<audio id="beepConnect">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg">
+</audio>
+      <div id="netPopup" class="net-popup"></div>
+      
   </div>
 </body>
    <div style="text-align:center;">
@@ -284,7 +342,7 @@
     </div>
 
     <div class="update-time">
-      ⏰ Diperbarui: <span id="update_time">--</span> WITA
+      ⏰ Diperbarui: <span id="update_time">--</span> 
     </div>
   </div>
     <script>
@@ -379,7 +437,32 @@
       else alert("Masukkan nama kota terlebih dahulu!");
     }
 
-    loadWeather(); // Default Balikpapan
+
+const popup = document.getElementById("netPopup");
+const beepDC = document.getElementById("beepDisconnect");
+const beepCN = document.getElementById("beepConnect");
+
+// Show Popup
+function showPopup(msg, bgColor) {
+  popup.innerText = msg;
+  popup.style.background = bgColor;
+  popup.style.display = "block";
+  setTimeout(() => popup.style.display = "none", 3000);
+}
+
+// Detect Internet Loss
+window.addEventListener("offline", () => {
+  showPopup("⚠️ Internet Terputus!", "#d32f2f");
+  beepDC.play();
+});
+
+// Detect Internet Return
+window.addEventListener("online", () => {
+  showPopup("🟢 Internet Tersambung Kembali", "#4caf50");
+  beepCN.play();
+});
+
+ loadWeather(); // Default Balikpapan
   </script>
 </body>
 </html>
