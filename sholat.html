@@ -50,7 +50,8 @@
       /*background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);*/
       /*background: linear-gradient(90deg, #56ab2f, #a8e063, #f3e7b3, #ffd89b, #ff9a9e);*/
       /**background: linear-gradient(90deg, #6a11cb, #2575fc, #43cea2, #f9d423, #ff4b2b);**/
-      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);  
+      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);
+      /***background: linear-gradient(90deg, #f5f5f5, #e0e0e0, #bdbdbd, #757575, #424242);***/ 
       border-radius: 20px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
       border: 1px solid #f3d7b6;
@@ -59,7 +60,7 @@
       transition: all 0.3s ease;
     }
     .card-waktu h3 {
-      color: brown;
+      color: gold;
       font-size: 13px;
       margin-bottom: 10px;
     }
@@ -298,10 +299,34 @@
   0%,100% { box-shadow: 0 0 15px #a5d6a7; }
   50% { box-shadow: 0 0 25px #66bb6a; }
 }
+    
+  .net-popup {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 99999;
+  display: none;
+  animation: fadeInOut 3s ease;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+    
 </style>
       <!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
 <script>
-  history.pushState(null, null, location.href);
+  /*history.pushState(null, null, location.href);
   window.onpopstate = function () {
     // Jika pengguna tekan tombol back sistem, tetap di halaman ini
     if (!window.ignoreBack) {
@@ -314,13 +339,36 @@
     // Aktifkan flag agar sistem back tidak di-block
     window.ignoreBack = true;
     window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }*/   
+   
+  history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    if (!window.ignoreBack) {
+      history.pushState(null, null, location.href);
+    }
+  };
+
+  function goDashboard() {
+    const beepClick = document.getElementById("beepClick");
+    beepClick.play();                    // 🔊 bunyikan beep
+
+    setTimeout(() => {                   // ⏳ tunggu 250ms sebelum pindah
+      window.ignoreBack = true;
+      window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+    }, 250);
   }
+
+    
 </script>
     
     <!-- 🔙 Tombol kembali -->
   <div class="back-container">
     <button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
   </div>
+    
+    <audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+</audio>
 
   <!-- 🕒 Card Zona Waktu -->
   <div class="card-waktu">
@@ -368,6 +416,15 @@ src='https://www.islamcan.com/audio/adhan/azan2.mp3' type="audio/mpeg"></audio>
       </div>
     </div>
   </div>
+
+ <div id="netPopup" class="net-popup"></div>
+
+<audio id="beepDisconnect">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+</audio>
+<audio id="beepConnect">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+</audio>
 
    <script>
  // 🔧 Simpan zona waktu ke localStorage
@@ -669,6 +726,32 @@ function showTicker(msg) {
   if (_tickerTO) clearTimeout(_tickerTO);
   _tickerTO = setTimeout(() => t.classList.remove("show"), 120000);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const popup = document.getElementById("netPopup");
+  const beepDC = document.getElementById("beepDisconnect");
+  const beepCN = document.getElementById("beepConnect");
+
+  function showPopup(msg, bgColor) {
+    popup.innerText = msg;
+    popup.style.background = bgColor;
+    popup.style.display = "block";
+    setTimeout(() => popup.style.display = "none", 3000);
+  }
+
+  window.addEventListener("offline", () => {
+    showPopup("⚠️ Internet Terputus!", "#d32f2f");
+    beepDC.play();
+  });
+
+  window.addEventListener("online", () => {
+    showPopup("🟢 Internet Tersambung Kembali", "#4caf50");
+    beepCN.play();
+  });
+
+});
+
 // 🚀 Jalankan semua fungsi
 window.addEventListener("DOMContentLoaded", () => {
   loadJadwal();
