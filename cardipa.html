@@ -415,18 +415,6 @@
   <div id="popup" class="popup">⚠️ Jaringan internet terputus. Periksa koneksi Anda!</div>
 
 <script>
-  // ====== CEK STATUS SPLASH ======
-if (localStorage.getItem("splashShown") === "true") {
-  document.getElementById("splash").style.display = "none";
-  document.body.style.overflow = "auto";
-} else {
-  setTimeout(() => {
-    document.getElementById("splash").style.display = "none";
-    document.body.style.overflow = "auto";
-    localStorage.setItem("splashShown", "true");
-  }, 10000);  // durasi splash
-}
-  
 let audioBeep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 let soundEnabled = localStorage.getItem("soundEnabled") === "true";
 
@@ -487,15 +475,8 @@ function updateClockLocal() {
     document.getElementById("splash").style.display = "none";
     document.body.style.overflow = "auto"; // aktifkan kembali scroll normal
   }, /*4200*/10000);
+
   
-  window.onload = function() {
-  history.pushState(null, null, location.href);
-};
-
-window.onpopstate = function () {
-  history.pushState(null, null, location.href);
-};
-
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
 </script>
