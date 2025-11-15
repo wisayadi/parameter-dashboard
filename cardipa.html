@@ -243,7 +243,8 @@
   background: linear-gradient(90deg, #e0ffcd, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff);  text-align: center;
   padding: 8px 16px;
   border: 0.5px solid silver;
-  margin: 10px auto 18px auto;
+  margin: 1px auto 1px auto;
+  /*margin-bottom: 5px;*/
   width: 250px;
 
   /* Glassmorphism */
@@ -471,11 +472,19 @@ function updateClockLocal() {
   // Hilangkan scroll & interaksi saat Splash aktif
   document.body.style.overflow = "hidden";
 
-  setTimeout(() => {
+  /*setTimeout(() => {
     document.getElementById("splash").style.display = "none";
     document.body.style.overflow = "auto"; // aktifkan kembali scroll normal
-  }, /*4200*/10000);
+  }, 10000);*/
+  
+setTimeout(() => {
+  document.getElementById("splash").style.display = "none";
+  document.body.style.overflow = "auto";
 
+  // ⬇ Auto scroll ke bagian card setelah splash
+  const target = document.querySelector(".title-card");
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+}, 10000);
   
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
