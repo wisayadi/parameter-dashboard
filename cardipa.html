@@ -476,6 +476,16 @@ function updateClockLocal() {
     document.body.style.overflow = "auto"; // aktifkan kembali scroll normal
   }, /*4200*/10000);
 
+// ================== KUNCI BACK HP AGAR TIDAK KEMBALI KE SPLASH ==================
+window.onload = function() {
+  history.pushState(null, null, location.href);
+};
+
+window.onpopstate = function () {
+  // Jika user menekan tombol back pada HP
+  // tetap stay di dashboard
+  history.pushState(null, null, location.href);
+};
   
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
