@@ -481,10 +481,14 @@ setTimeout(() => {
   document.getElementById("splash").style.display = "none";
   document.body.style.overflow = "auto";
 
-  // ⬇ Auto scroll ke bagian card setelah splash
   const target = document.querySelector(".title-card");
-  target.scrollIntoView({ behavior: "smooth", block: "center" });
-}, 10000);
+  const offset = target.getBoundingClientRect().top + window.scrollY - 190; // sesuaikan jaraknya
+
+  window.scrollTo({
+    top: offset,
+    behavior: "smooth"
+  });
+}, 10000);  
   
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
