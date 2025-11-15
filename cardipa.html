@@ -415,6 +415,18 @@
   <div id="popup" class="popup">⚠️ Jaringan internet terputus. Periksa koneksi Anda!</div>
 
 <script>
+  // ====== CEK STATUS SPLASH ======
+if (localStorage.getItem("splashShown") === "true") {
+  document.getElementById("splash").style.display = "none";
+  document.body.style.overflow = "auto";
+} else {
+  setTimeout(() => {
+    document.getElementById("splash").style.display = "none";
+    document.body.style.overflow = "auto";
+    localStorage.setItem("splashShown", "true");
+  }, 10000);  // durasi splash
+}
+  
 let audioBeep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 let soundEnabled = localStorage.getItem("soundEnabled") === "true";
 
