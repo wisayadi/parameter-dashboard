@@ -487,6 +487,14 @@ function updateClockLocal() {
     document.getElementById("splash").style.display = "none";
     document.body.style.overflow = "auto"; // aktifkan kembali scroll normal
   }, /*4200*/10000);
+  
+  window.onload = function() {
+  history.pushState(null, null, location.href);
+};
+
+window.onpopstate = function () {
+  history.pushState(null, null, location.href);
+};
 
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
