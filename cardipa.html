@@ -55,13 +55,18 @@
     padding: 5px 12px;
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.25);
-    animation: glowPulse 1.5s ease-in-out infinite alternate;
-  }
+    animation: glowPulse 1.5s ease-in-out infinite alternate; 
+    will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+
+    }
   @keyframes glowPulse {
     from { text-shadow: 0 0 8px #00ffff; }
     to { text-shadow: 0 0 18px #00ffff; }
   }
-
+  
   .scrolling-text {
     position: absolute; top: 5px; left: 0; width: 100%;
     white-space: nowrap; overflow: hidden;
@@ -266,7 +271,7 @@
   to   { box-shadow: 0 0 22px rgba(0, 200, 120, 0.45); }
 }
   
-  /* ================= SPLASH SCREEN FUTURISTIK ================= */
+ /* ================= SPLASH SCREEN SLIDE ICONS ================= */
 #splash {
   position: fixed;
   top: 0; left: 0;
@@ -275,9 +280,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   z-index: 999999;
-  /*animation: splashFadeOut 0.7s ease 3.5s forwards;*/
-  animation: splashFadeOut 0.7s ease 8.5s forwards;
+  animation: splashFadeOut 0.8s ease 8s forwards;
 }
 
 .splash-bg {
@@ -285,9 +290,9 @@
   width: 100%; height: 100%;
   background: linear-gradient(135deg, #4facfe, #00f2fe, #8e2de2, #ff512f);
   background-size: 400% 400%;
-  filter: blur(35px);
+  filter: blur(40px);
   animation: splashBgMove 6s ease-in-out infinite;
-  opacity: 0.45;
+  opacity: 0.35;
 }
 
 @keyframes splashBgMove {
@@ -296,63 +301,87 @@
   100%{background-position: 0% 50%; }
 }
 
-.splash-content {
-  text-align: center;
-  position: relative;
-  z-index: 5;
-  animation: fadeIn 1.2s ease-out forwards;
+.splash-title {
+  font-size: 40px;
+  font-weight: 700;
+  color: cyan;
+  text-shadow: 0 0 12px cyan, 0 0 28px cyan;
+  margin-bottom: 28px;
+  animation: fadeIn 1.4s ease forwards;
   opacity: 0;
 }
 
-.splash-title {
-  font-size: 42px;
-  color: cyan;
-  text-shadow: 0 0 12px cyan, 0 0 25px cyan;
-  font-weight: 700;
-  margin-bottom: 18px;
-  animation: glowTitle 2.5s ease-in-out infinite alternate;
-}
-
-@keyframes glowTitle {
-  from { text-shadow: 0 0 10px cyan; }
-  to   { text-shadow: 0 0 30px cyan; }
-}
-
-.splash-icons {
+  /* ===== Slide in dari kanan ===== */
+.splash-swipe {
+  position: relative;
+  width: 100%;
   display: flex;
-  gap: 18px;
   justify-content: center;
-  margin-bottom: 18px;
+  gap: 22px;
+  height: 60px;
+  overflow: visible;
 }
 
 .sicon {
-  font-size: 32px;
-  animation: floatIcon 3s ease-in-out infinite;
-  text-shadow: 0 0 12px white;
+  font-size: 25px;
+  opacity: 0;
+  transform: translateX(150px);
+  animation: slideRight 5.1s ease forwards;
 }
 
+/* Delay agar muncul bergiliran */
+.sicon:nth-child(1) { animation-delay: 0.8s; }
+.sicon:nth-child(2) { animation-delay: 1.8s; }
+.sicon:nth-child(3) { animation-delay: 2.8s; }
+.sicon:nth-child(4) { animation-delay: 3.8s; }
+
+/* Animasi masuk dari kanan */
+@keyframes slideRight {
+  0%   { transform: translateX(150px); opacity: 0; }
+  70%  { transform: translateX(-10px); opacity: 1; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+/* Animasi melayang setelah semua selesai */
 @keyframes floatIcon {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-6px); }
 }
 
 .splash-sub {
-  font-size: 11px;
-  color: /*#eee*/orange;
-  text-shadow: 0 0 8px rgba(255,255,255,0.6);
+  margin-top: 25px;
+  font-size: 12px;
+  color: orange;
+  opacity: 0;
+  animation: fadeIn 1.2s ease 6.2s forwards;
+  text-shadow: 0 0 8px orange;
 }
 
-/* Fade out ke dashboard */
+@keyframes fadeIn { to { opacity: 1; } }
+
 @keyframes splashFadeOut {
   to { opacity: 0; visibility: hidden; }
 }
-
-/* Fade in awal */
-@keyframes fadeIn {
-  to { opacity: 1; }
+  /* ================= WHITE SCREEN FLASH TRANSITION ================= */
+#whiteFlash {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: white;
+  opacity: 0;
+  backdrop-filter: blur(18px);   /* blur kaca */
+  z-index: 9999999;
+  pointer-events: none;
+  animation: whiteFlashAnim 4s ease forwards;
+  animation-delay: 7.5s;   /* muncul sebelum splash fadeOut */
 }
-  
-</style>
+
+@keyframes whiteFlashAnim {
+  0%   { opacity: 0; }
+  40%  { opacity: 1; }
+  100% { opacity: 0; }
+}  
+  </style>
 </head>
 
 <body>
@@ -360,19 +389,18 @@
 <div id="splash">
   <div class="splash-bg"></div>
 
-  <div class="splash-content">
-    <h1 class="splash-title">CARDIPA</h1>
+  <h1 class="splash-title">CARDIPA</h1>
 
-    <div class="splash-icons">
-      <div class="sicon">🌦️</div>
-      <div class="sicon">🏭</div>
-      <div class="sicon">🕌</div>
-      <div class="sicon">🌋</div>
-    </div>
-
-    <p class="splash-sub">Card Parameter</p>
+  <div class="splash-swipe">
+    <div class="sicon">🌦️</div>
+    <div class="sicon">🏭</div>
+    <div class="sicon">🕌</div>
+    <div class="sicon">🌋</div>
   </div>
+
+  <p class="splash-sub">Card Parameter</p>
 </div>
+  <div id="whiteFlash"></div>
   
   <header>
     <h1>Dashboard Cardipa 🌿</h1>
@@ -467,28 +495,34 @@ function updateClockLocal() {
   const detik = String(t.getSeconds()).padStart(2,'0');
   document.getElementById("clock").textContent =
     `${hari}, ${tanggal} ${bulan} ${tahun} | ${jam}:${menit}-${detik}`;
-}
+}  
 
-  // Hilangkan scroll & interaksi saat Splash aktif
-  document.body.style.overflow = "hidden";
+  // === Splash control === // 
+document.body.style.overflow = "hidden";
 
-  /*setTimeout(() => {
-    document.getElementById("splash").style.display = "none";
-    document.body.style.overflow = "auto"; // aktifkan kembali scroll normal
-  }, 10000);*/
-  
+// Aktifkan animasi melayang ikon setelah semua icon slide masuk
 setTimeout(() => {
-  document.getElementById("splash").style.display = "none";
+  document.querySelectorAll(".sicon").forEach(icon => {
+    icon.style.animation = "floatIcon 15s ease-in-out infinite";
+  });
+}, 10000); // waktu ideal
+
+// Hilangkan splash & aktifkan scroll + auto scroll ke kartu
+setTimeout(() => {
+  const splash = document.getElementById("splash");
+  if (splash) splash.remove();
+
   document.body.style.overflow = "auto";
 
   const target = document.querySelector(".title-card");
-  const offset = target.getBoundingClientRect().top + window.scrollY - 307; // sesuaikan jaraknya
+  const offset = target.offsetTop - 307;
 
   window.scrollTo({
     top: offset,
     behavior: "smooth"
   });
-}, 10000);  
+}, 10000); // sinkron dengan whiteFlash + animasi fade
+  
   
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
