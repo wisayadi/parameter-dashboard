@@ -5,14 +5,39 @@
 <title>Dashboard Parameter Cardipa</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style> 
-  body {
+ /*body{
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(180deg, #f5fff8, #fdfdfd);
     margin: 0;
     text-align: center;
     opacity: 0;
     animation: fadeInBody 0.8s ease-in forwards;
-  }
+  }*/
+ body {
+  font-family: 'Poppins', sans-serif;
+  text-align: center;
+  margin: 0;
+  background: /*#f6efe5*/silver;/* url("https://png.pngtree.com/png-clipart/20240516/original/pngtree-steaming-coffee-cups-brown-seamless-pattern-png-image_15107556.png") repeat;*/ 
+  background-size: 340px;
+  background-attachment: fixed;
+  position: relative;
+}
+ body::after {
+  content: "";
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #000;
+  opacity: 1;
+  z-index: 999;
+  animation: fadeOutOverlay 1s ease forwards 0.8s;
+}
+
+@keyframes fadeOutOverlay {
+  0%   { opacity: 1; }
+  100% { opacity: 0; visibility: hidden; }
+}
+  
   header {
     background: linear-gradient(90deg, #4caf50, #81c784);
     color: red;
@@ -383,6 +408,26 @@
 }  
   </style>
 </head>
+
+<!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
+<script>
+history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    if (!window.ignoreBack) {
+      history.pushState(null, null, location.href);
+    }
+  };
+
+  function goDashboard() {
+    const beepClick = document.getElementById("beepClick");
+    beepClick.play();                    // 🔊 bunyikan beep
+
+    setTimeout(() => {                   // ⏳ tunggu 250ms sebelum pindah
+      window.ignoreBack = true;
+      window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+    }, 250);
+  }  
+</script>
 
 <body>
    <!-- 🌟 FUTURISTIC SPLASH SCREEN -->
