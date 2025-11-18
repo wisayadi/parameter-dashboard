@@ -420,7 +420,7 @@
 .card, .grid-card, .slide-container, .carousel {
   position: relative;
   z-index: 10;  /* ⬅️ Konten naik ke depan */
-}   
+} 
    </style>
 </head>
 
@@ -443,7 +443,7 @@
     }, 250);
   }*/  
    
-history.pushState(null, null, location.href);
+/*history.pushState(null, null, location.href);
 window.onpopstate = function () {
   if (!window.ignoreBack) {
     history.pushState(null, null, location.href);
@@ -470,10 +470,39 @@ function goDashboard() {
     window.location.href =
       "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
   }, 250);
+}*/
+
+history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
+
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+
+    // Paksa kembali ke top
+    window.scrollTo(0, 0);
+
+    // Kunci scroll sementara
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+      document.body.style.overflow = "auto";
+    }, 500);
+  }
+};
+
+// tombol custom
+function goDashboard() {
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
+  window.ignoreBack = true;
+  setTimeout(() => {
+    window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 200);
 }
 </script>
 
-<body>
+
+   <body>
    <div id="watermark"></div>
    <!-- 🌟 FUTURISTIC SPLASH SCREEN -->
 <div id="splash">
@@ -618,7 +647,7 @@ setTimeout(() => {
    const line = " CARDIPA  CARDIPA  CARDIPA  CARDIPA  CARDIPA  CARDIPA ".repeat(40);
 document.getElementById("watermark").innerText =
 Array(60).fill(line).join("\n");
-
+   
 setInterval(updateClockLocal, 1000);
 updateClockLocal();
 </script>
