@@ -333,7 +333,7 @@
     window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
   }*/
  
-  history.pushState(null, null, location.href);
+  /**history.pushState(null, null, location.href);
   window.onpopstate = function () {
     if (!window.ignoreBack) {
       history.pushState(null, null, location.href);
@@ -348,7 +348,34 @@
       window.ignoreBack = true;
       window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
     }, 250);
+  }**/
+  
+  history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
+
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+
+    // Paksa kembali ke top
+    window.scrollTo(0, 0);
+
+    // Kunci scroll sementara
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+      document.body.style.overflow = "auto";
+    }, 500);
   }
+};
+
+function goDashboard() {
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
+  window.ignoreBack = true;
+  setTimeout(() => {
+    window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 200);
+}
   
 </script>
 
