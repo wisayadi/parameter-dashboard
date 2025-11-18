@@ -199,7 +199,23 @@
   .card:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
 
   .card-icon { font-size: 22px; margin-bottom: 5px; animation: float 3s ease-in-out infinite; }
-  .card h3 { font-size: 11px; color: grey; margin: 0; }
+  /*.card h3 { font-size: 11px; color: grey; margin: 0; }*/
+   .card h3 {
+  font-size: 11px;
+  color: grey;
+  margin: 0;
+
+  /* ✨ Outline putih */
+  text-shadow:
+    1px 1px 0 white,
+   -1px 1px 0 white,
+    1px -1px 0 white,
+   -1px -1px 0 white,
+    0px 2px 0 white,
+    2px 0px 0 white,
+   -2px 0px 0 white,
+    0px -2px 0 white;
+}
 
   .cuaca { background: linear-gradient(135deg, #2196f3, #64b5f6); }
   .udara { background: linear-gradient(135deg, #ff9800, #ffb74d); }
@@ -389,7 +405,12 @@
   transform: translate(-50%, -50%) rotate(-35deg);
   font-size: 12px;
   font-weight: 900;
-  color: rgba(0,0,0,0.12);  /* Bisa diubah lebih gelap */
+  /*color: rgba(0,0,0,0.12);  /* Bisa diubah lebih gelap */
+  /*text-shadow: 0 0 6px rgba(255,255,255,0.35); */  
+  color: rgba(0,0,0,0.22);
+  text-shadow:
+   1px 1px 3px rgba(255,255,255,0.6),
+  -1px -1px 3px rgba(0,0,0,0.25);    
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
@@ -405,7 +426,7 @@
 
 <!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
 <script>
-history.pushState(null, null, location.href);
+/*history.pushState(null, null, location.href);
   window.onpopstate = function () {
     if (!window.ignoreBack) {
       history.pushState(null, null, location.href);
@@ -420,7 +441,36 @@ history.pushState(null, null, location.href);
       window.ignoreBack = true;
       window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
     }, 250);
-  }  
+  }*/  
+   
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+
+    // ⛔ Cegah scroll turun
+    window.scrollTo({ top: 0, behavior: "instant" });
+
+    // 🔒 Kunci scroll sementara
+    document.body.style.overflow = "hidden";
+
+    setTimeout(() => {
+      document.body.style.overflow = "auto";
+    }, 600); // unlock setelah 600ms
+  }
+};
+
+// tombol custom
+function goDashboard() {
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
+
+  setTimeout(() => {
+    window.ignoreBack = true;
+    window.location.href =
+      "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 250);
+}
 </script>
 
 <body>
