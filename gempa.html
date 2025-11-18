@@ -17,7 +17,7 @@
     window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
   }*/
   
-  history.pushState(null, null, location.href);
+  /**history.pushState(null, null, location.href);
   window.onpopstate = function () {
     if (!window.ignoreBack) {
       history.pushState(null, null, location.href);
@@ -32,7 +32,34 @@
       window.ignoreBack = true;
       window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
     }, 250);
+  }**/
+   
+ history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
+
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+
+    // Paksa kembali ke top
+    window.scrollTo(0, 0);
+
+    // Kunci scroll sementara
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+      document.body.style.overflow = "auto";
+    }, 500);
   }
+};
+
+function goDashboard() {
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
+  window.ignoreBack = true;
+  setTimeout(() => {
+    window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 200);
+}
    
 </script>
 
@@ -91,8 +118,9 @@
 
 /* 🌍 Latar belakang dan area scroll */
   .info-gempa {
-    background: linear-gradient(90deg, /*#00c853,*/ #2196f3/*, #ff9800, #f44336*/);
+    /**background: linear-gradient(90deg, #00c853, #2196f3, #ff9800, #f44336);**/
     /*background: linear-gradient(180deg, #fffef7, #f5fff5);*/
+    background: grey;
     background-size: 400% 400%;
     padding: 8px 0;
     margin-top: 10px;
@@ -102,7 +130,7 @@
     white-space: nowrap;
     text-align: center;
     animation: gradientFlow 6s ease infinite, pulse-bg 2.5s infinite;
-    border-radius: 2px;
+    border-radius: 4px;
   }
 
   /* ✨ Teks berjalan */
