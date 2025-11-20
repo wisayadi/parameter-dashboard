@@ -60,9 +60,8 @@ function goDashboard() {
     window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
   }, 200);
 }
-   
 </script>
-
+  
   <!-- 🔹 Info Gempa Berjalan -->
   <div class="info-gempa pulse-bg">
     <span id="scrollGempa" class="scrolling-text warna-abu-emas">
@@ -120,10 +119,11 @@ function goDashboard() {
   .info-gempa {
     /**background: linear-gradient(90deg, #00c853, #2196f3, #ff9800, #f44336);**/
     /*background: linear-gradient(180deg, #fffef7, #f5fff5);*/
-    background: grey;
+    /*background: black;*/
+    background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);
     background-size: 400% 400%;
     padding: 8px 0;
-    margin-top: 10px;
+    margin-top: 30px;
     margin-bottom: 10px;
     width: 100%;
     overflow: hidden;
@@ -131,6 +131,7 @@ function goDashboard() {
     text-align: center;
     animation: gradientFlow 6s ease infinite, pulse-bg 2.5s infinite;
     border-radius: 4px;
+    border: 0.5px solid /*#eee*//*#f3d7b6*/silver;
   }
 
   /* ✨ Teks berjalan */
@@ -265,7 +266,7 @@ function goDashboard() {
 </script>
 
     <!-- wilayah Zona Waktu -->
-  <body>
+  <body>    
   <div class="card-waktu">
   <h3>🕒 Zona Waktu</h3>
 
@@ -455,6 +456,8 @@ function goDashboard() {
     margin: 12px auto;
     border-radius: 15px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border: 1px solid /*#eee*//*#f3d7b6*/silver;
+
   }
 
   /* 🔹 Legenda warna */
@@ -832,6 +835,8 @@ window.addEventListener('load', initMap);
          <div style="text-align:center; margin-top:15px; margin-bottom:15px;">
   <canvas id="gempaChart" style="max-width:500px; width:100%; height:300px;"></canvas>
 </div>
+    <div id="netPopup" class="net-popup"></div>
+
    
   </div>
 </div>
@@ -906,24 +911,8 @@ loadGempa();
 </script>
 </body>
 </html>
-  
-<!-- ======================== CARD SUMBER DATA ======================== -->
-<div class="card muted">
-  <span class="dot-gradient left-dot">•</span>
-  <span class="muted-text">Sumber data: BMKG Nasional</span>
-  <span class="dot-gradient right-dot">•</span>
-</div>
-
-<!-- ======================== POPUP NETWORK ======================== -->
-<div id="netPopup" class="net-popup"></div>
-
-<!-- OPTIONAL: Suara notifikasi -->
-<audio id="beepDisconnect" src="beep-off.mp3" preload="auto"></audio>
-<audio id="beepConnect" src="beep-on.mp3" preload="auto"></audio>
-
-</body>
-
-<style>
+    
+  <style>
 .card.muted {
   position: relative;
   text-align: center;
@@ -962,8 +951,8 @@ loadGempa();
   50% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.6); }
 }
 
-/* ===================== NETWORK POPUP ===================== */
-.net-popup {
+/* ========== POPUP NETWORK ========== */
+/*.net-popup {
   position: fixed;
   top: 15px;
   left: 50%;
@@ -973,8 +962,8 @@ loadGempa();
   font-weight: bold;
   font-size: 14px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 99999;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  z-index: 999999;
   display: none;
   animation: fadeInOut 3s ease;
 }
@@ -984,41 +973,168 @@ loadGempa();
   15% { opacity: 1; transform: translate(-50%, 0); }
   85% { opacity: 1; transform: translate(-50%, 0); }
   100% { opacity: 0; transform: translate(-50%, -20px); }
+}*/
+    /* ====================== iOS NETWORK POPUP ======================= */
+.net-popup-ios {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  padding: 14px 26px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 22px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.23);
+  color: #fff;
+  box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
+  z-index: 999999;
+  display: none;
+  transition: all 0.6s cubic-bezier(.22,1.25,.32,1);
+  letter-spacing: 0.4px;
+  text-align: center;
 }
+
+.net-popup-ios.show {
+  top: 20px;
+  transform: translateX(-50%) scale(1);
+}
+
+.net-popup-ios.success {
+  background: rgba(26, 188, 156, 0.55);
+}
+
+.net-popup-ios.error {
+  background: rgba(231, 76, 60, 0.55);
+}
+
+/* Icon WiFi animasi */
+.wifi-icon {
+  display: inline-block;
+  margin-right: 6px;
+  animation: blink 1s infinite alternate ease-in-out;
+}
+@keyframes blink {
+  0% { opacity: .3; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===================== PING INDICATOR ===================== */
+.ping-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  z-index: 999999;
+}
+    
 </style>
 
+<!-- =================== CARD SUMBER DATA =================== -->
+<div class="card muted">
+  <span class="dot-gradient left-dot">•</span>
+  <span class="muted-text">Sumber data: BMKG Nasional</span>
+  <span class="dot-gradient right-dot">•</span>
+</div>
+
+<!-- =================== POPUP NETWORK =================== -->
+<!-- ============ PING INDICATOR ============ -->
+<div id="pingBox" class="ping-indicator">🔄 Ping...</div>
+    
+<!-- Suara Notifikasi -->
+<audio id="beepDisconnect" src="beep-off.mp3" preload="auto"></audio>
+<audio id="beepConnect" src="beep-on.mp3" preload="auto"></audio>
+
 <script>
-// ambil elemen popup dan audio
-const popup = document.getElementById("netPopup");
-const beepDC = document.getElementById("beepDisconnect");
-const beepCN = document.getElementById("beepConnect");
+/*window.addEventListener("load", () => {
 
-// fungsi untuk tampilkan popup
-function showPopup(msg, bgColor) {
-  popup.innerText = msg;
-  popup.style.background = bgColor;
+  const popup = document.getElementById("netPopup");
+  const beepDC = document.getElementById("beepDisconnect");
+  const beepCN = document.getElementById("beepConnect");
 
-  // reset animasi agar bisa berjalan ulang
-  popup.style.display = "block";
-  popup.style.animation = "none";
-  void popup.offsetWidth; // trigger reflow
-  popup.style.animation = "fadeInOut 3s ease";
+  function showPopup(msg, bgColor) {
+    popup.innerText = msg;
+    popup.style.background = bgColor;
 
-  // auto hide
-  setTimeout(() => {
-    popup.style.display = "none";
-  }, 3000);
-}
+    popup.style.display = "block";
+    popup.style.animation = "none";
+    void popup.offsetWidth; // restart animasi
+    popup.style.animation = "fadeInOut 3s ease";
 
-// event koneksi terputus
-window.addEventListener("offline", () => {
-  showPopup("⚠️ Internet Terputus!", "#d32f2f");
-  if(beepDC) beepDC.play().catch(()=>{});
-});
+    setTimeout(() => popup.style.display = "none", 10000);
+  }
 
-// event koneksi tersambung ulang
-window.addEventListener("online", () => {
-  showPopup("🟢 Internet Tersambung Kembali", "#4caf50");
-  if(beepCN) beepCN.play().catch(()=>{});
+  window.addEventListener("offline", () => {
+    showPopup("⚠️ Internet Terputus!", "#d32f2f");
+    beepDC.play().catch(()=>{});
+  });
+
+  window.addEventListener("online", () => {
+    showPopup("🟢 Internet Tersambung!", "#2e7d32");
+    beepCN.play().catch(()=>{});
+  });
+
+});*/
+    
+window.addEventListener("load", () => {
+
+  const popup = document.getElementById("netPopup");
+  const pingBox = document.getElementById("pingBox");
+
+  const beepDC = document.getElementById("beepDisconnect");
+  const beepCN = document.getElementById("beepConnect");
+
+  function showPopup(msg, style) {
+    popup.innerHTML = `<span class="wifi-icon">📶</span> ${msg}`;
+    popup.className = `net-popup-ios ${style}`;
+    popup.style.display = "block";
+
+    setTimeout(() => popup.classList.add("show"), 20);
+
+    setTimeout(() => {
+      popup.classList.remove("show");
+      setTimeout(() => popup.style.display = "none", 600);
+    }, 10000);
+  }
+
+  window.addEventListener("offline", () => {
+    showPopup("Jaringan Terputus", "error");
+    beepDC.play().catch(()=>{});
+    if (navigator.vibrate) navigator.vibrate([180,80,120]);
+  });
+
+  window.addEventListener("online", () => {
+    showPopup("Internet Tersambung", "success");
+    beepCN.play().catch(()=>{});
+    if (navigator.vibrate) navigator.vibrate(120);
+  });
+
+  // ====================== PING CHECKER ======================
+  async function pingTest() {
+    const start = performance.now();
+    try {
+      await fetch("https://www.google.com", {mode: "no-cors"});
+      const delay = Math.round(performance.now() - start);
+      pingBox.innerText = `📶 ${delay} ms`;
+
+      if(delay < 80) pingBox.style.background = "rgba(76,175,80,0.55)";
+      else if(delay < 150) pingBox.style.background = "rgba(255,193,7,0.55)";
+      else pingBox.style.background = "rgba(244,67,54,0.55)";
+
+    } catch {
+      pingBox.innerText = "❌ Offline";
+      pingBox.style.background = "rgba(244,67,54,0.55)";
+    }
+  }
+  setInterval(pingTest, 2500);
+  pingTest();
+
 });
 </script>
