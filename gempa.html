@@ -118,9 +118,10 @@ function goDashboard() {
 /* 🌍 Latar belakang dan area scroll */
   .info-gempa {
     /**background: linear-gradient(90deg, #00c853, #2196f3, #ff9800, #f44336);**/
-    /*background: linear-gradient(180deg, #fffef7, #f5fff5);*/
-    /*background: black;*/
-    background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);
+    /**background: linear-gradient(180deg, #fffef7, #f5fff5);**/
+    /*background: linear-gradient(90deg, #efebe9, #d7ccc8, #a1887f, #795548, #3e2723);*/
+    background: #d7ccc8;
+    /*background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);*/
     background-size: 400% 400%;
     padding: 8px 0;
     margin-top: 30px;
@@ -131,7 +132,7 @@ function goDashboard() {
     text-align: center;
     animation: gradientFlow 6s ease infinite, pulse-bg 2.5s infinite;
     border-radius: 4px;
-    border: 0.5px solid /*#eee*//*#f3d7b6*/silver;
+    border: 1px solid /*#eee*//*#f3d7b6*/brown;
   }
 
   /* ✨ Teks berjalan */
@@ -1053,36 +1054,6 @@ loadGempa();
 <audio id="beepConnect" src="beep-on.mp3" preload="auto"></audio>
 
 <script>
-/*window.addEventListener("load", () => {
-
-  const popup = document.getElementById("netPopup");
-  const beepDC = document.getElementById("beepDisconnect");
-  const beepCN = document.getElementById("beepConnect");
-
-  function showPopup(msg, bgColor) {
-    popup.innerText = msg;
-    popup.style.background = bgColor;
-
-    popup.style.display = "block";
-    popup.style.animation = "none";
-    void popup.offsetWidth; // restart animasi
-    popup.style.animation = "fadeInOut 3s ease";
-
-    setTimeout(() => popup.style.display = "none", 10000);
-  }
-
-  window.addEventListener("offline", () => {
-    showPopup("⚠️ Internet Terputus!", "#d32f2f");
-    beepDC.play().catch(()=>{});
-  });
-
-  window.addEventListener("online", () => {
-    showPopup("🟢 Internet Tersambung!", "#2e7d32");
-    beepCN.play().catch(()=>{});
-  });
-
-});*/
-    
 window.addEventListener("load", () => {
 
   const popup = document.getElementById("netPopup");
