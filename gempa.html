@@ -44,8 +44,8 @@ function goDashboard() {
   <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
 </audio>
    
-    <button id="speakBtn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/voice.html'">
-  🔊 aktifkan baca gempa
+   <button id="speakBtn" onclick="openChrome()">
+  🔊 Aktifkan Baca Gempa
 </button>
    
    <style>  
@@ -276,6 +276,11 @@ function speakGempa() {
 
   window.speechSynthesis.cancel(); // stop kalau ada yang sedang berbunyi
   window.speechSynthesis.speak(speech); // mulai TTS
+}
+  
+function openChrome() {
+  window.location.href =
+    "intent://wisayadi.github.io/parameter-dashboard/voice.html#Intent;scheme=https;package=com.android.chrome;end";
 }
    
 </script>
