@@ -70,6 +70,48 @@
 <button id="testVoicesBtn">🧪 Test Voice</button>
 
 <script>
+    /*const scrollElem = document.getElementById('scrollGempa');*/
+
+  // 🔁 Efek ganti teks halus
+  function updateGempa(teks, magnitudo) {
+    scrollElem.style.opacity = 0;
+    setTimeout(() => {
+      scrollElem.textContent = teks;
+      scrollElem.className = 'scrolling-text';
+          
+      if (magnitudo < 4.0) scrollElem.classList.add('warna-hijau');
+      else if (magnitudo < 5.0) scrollElem.classList.add('warna-abu-emas');
+      else if (magnitudo >= 5.0 && magnitudo < 6.0) scrollElem.classList.add('warna-orange');
+      else scrollElem.classList.add('warna-merah-maron');       
+      scrollElem.style.opacity = 1;
+    }, 800);
+  }
+
+  // 🌍 Ambil data gempa dari API BMKG
+  async function fetchGempa() {
+    try {
+      const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
+      const data = await res.json();
+
+      const g = data.Infogempa.gempa;
+      const magnitudo = parseFloat(g.Magnitude);
+      const lokasi = g.Wilayah;
+      const waktu = g.Tanggal + ' ' + g.Jam;
+      const dirasakan = g.Dirasakan;
+      const teks = `🌋 GEMPA ${g.Tanggal} pukul ${g.Jam} | Magnitudo: ${g.Magnitude} SR | Kedalaman: ${g.Kedalaman} | Lokasi: ${g.Wilayah} | Koordinat: ${g.Lintang}, ${g.Bujur} | Dirasakan: ${dirasakan} | Potensi: ${g.Potensi}`;
+      
+      updateGempa(teks, magnitudo);
+    } catch (e) {
+      console.error('Gagal ambil data BMKG:', e);
+      updateGempa('⚠️ Gagal memuat data gempa dari BMKG.', 0);
+    }
+  }
+
+  // ⏱ Jalankan pertama kali & perbarui tiap 5 menit
+  fetchGempa();
+  setInterval(fetchGempa, 5 * 60 * 1000);
+  
+
 /* ========= TTS INTEGRASI ========= */
 const ttsBtn = document.getElementById('ttsToggle');
 const scrollElem = document.getElementById('scrollGempa');
