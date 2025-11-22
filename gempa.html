@@ -43,9 +43,12 @@ function goDashboard() {
  <audio id="beepClick">
   <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
 </audio>
-    <button id="speakBtn" onclick="speakGempa()">🔊 Baca Info Gempa</button>  
-   <button onclick="window.speechSynthesis.cancel()">⏹ Stop</button>
-<style>
+   
+    <button id="speakBtn" onclick="window.location.href='https://wisayadi.github.io/parameter-dashboard/voice.html'">
+  🔊 aktifkan baca gempa
+</button>
+   
+   <style>  
       /* 🔹 Tombol kembali */
   .back-btn {
     display: inline-block;
@@ -72,12 +75,12 @@ function goDashboard() {
     /**background: linear-gradient(90deg, #00c853, #2196f3, #ff9800, #f44336);**/
     /**background: linear-gradient(180deg, #fffef7, #f5fff5);**/
     /*background: linear-gradient(90deg, #efebe9, #d7ccc8, #a1887f, #795548, #3e2723);*/
-    background: /*#d7ccc8*/silver;
+    background: /*#d7ccc8*/grey;
     /*background: linear-gradient(90deg, #e0ffcd, #caffbf, #9bf6ff, #a0c4ff, #bdb2ff);*/  
     /*background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);*/
     background-size: 400% 400%;
     padding: 8px 0;
-    margin-top: 30px;
+    margin-top: 40px;
     margin-bottom: 10px;
     width: 100%;
     overflow: hidden;
@@ -95,7 +98,7 @@ function goDashboard() {
     animation: scroll-left 45s linear infinite;
     transition: opacity 1s ease;
     font-weight: 600;
-    font-size: 11px;
+    font-size: 12px;
     color: white;
     text-shadow: 0 0 6px rgba(0,0,0,0.3);
   }
@@ -131,10 +134,10 @@ function goDashboard() {
     100% { background-position: 0% 50%; }
   }
  /* Warna alternatif teks */
-  .warna-hijau { color: #00c853; }
-  .warna-abu-emas { color: #fdf5c4; }
-  .warna-orange { color: #ff8c00; }
-  .warna-merah-maron { color: #b71c1c; }
+  .warna-hijau { color: /*#00c853*/lightgreen; }
+  .warna-abu-emas { color: /*#fdf5c4*/yellow; }
+  .warna-orange { color: /*#ff8c00*/orange; }
+  .warna-merah-maron { color: /*#b71c1c*/darkred; }
 
   /* 💥 Efek gradient berdenyut untuk magnitudo ≥6 */
   @keyframes pulse-gradient {
