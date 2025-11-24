@@ -132,6 +132,44 @@
   transition: transform .2s ease, box-shadow .2s ease;
 }
 #ttsToggle:active { transform: scale(0.92); }
+  .pulse-btn {
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  transition: 0.3s;
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.6);
+}
+
+.pulse-btn.stop {
+  background: #d50000;
+  box-shadow: 0 0 14px rgba(213, 0, 0, .7);
+}
+
+.equalizer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 5px;
+  height: 60px;
+  margin-top: 14px;
+}
+
+.equalizer span {
+  width: 8px;
+  height: 10px;
+  background: linear-gradient(180deg, #00ffea, #00c853);
+  border-radius: 6px;
+  transition: height 0.1s ease-out;
+  box-shadow: 0 0 10px #00ffea;
+}
+
+.hidden { display: none; }
+  
   
   /* small helper */
   .muted { text-align:center; font-size:12px; color:#666; margin-top:8px; }
@@ -245,12 +283,12 @@
 </div>
 
 <!-- tombol tunggal play / stop -->
-<button id="ttsToggle" class="pulse-btn" aria-pressed="false">
-  🔊 Baca Info Gempa
-</button>
+<button id="ttsToggle" class="pulse-btn" aria-pressed="false">🔊 Baca Info Gempa</button>
 
-<div style="text-align:center;margin-top:6px;">
-  <button id="testVoice" style="padding:8px 12px;font-size: 8px;border-radius:10px;border:none;cursor:pointer;color: purple;background: lightyellow;border: 0.5px solid /*#eee*//*#f3d7b6*/grey;">🧪 Test Voice (browser)</button>
+<!-- Equalizer DJ -->
+<div id="equalizer" class="equalizer hidden">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
 </div>
   <!-- ============ PING INDICATOR ============ -->
 <div id="pingBox" class="ping-indicator">🔄 Ping...</div>  
@@ -319,6 +357,61 @@ updateButton();
     updateButton();
   }
 });
+  
+  let isPlaying = false;
+let utterance;
+
+const ttsBtn = document.getElementById("ttsToggle");
+const equalizer = document.getElementById("equalizer");
+const bars = equalizer.querySelectorAll("span");
+
+ttsBtn.addEventListener("click", toggleTTS);
+
+function toggleTTS() {
+  if (!isPlaying) startTTS();
+  else stopTTS();
+}
+
+function startTTS() {
+  const textGempa = document.getElementById("infoGempa").innerText;
+  utterance = new SpeechSynthesisUtterance(textGempa);
+  utterance.lang = "id-ID";
+
+  speechSynthesis.speak(utterance);
+
+  isPlaying = true;
+  showEqualizer();
+  animateEqualizer();
+
+  ttsBtn.innerHTML = "⏹ Stop Baca";
+  ttsBtn.classList.add("stop");
+
+  utterance.onend = () => stopTTS();
+}
+
+function stopTTS() {
+  speechSynthesis.cancel();
+  isPlaying = false;
+
+  ttsBtn.innerHTML = "🔊 Baca Info Gempa";
+  ttsBtn.classList.remove("stop");
+  equalizer.classList.add("hidden");
+}
+
+function showEqualizer() {
+  equalizer.classList.remove("hidden");
+}
+
+function animateEqualizer() {
+  if (!isPlaying) return;
+
+  bars.forEach(bar => {
+    const height = 8 + Math.random() * 55;
+    bar.style.height = `${height}px`;
+  });
+
+  requestAnimationFrame(animateEqualizer);
+}
 
   /* ============================
      Fetch BMKG running text once & every 5 min
