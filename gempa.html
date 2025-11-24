@@ -38,19 +38,19 @@ function goDashboard() {
     </span>
   </div>
      
-<!-- 🔹 Tombol kembali -->
+<!-- Tombol Dashboard -->
 <button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
- <audio id="beepClick">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+
+<!-- Sound -->
+<audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
 </audio>
-   
-   <button id="speakBtn" onclick="openChrome()">
+
+<!-- Tombol Aktifkan TTS -->
+<button id="speakBtn" onclick="buttonClicked()">
   🔊 Aktifkan Teks Suara
-</button>
-    <audio id="beepClick">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
-</audio>
-   
+</button>   
+
    <style>  
       /* 🔹 Tombol kembali */
   .back-btn {
@@ -234,6 +234,17 @@ function goDashboard() {
   speech.rate = 1;
   window.speechSynthesis.speak(speech);
 }*/
+   function buttonClicked() {
+  const beep = document.getElementById("beepClick");
+  beep.currentTime = 0; // reset ke awal
+  beep.play();          // mainkan suara
+
+  openChrome();         // jalankan fungsi membuka chrome
+}
+
+function openChrome() {
+  window.location.href = "googlechrome://navigate?url=https://wisayadi.github.io/parameter-dashboard/voice.html";
+}
    
 function unlockTTS() {
   speechSynthesis.cancel(); // reset engine
