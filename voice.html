@@ -120,16 +120,22 @@
   width: 60%;
   max-width: 420px;
   display: block;
-  margin: 16px auto;
-  padding: 14px 18px;
+  margin: 10px auto;
+  padding: 10px 14px;
   font-size: 12px;
   font-weight: 700;
   color: #fff !important;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 6px 16px rgba(0,0,0,0.20);
+  /*box-shadow: 0 6px 16px rgba(0,0,0,0.12);
   transition: transform .2s ease, box-shadow .2s ease;
+  margin-top: 30px;*/
+  box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+  transition: transform .15s ease, box-shadow .15s ease;
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  outline: none;
+  margin-top: 30px;
 }
 #ttsToggle:active { transform: scale(0.92); }
   .pulse-btn {
@@ -285,11 +291,11 @@
 <!-- tombol tunggal play / stop -->
 <button id="ttsToggle" class="pulse-btn" aria-pressed="false">🔊 Baca Info Gempa</button>
 
-<!-- Equalizer DJ -->
+<!-- Equalizer DJ --> 
 <div id="equalizer" class="equalizer hidden">
   <span></span><span></span><span></span><span></span><span></span>
   <span></span><span></span><span></span><span></span><span></span>
-</div>
+</div> 
   <!-- ============ PING INDICATOR ============ -->
 <div id="pingBox" class="ping-indicator">🔄 Ping...</div>  
  <div id="netPopup" class="net-popup-ios"></div>  
@@ -373,7 +379,8 @@ function toggleTTS() {
 }
 
 function startTTS() {
-  const textGempa = document.getElementById("scrollGempa").innerText;
+  /*const textGempa = document.getElementById("scrollGempa").innerText;*/
+  const textGempa = document.getElementById("infoGempa").innerText;
   utterance = new SpeechSynthesisUtterance(textGempa);
   utterance.lang = "id-ID";
 
