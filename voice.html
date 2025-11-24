@@ -374,8 +374,8 @@ function toggleTTS() {
 }
 
 function startTTS() {
-  /*const textGempa = document.getElementById("scrollGempa").innerText;*/
-  const textGempa = document.getElementById("infoGempa").innerText;
+  const textGempa = document.getElementById("scrollGempa").innerText;
+  /*const textGempa = document.getElementById("infoGempa").innerText;*/
   utterance = new SpeechSynthesisUtterance(textGempa);
   utterance.lang = "id-ID";
 
