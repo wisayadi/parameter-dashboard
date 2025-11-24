@@ -45,8 +45,11 @@ function goDashboard() {
 </audio>
    
    <button id="speakBtn" onclick="openChrome()">
-  🔊 Aktifkan Baca Gempa
+  🔊 Aktifkan Teks Suara
 </button>
+    <audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+</audio>
    
    <style>  
       /* 🔹 Tombol kembali */
@@ -55,7 +58,7 @@ function goDashboard() {
     background: linear-gradient(90deg, #ff5f6d, #ffc371);
     color: /*white*/black;
     border: none;
-    padding: 6px 12px;
+    padding: 10px 15px;
     border-radius: 12px;
     font-size: 6px;
     font-weight: 600;
@@ -158,7 +161,7 @@ function goDashboard() {
   background: linear-gradient(90deg,#4facfe,#00f2fe);
   color: brown;
   border: none;
-  padding: 5px 13px;
+  padding: 9px 12px;
   font-weight: 600;
   border-radius: 22px;
   font-size: 9px;
@@ -1051,7 +1054,7 @@ loadGempa();
 
 <!-- =================== POPUP NETWORK =================== -->
 <!-- ============ PING INDICATOR ============ -->
-<div id="pingBox" class="ping-indicator">🔄 Ping...</div>    
+<div id="pingBox" class="ping-indicator">🔄 Ping...</div>     
 <!-- Suara Notifikasi -->
 <audio id="beepDisconnect" src="beep-off.mp3" preload="auto"></audio>
 <audio id="beepConnect" src="beep-on.mp3" preload="auto"></audio>
