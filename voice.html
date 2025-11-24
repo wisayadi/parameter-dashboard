@@ -334,7 +334,7 @@ function updateButton() {
   }
 }
 
-updateButton();
+/****updateButton();
   ttsToggle.addEventListener("click", () => {
   if (!isSpeaking) {
     const text = document.getElementById("scrollGempa").innerText.trim();
@@ -356,7 +356,7 @@ updateButton();
     isSpeaking = false;
     updateButton();
   }
-});
+});****/
   
   let isPlaying = false;
 let utterance;
@@ -373,7 +373,7 @@ function toggleTTS() {
 }
 
 function startTTS() {
-  const textGempa = document.getElementById("infoGempa").innerText;
+  const textGempa = document.getElementById("scrollGempa").innerText;
   utterance = new SpeechSynthesisUtterance(textGempa);
   utterance.lang = "id-ID";
 
