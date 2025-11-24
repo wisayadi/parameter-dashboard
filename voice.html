@@ -95,7 +95,7 @@
   } 
 
   /* single play/stop button — use inline styles from JS to force color */
-  #ttsButton {
+  /*#ttsButton {
     width: 60%;
     max-width:420px;
     display:block;
@@ -113,8 +113,26 @@
     outline: none;
     margin-top: 30px;
   }
-  #ttsButton:active { transform: translateY(2px); }
-
+  #ttsButton:active { transform: translateY(2px); }*/
+  
+  /* ==== Modern Play / Stop Button ==== */
+#ttsToggle {
+  width: 60%;
+  max-width: 420px;
+  display: block;
+  margin: 16px auto;
+  padding: 14px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff !important;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.20);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+#ttsToggle:active { transform: scale(0.92); }
+  
   /* small helper */
   .muted { text-align:center; font-size:12px; color:#666; margin-top:8px; }
   .tiny { font-size:12px; color:#333; margin-top:6px; text-align:center; }
@@ -227,7 +245,9 @@
 </div>
 
 <!-- tombol tunggal play / stop -->
-<button id="ttsButton" aria-pressed="false">🔊 Baca Info Gempa</button>
+<button id="ttsToggle" class="pulse-btn" aria-pressed="false">
+  🔊 Baca Info Gempa
+</button>
 
 <div style="text-align:center;margin-top:6px;">
   <button id="testVoice" style="padding:8px 12px;font-size: 8px;border-radius:10px;border:none;cursor:pointer;color: purple;background: lightyellow;border: 0.5px solid /*#eee*//*#f3d7b6*/grey;">🧪 Test Voice (browser)</button>
@@ -244,12 +264,13 @@
   <span class="muted-text">Sumber data: BMKG Nasional</span>
   <span class="dot-gradient right-dot">•</span>
 </div>
+  
 <script>
 /* ---------------------------
    Utility & state
    --------------------------- */
 document.addEventListener('DOMContentLoaded', () => {
-  const ttsButton = document.getElementById('ttsButton');
+  /**const ttsButton = document.getElementById('ttsButton');
   const scrollEl = document.getElementById('scrollGempa');
   const testBtn = document.getElementById('testVoice');
 
@@ -259,7 +280,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // set initial style (force inline)
   ttsButton.style.background = "linear-gradient(90deg, var(--blue1), var(--blue2))";
-  ttsButton.textContent = "🔊 Baca Info Gempa";
+  ttsButton.textContent = "🎧 Baca Info Gempa";**/
+  
+  const ttsToggle = document.getElementById("ttsToggle");
+let isSpeaking = false;
+let utter = null;
+
+function updateButton() {
+  if (isSpeaking) {
+    ttsToggle.textContent = "⏹ Stop Membaca";
+    ttsToggle.style.background = "linear-gradient(90deg, #ff5858, #ff2e63)";
+  } else {
+    ttsToggle.textContent = "🔊 Baca Info Gempa";
+    ttsToggle.style.background = "linear-gradient(90deg, #4facfe, #00f2fe)";
+  }
+}
+
+updateButton();
+  ttsToggle.addEventListener("click", () => {
+  if (!isSpeaking) {
+    const text = document.getElementById("scrollGempa").innerText.trim();
+    if (!text) return alert("Belum ada data gempa untuk dibaca.");
+
+    window.speechSynthesis.cancel();
+    utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "id-ID";
+
+    utter.onend = () => { isSpeaking = false; updateButton(); };
+    utter.onerror = () => { isSpeaking = false; updateButton(); };
+
+    isSpeaking = true;
+    updateButton();
+    window.speechSynthesis.speak(utter);
+
+  } else {
+    window.speechSynthesis.cancel();
+    isSpeaking = false;
+    updateButton();
+  }
+});
 
   /* ============================
      Fetch BMKG running text once & every 5 min
@@ -457,6 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // else stop
     stopSpeak();
   });
+  
 
   /* Test voice button for debugging in browser */
   testBtn.addEventListener('click', () => {
