@@ -1,79 +1,15 @@
-  
- <body>  
-   <!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
-<script>
-   
- history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gempa + TTS (Play / Stop)</title>
+<style>
+  :root { --blue1: #4facfe; --blue2:#00f2fe; --red1:#ff5858; --red2:#ff2e63; }
 
-history.pushState(null, null, location.href);
-window.onpopstate = function () {
-  if (!window.ignoreBack) {
-    history.pushState(null, null, location.href);
+  body { font-family: Arial, Helvetica, sans-serif; margin:18px; background: linear-gradient(#f7fbff,#fff); }
 
-    // Paksa kembali ke top
-    window.scrollTo(0, 0);
-
-    // Kunci scroll sementara
-    document.body.style.overflow = "hidden";
-    setTimeout(() => {
-      document.body.style.overflow = "auto";
-    }, 500);
-  }
-};
-
-function goDashboard() {
-  const beepClick = document.getElementById("beepClick");
-  beepClick.play();
-  window.ignoreBack = true;
-  setTimeout(() => {
-    window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
-  }, 200);
-}
-</script>
-  
-  <!-- 🔹 Info Gempa Berjalan -->
-  <div class="info-gempa pulse-bg">
-    <span id="scrollGempa" class="scrolling-text warna-abu-emas">
-      Memuat data gempa terkini dari BMKG...
-    </span>
-  </div>
-     
-<!-- Tombol Dashboard -->
-<button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
-
-<!-- Sound -->
-<audio id="beepClick">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-</audio>
-
-<!-- Tombol Aktifkan TTS -->
-<button id="speakBtn" onclick="buttonClicked()">
-  🔊 Aktifkan Teks Suara
-</button>   
-
-   <style>  
-      /* 🔹 Tombol kembali */
-  .back-btn {
-    display: inline-block;
-    background: linear-gradient(90deg, #ff5f6d, #ffc371);
-    color: /*white*/black;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 12px;
-    font-size: 6px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-bottom: 1px;
-    margin-top: 25px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-    transition: all 0.3s ease;
-  }
-  .back-btn:hover {
-    transform: scale(1.07);
-    background: linear-gradient(90deg, #ff7a7a, #ffb86b);
-  }
-
-/* 🌍 Latar belakang dan area scroll */
+  /* 🌍 Latar belakang dan area scroll */
   .info-gempa {
     /**background: linear-gradient(90deg, #00c853, #2196f3, #ff9800, #f44336);**/
     /**background: linear-gradient(180deg, #fffef7, #f5fff5);**/
@@ -83,9 +19,9 @@ function goDashboard() {
     /*background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);*/
     background-size: 400% 400%;
     padding: 8px 0;
-    margin-top: 40px;
+    margin-top: 20px;
     margin-bottom: 10px;
-    width: 100%;
+    width: 101%;
     overflow: hidden;
     white-space: nowrap;
     text-align: center;
@@ -156,805 +92,97 @@ function goDashboard() {
       background-position: 0% 50%;
       text-shadow: 0 0 6px rgba(176, 42, 55, 0.4);
     }
+  } 
+
+  /* single play/stop button — use inline styles from JS to force color */
+  /*#ttsButton {
+    width: 60%;
+    max-width:420px;
+    display:block;
+    margin: 10px auto;
+    padding: 10px 14px;
+    font-size:14px;
+    font-weight:700;
+    color:#fff !important;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+    transition: transform .15s ease, box-shadow .15s ease;
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    outline: none;
+    margin-top: 30px;
   }
-  #speakBtn {
-  background: linear-gradient(90deg,#4facfe,#00f2fe);
-  color: brown;
+  #ttsButton:active { transform: translateY(2px); }*/
+  
+  /* ==== Modern Play / Stop Button ==== */
+#ttsToggle {
+  width: 60%;
+  max-width: 420px;
+  display: block;
+  margin: 16px auto;
+  padding: 14px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff !important;
   border: none;
-  padding: 9px 12px;
-  font-weight: 600;
-  border-radius: 22px;
-  font-size: 9px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  border-radius: 16px;
   cursor: pointer;
-  margin-bottom: 20px;
-}    
-
-</style>
-
-<script>
-  const scrollElem = document.getElementById('scrollGempa');
-
-  // 🔁 Efek ganti teks halus
-  function updateGempa(teks, magnitudo) {
-    scrollElem.style.opacity = 0;
-    setTimeout(() => {
-      scrollElem.textContent = teks;
-      scrollElem.className = 'scrolling-text';
-          
-      if (magnitudo < 4.0) scrollElem.classList.add('warna-hijau');
-      else if (magnitudo < 5.0) scrollElem.classList.add('warna-abu-emas');
-      else if (magnitudo >= 5.0 && magnitudo < 6.0) scrollElem.classList.add('warna-orange');
-      else scrollElem.classList.add('warna-merah-maron');       
-      scrollElem.style.opacity = 1;
-    }, 800);
-  }
-
-  // 🌍 Ambil data gempa dari API BMKG
-  async function fetchGempa() {
-    try {
-      const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
-      const data = await res.json();
-
-      const g = data.Infogempa.gempa;
-      const magnitudo = parseFloat(g.Magnitude);
-      const lokasi = g.Wilayah;
-      const waktu = g.Tanggal + ' ' + g.Jam;
-      const dirasakan = g.Dirasakan;
-      const teks = `🌋 GEMPA ${g.Tanggal} pukul ${g.Jam} | Magnitudo: ${g.Magnitude} SR | Kedalaman: ${g.Kedalaman} | Lokasi: ${g.Wilayah} | Koordinat: ${g.Lintang}, ${g.Bujur} | Dirasakan: ${dirasakan} | Potensi: ${g.Potensi}`;
-      
-      updateGempa(teks, magnitudo);
-    } catch (e) {
-      console.error('Gagal ambil data BMKG:', e);
-      updateGempa('⚠️ Gagal memuat data gempa dari BMKG.', 0);
-    }
-  }
-
-  // ⏱ Jalankan pertama kali & perbarui tiap 5 menit
-  fetchGempa();
-  setInterval(fetchGempa, 5 * 60 * 1000);
-   
-   
-  /*function speakGempa() {
-    const text = document.getElementById("scrollGempa").innerText; // ID dari teks gempa berjalan
-    const speech = new SpeechSynthesisUtterance(text);
-
-    // Set bahasa Indonesia
-    speech.lang = "id-ID";
-    speech.rate = 1.0;   // kecepatan bicara
-    speech.pitch = 1.0;  // nada bicara
-
-    window.speechSynthesis.speak(speech);
-  }
-    function updateMarquee(newText) {
-  document.getElementById("scrollGempa").innerText = newText;
-
-  const speech = new SpeechSynthesisUtterance(newText);
-  speech.lang = "id-ID";
-  speech.rate = 1;
-  window.speechSynthesis.speak(speech);
-}*/
-   function buttonClicked() {
-  const beep = document.getElementById("beepClick");
-  beep.currentTime = 0; // reset ke awal
-  beep.play();          // mainkan suara
-
-  openChrome();         // jalankan fungsi membuka chrome
+  box-shadow: 0 6px 16px rgba(0,0,0,0.20);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-
-function openChrome() {
-  window.location.href = "googlechrome://navigate?url=https://wisayadi.github.io/parameter-dashboard/voice.html";
-}
-   
-function unlockTTS() {
-  speechSynthesis.cancel(); // reset engine
-  speechSynthesis.resume(); // wajib untuk Chrome Android
-
-  const msg = new SpeechSynthesisUtterance("Sistem pembacaan gempa diaktifkan");
-  msg.lang = "id-ID";
-  speechSynthesis.speak(msg);
-}
-   
-// 🟢 Paksa load suara di Android Chrome
-window.speechSynthesis.onvoiceschanged = function () {
-  console.log("Voice Loaded");
-};
-
-// 🟢 Fungsi TTS Gempa
-function speakGempa() {
-  let text = "";
-
-  // Ambil dari running text gempa
-  const scrollEl = document.getElementById("scrollGempa");
-  if (scrollEl && scrollEl.innerText.trim() !== "") {
-    text = scrollEl.innerText.trim();
-  }
-
-  // Jika kosong, ambil dari marquee standby
-  if (!text) {
-    const marqueeEl = document.getElementById("marqueeText");
-    if (marqueeEl && marqueeEl.innerText.trim() !== "") {
-      text = marqueeEl.innerText.trim();
-    }
-  }
-
-  if (!text) {
-    console.log("❌ Tidak ada teks untuk dibacakan");
-    return;
-  }
-
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = "id-ID";    // Suara Indonesia
-  speech.rate = 1.0;         // Kecepatan normal
-  speech.pitch = 1.0;        // Nada normal
-
-  window.speechSynthesis.cancel(); // stop kalau ada yang sedang berbunyi
-  window.speechSynthesis.speak(speech); // mulai TTS
-}
-  
-function openChrome() {
-  window.location.href =
-    "intent://wisayadi.github.io/parameter-dashboard/voice.html#Intent;scheme=https;package=com.android.chrome;end";
-}
-   
-</script>
-
-    <!-- wilayah Zona Waktu -->
-  <body>    
-  <div class="card-waktu">
-  <h3>🕒 Zona Waktu</h3>
-
-  <!-- Tombol Zona Waktu -->
-  <div style="text-align:center; margin:10px;">
-    <button class="btnZona" onclick="setZona('WIB')">WIB</button>
-    <button class="btnZona" onclick="setZona('WITA')">WITA</button>
-    <button class="btnZona" onclick="setZona('WIT')">WIT</button>
-  </div>
-
-   <div id="waktuSekarang" class="waktu-display">Memuat waktu...</div>
-</div>
-  </div>
-
-  <script>
-  // 🔧 Simpan zona waktu ke localStorage
-  function setZona(zona) {
-    localStorage.setItem('zonaWaktu', zona);
-    tampilkanWaktu();
-  }
-
-  // 🔄 Tampilkan waktu sesuai zona
-  function tampilkanWaktu() {
-    let zona = localStorage.getItem('zonaWaktu') || 'WIB'; // default WIB
-    let now = new Date();
-
-    // Konversi offset zona waktu
-    let offset = 7; // WIB default
-    if (zona === 'WITA') offset = 8;
-    if (zona === 'WIT') offset = 9;
-
-    // Hitung waktu lokal
-    let utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-    let waktuZona = new Date(utc + (3600000 * offset));
-
-    // Format tanggal dan waktu
-    const hari = waktuZona.toLocaleDateString('id-ID', { weekday: 'long' });
-    const tanggal = waktuZona.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-    const jam = waktuZona.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-    document.getElementById('waktuSekarang').innerHTML =
-      `${hari}, ${tanggal} pukul ${jam} (${zona})`;
-
-    // Simpan zona aktif di tombol
-    document.querySelectorAll('.btnZona').forEach(btn => {
-      btn.style.background = (btn.textContent === zona) ? '#7B61FF' : '#ddd';
-      btn.style.color = (btn.textContent === zona) ? '#fff' : '#000';
-    });
-  }
-
-  // Jalankan otomatis
-  setInterval(tampilkanWaktu, 1000);
-  tampilkanWaktu();
-  </script>
-
-  <style>
-     /* 🌟 Card Container */
-  .card-waktu {
-    max-width: 285px;
-    margin: 25px auto;
-    /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
-    /*background: #f3fff6;*/
-    background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);
-    /**background: linear-gradient(90deg, #f5f5f5, #e0e0e0, #bdbdbd, #757575, #424242);**/
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    border: 1px solid #f3d7b6;
-    padding: 20px;
-    text-align: center;
-    font-family: 'Poppins', Arial, sans-serif;
-    transition: all 0.3s ease;
-  }
-
-  .card-waktu:hover {
-    transform: scale(1.02);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-  }
-
-  .card-waktu h3 {
-    color: /*#2a3d66*/yellow;
-    font-size: 12px;
-    margin-bottom: 10px;
-  }
-
-  /*.btnZona {
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 10px;
-    border: none;
-    margin: 3px;
-    cursor: pointer;
-    background: #ddd;
-    transition: 0.3s;
-  }
-  .btnZona:hover {
-    background: #7B61FF;
-    color: white;
-  }*/
-     /* 🧭 Tombol Zona */
-  .Zona-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 12px;
-  }
-
-  .btnZona {
-    background: linear-gradient(135deg, #e0e0e0, #ffffff);
-    border: 2px solid #ccc;
-    border-radius: 50px;
-    padding: 3px 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 11px;
-    color: /*#333*/silver;
-  }
-
-  .btnZona:hover {
-    background: linear-gradient(135deg, #d4e2fc, #f0f8ff);
-    transform: scale(1.08);
-    box-shadow: 0 0 6px rgba(0,0,0,0.2);
-  }
-
-  .btnZona.active {
-    background: linear-gradient(135deg, #4a90e2, #5cc6ff);
-    color: white;
-    border-color: #4a90e2;
-    box-shadow: 0 0 12px rgba(0, 150, 255, 0.6);
-    transform: scale(1.05);
-  }
-   
-  /* ⏰ Teks Waktu */
-  .waktu-display {
+#ttsToggle:active { transform: scale(0.92); }
+  .pulse-btn {
+  padding: 12px 24px;
+  font-size: 18px;
   font-weight: bold;
-  color: /*#111*/brown;
-  font-size: 10px;
-  background: /*linear-gradient(90deg, #eef5ff, #ffffff)*/lightyellow;
-  border-radius: 10px;
-  padding: /*8px*/10px 12px;
-  display: inline-block;
-  border: 1px solid /*#eee*/#f3d7b6;
-}
-    
-  </style>
-</body>
-    <!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Peta Gempa BMKG Interaktif</title>
-
-<!-- ✅ Izinkan semua sumber HTTPS agar aman di AppsGeyser WebView -->
-<meta http-equiv="Content-Security-Policy"
-      content="default-src * 'self' data: blob: filesystem: https: 'unsafe-inline' 'unsafe-eval';
-               img-src * data: blob:;">
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-
-<style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(180deg, #eef5ff, #ffffff);
-    margin: 0;
-    padding: 0;
-    text-align: center;
-  }
-
-  h2 {
-    color: brown;
-    font-size: 13px;
-    margin-top: 10px;
-  }
-
-  /* 🔹 Kontainer peta */
-  #mapContainer {
-    width: 100%;
-    opacity: 1;
-    transform: scale(1);
-    transition: all 0.8s ease;
-  }
-
-  #map {
-    height: 420px;
-    width: 96%;
-    margin: 12px auto;
-    border-radius: 15px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    border: 1px solid /*#eee*//*#f3d7b6*/silver;
-
-  }
-
-  /* 🔹 Legenda warna */
-  .legend {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    background: /*#ffffffd0*/#ffffff4D;
-    padding: 6px 10px;
-    border-radius: 12px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-    font-size: 9px;
-    line-height: 12px;
-    color: #333;
-    z-index: 1000;
-  }
-  .legend i {
-    width: 10px;
-    height: 10px;
-    float: left;
-    margin-right: 8px;
-    border-radius: 3px;
-  }
-
-  /* 🔹 Efek marker */
-  .marker-icon {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    border: 2px solid white;
-  }
-  .green { background-color: #00c853; }
-  .yellow { background-color: #ffeb3b; }
-  .orange { background-color: #ff9800; }
-  .red { background-color: #e53935; }
-
-  /* 🔹 Efek berdenyut */
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2); opacity: 0.6; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-  .pulse { animation: pulse 1.5s infinite; }
-
-  /* 🔹 Efek getar */
-  @keyframes shake {
-    0%,100% { transform: translate(0,0); }
-    20% { transform: translate(-3px, 2px); }
-    40% { transform: translate(3px, -2px); }
-    60% { transform: translate(-2px, 2px); }
-    80% { transform: translate(2px, -1px); }
-  }
-  .shake { animation: shake 0.5s ease-in-out infinite; }
-
-  /* 🔹 Popup peringatan */
-  #popup {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(0.8);
-    background: radial-gradient(circle at top left, #ff4d4d, #b30000);
-    color: #fff;
-    padding: 25px 30px;
-    border-radius: 15px;
-    box-shadow: 0 4px 30px rgba(0,0,0,0.3);
-    opacity: 0;
-    transition: all 0.5s ease;
-    z-index: 9999;
-  }
-  #popup.show {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  #popup button {
-    margin-top: 10px;
-    background: #fff;
-    color: #b30000;
-    border: none;
-    border-radius: 8px;
-    padding: 6px 14px;
-    cursor: pointer;
-  }
-  /* Popup info marker */
-  .leaflet-popup-content-wrapper {
-    border-radius: 10px;
-    padding: 6px;
-    background: /*#ffffffcc*/#ffffff4D;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    font-size: 5px;
-    color: brown;
-  }
-  .leaflet-popup-content { margin: 6px 8px; }
-</style>
-</head>
-
-<body>
-  <h2>🌋 Peta Gempa BMKG Terkini</h2>
-
-  <!-- 🔹 Peta -->
-  <div id="mapContainer">
-    <div id="map"></div>
-    <audio id="gemuruhAudio" src="https://cdn.pixabay.com/download/audio/2023/03/15/audio_2abce8c9c7.mp3?filename=rumble-low-earthquake-143076.mp3"></audio>
-
-    <div id="popup">
-      <h3>⚠️ Peringatan Gempa Besar!</h3>
-      <p id="popupText"></p>
-      <button onclick="closePopup()">Tutup</button>
-    </div>
-
-    <div class="legend">
-      <strong>Magnitudo</strong><br>
-      <i style="background:#00c853"></i> < 3<br>
-      <i style="background:#ffeb3b"></i> 3 – 4.9<br>
-      <i style="background:#ff9800"></i> 5 – 5.9<br>
-      <i style="background:#e53935"></i> ≥ 6
-    </div>
-  </div>
-
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-let map, marker, circle;
-const audio = document.getElementById('gemuruhAudio');
-const popup = document.getElementById('popup');
-const popupText = document.getElementById('popupText');
-
-function showPopup(teks) {
-  popupText.innerHTML = teks;
-  popup.classList.add('show');
-}
-function closePopup() {
-  popup.classList.remove('show');
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  background: #007bff;
+  color: white;
+  transition: 0.3s;
+  box-shadow: 0 0 12px rgba(0, 123, 255, 0.6);
 }
 
-function initMap() {
-  map = L.map('map').setView([-2.5, 118], 5);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 10
-  }).addTo(map);
-  fetchGempa();
+.pulse-btn.stop {
+  background: #d50000;
+  box-shadow: 0 0 14px rgba(213, 0, 0, .7);
 }
 
-function createColoredMarker(colorClass) {
-  const div = document.createElement('div');
-  div.className = `marker-icon ${colorClass} pulse`;
-  return L.divIcon({
-    className: '',
-    html: div.outerHTML,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10]
-  });
+.equalizer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 5px;
+  height: 60px;
+  margin-top: 14px;
 }
 
-async function updateGempa(magnitudo, lat, lon, lokasi, waktu, kedalaman, potensi) {
-  let color = 'green';
-  if (magnitudo >= 3.0 && magnitudo < 5.0) color = 'yellow';
-  else if (magnitudo >= 5.0 && magnitudo < 6.0) color = 'orange';
-  else if (magnitudo >= 6.0) color = 'red';
-
-  const icon = createColoredMarker(color);
-
-  if (magnitudo >= 5.0) {
-    document.body.classList.add('shake');
-    setTimeout(() => document.body.classList.remove('shake'), 3000);
-    audio.currentTime = 0;
-    audio.play().catch(()=>{});
-  }
-
-  if (magnitudo >= 6.0) {
-    showPopup(`Terjadi gempa besar <b>${magnitudo} SR</b><br>${lokasi}<br>Waktu: ${waktu}<br>Kedalaman: ${kedalaman}<br>${potensi}`);
-  }
-
-  if (marker) map.removeLayer(marker);
-  if (circle) map.removeLayer(circle);
-
-  marker = L.marker([lat, lon], { icon }).addTo(map)
-    .bindPopup(`
-      <b>📍 Lokasi:</b> ${lokasi}<br>
-      <b>🧭 Koordinat:</b> ${lat}, ${lon}<br>
-      <b>💥 Magnitudo:</b> ${magnitudo} SR<br>
-      <b>🌊 Kedalaman:</b> ${kedalaman}<br>
-      <b>🕒 Waktu:</b> ${waktu}<br>
-      <b>⚠️ Potensi:</b> ${potensi}
-    `).openPopup();
-
-  // 🔵 Tambahkan lingkaran radius sekitar episentrum
-  let radius = 30000;
-  if (magnitudo >= 5 && magnitudo < 6) radius = 50000;
-  else if (magnitudo >= 6 && magnitudo < 7) radius = 75000;
-  else if (magnitudo >= 7) radius = 100000;
-
-  circle = L.circle([lat, lon], {
-    color: color,
-    fillColor: color,
-    fillOpacity: 0.15,
-    radius: radius
-  }).addTo(map);
-
-  map.setView([lat, lon], 6);
+.equalizer span {
+  width: 8px;
+  height: 10px;
+  background: linear-gradient(180deg, #00ffea, #00c853);
+  border-radius: 6px;
+  transition: height 0.1s ease-out;
+  box-shadow: 0 0 10px #00ffea;
 }
 
-async function fetchGempa() {
-  try {
-    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
-    const data = await res.json();
-    const g = data.Infogempa.gempa;
-
-    const magnitudo = parseFloat(g.Magnitude);
-    const lokasi = g.Wilayah;
-    const waktu = `${g.Tanggal} pukul ${g.Jam}`;
-    const kedalaman = g.Kedalaman;
-    const potensi = g.Potensi || "Tidak ada potensi tsunami.";
-
-    let latText = g.Lintang.trim();
-    let lonText = g.Bujur.trim();
-
-    let lat = parseFloat(latText);
-    let lon = parseFloat(lonText);
-
-    if (latText.includes("LS")) lat = -lat;
-    if (lonText.includes("BB")) lon = -lon;
-
-    updateGempa(magnitudo, lat, lon, lokasi, waktu, kedalaman, potensi);
-  } catch (e) {
-    console.error('Gagal ambil data BMKG:', e);
-  }
-}
-
-// 🌍 Inisialisasi otomatis saat halaman dimuat
-window.addEventListener('load', initMap);
-</script>
-</body>
-</html>
+.hidden { display: none; }
   
-   <!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <title>Dashboard Data Indonesia</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-      html, body {
-  overflow-x: visible !important;
-}
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
-      color: #222;
-      margin: 0;
-      padding: 16px;
-    }
-    .wrap { max-width: 680px; margin: 0 auto; }
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.08);
-      margin: 12px 0;
-      padding: 14px;
-    }
-
-    /* --- Tabel Cuaca, Udara, Sholat --- */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      table-layout: auto;
-      word-wrap: break-word; /* biar teks panjang bisa patah */
-    }
-    th, td {
-      border: 1px solid #e5e9ef;
-      padding: 8px 6px;
-      text-align: center;
-      font-size: 14px;
-    }
-    table.cuaca th { background:#007BFF; color:#fff; }
-    table.jadwal th { background:#28A745; color:#fff; }
-    table.udara th  { background:#f97316; color:#fff; }
-    table.cuaca td, table.jadwal td, table.udara td { background:#f9fbfd; }
-    table tr:nth-child(even) td { background:#eef3f9; }
-
-    /* --- Tabel Gempa --- */
-    .table-container {
-      overflow-x: auto; /* scroll horizontal */
-      margin-top: 12px;
-      border: 1px solid #ddd;
-      padding: 5px;
-    }
-    .table-container table {
-      min-width: 800px;   /* tetap lebar */
-      white-space: nowrap; /* cegah pecah huruf */
-      word-wrap: normal;   /* override */
-    }
-    .table-container th,
-    .table-container td {
-      font-size: 13px;
-      padding: 6px 8px;
-      text-align: center;
-    }
-      
- .card-gempa h2 {
-  text-align: center;
-  font-size: 14px;
-  /*color: #1b5e20;*/
-  color: brown;
-  margin-bottom: 12px;
-  font-weight: bold;
-}
-  /* Header tabel merah */
-    #gempaTable thead th {
-    background-color: #c62828; /* merah */
-    color: #fff;               /* teks putih biar kontras */
-    }  
-  .card-gempa {
-  /*background: linear-gradient(180deg, #e3f2fd, #bbdefb);*/
-  /*background: linear-gradient(180deg, #fce4ec, #f8bbd0);*/
-  /*background: linear-gradient(180deg, #263238, #37474f);
-  color: silver;*/
-  /***background: linear-gradient(180deg, #efebe9, #d7ccc8);***/
-  background: linear-gradient(90deg, #efebe9, #d7ccc8, #a1887f/*, #795548, #3e2723*/);
-  /*background: linear-gradient(180deg, #f1f8e9, #e8f5e9);*/
-  /*background: linear-gradient(180deg, #fffde7, #fff9c4);*/
-  /*background: linear-gradient(180deg, #e3f2fd, #bbdefb);*/
-  /***background: linear-gradient(180deg, #f1f8e9, #e8f5e9);***/
-  /*background: linear-gradient(135deg, #e8f5e9, #f1f8e9);*/
-  /*background: linear-gradient(180deg, #fff8e1, #fff3e0);*/
-  color: black;
-  border-radius: 18px; 
-  /*box-shadow: 0 6px 20px rgba(255, 140, 0, 0.25);*/
-  padding: 20px;
-  margin: 20px 0;
-  border: 1px solid rgba(255, 183, 77, 0.4);
-  transition: all 0.3s ease;
-  }
-   /*.card-gempa:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 24px rgba(255, 140, 0, 0.35);
-    }*/
-  .blink-text {
-    text-align: center;
-    font-size: 12px;
-    font-weight: bold;
-    color: red;
-    margin-bottom: 5px;
-    animation: blink 1s infinite;
-  }
-
-  @keyframes blink {
-    0%   { opacity: 1; }
-    50%  { opacity: 0; }
-    100% { opacity: 1; }
-  }
-    .table-container {
-  overflow-x: auto !important;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-}
-  </style>
-</head>
-<body>
-<div class="wrap">
-
-  <!-- Gempa -->
-  <div class="card-gempa">
-   <h2>Tabel Gempa Bumi (BMKG) diatas 5 SR 🌋</h2>
-    <p>Data resmi BMKG: 
-      <a href="https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json" target="_blank">JSON Feed</a>
-    </p>
- <!-- Teks geser berkedip -->
-<div class="blink-text">
-  &lt;-------geser-------&gt;
-</div>
-    <div class="table-container">
-      <table id="gempaTable">
-        <thead></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-         <div style="text-align:center; margin-top:15px; margin-bottom:15px;">
-  <canvas id="gempaChart" style="max-width:500px; width:100%; height:300px;"></canvas>
-</div>
-    <div id="netPopup" class="net-popup"></div>
-
-   
-  </div>
-</div>
-  <script>
-async function loadGempa() {
-  try {
-    const res = await fetch("https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json");
-    const data = await res.json();
-
-    const gempas = data.Infogempa.gempa;
-    const thead = document.querySelector("#gempaTable thead");
-    const tbody = document.querySelector("#gempaTable tbody");
-
-    // Header jadi Gempa 1,2,3...
-    let headerRow = "<tr><th>Data</th>";
-    gempas.forEach((g, i) => {
-      headerRow += `<th>Gempa ${i+1}</th>`;
-    });
-    headerRow += "</tr>";
-    thead.innerHTML = headerRow;
-
-    function buatBaris(label, key) {
-      let row = `<tr><td><b>${label}</b></td>`;
-      gempas.forEach(g => {
-        row += `<td>${g[key]}</td>`;
-      });
-      row += "</tr>";
-      return row;
-    }
-
-    tbody.innerHTML += buatBaris("Tanggal", "Tanggal");
-    tbody.innerHTML += buatBaris("Jam", "Jam");
-    tbody.innerHTML += buatBaris("Wilayah", "Wilayah");
-    tbody.innerHTML += buatBaris("Lintang", "Lintang");
-    tbody.innerHTML += buatBaris("Bujur", "Bujur");
-    tbody.innerHTML += buatBaris("Kedalaman", "Kedalaman");
-    tbody.innerHTML += buatBaris("Magnitudo (SR)", "Magnitude");
-
-    // Chart
-    let labels = gempas.map(g => g.Wilayah);
-    let magnitudes = gempas.map(g => parseFloat(g.Magnitude));
-
-    const ctx = document.getElementById("gempaChart").getContext("2d");
-    new Chart(ctx, {
-      type: "bar",
-      data: {
-        labels: labels,
-        datasets: [{
-          label: "Magnitudo Gempa (Skala Richter)",
-          data: magnitudes,
-          borderWidth: 1,
-          backgroundColor: "rgba(255, 99, 132, 0.5)"
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: { display: true, text: "Magnitudo (SR)" }
-          }
-        }
-      }
-    });
-
-  } catch (err) {
-    console.error("Gagal memuat data gempa:", err);
-  }
-    
-}
-loadGempa();
-</script>
-</body>
-</html>
-    
-  <style>
-.card.muted {
+  
+  /* small helper */
+  .muted { text-align:center; font-size:12px; color:#666; margin-top:8px; }
+  .tiny { font-size:12px; color:#333; margin-top:6px; text-align:center; }
+  
+  .card.muted {
   position: relative;
   text-align: center;
   font-size: 11px;
   color: purple;
   background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);
   border-radius: 8px;
-  margin-top: 8px;
+  margin-top: 420px;
   margin-bottom: 10px;
   width: 258px;
   padding: 8px 35px;
@@ -984,7 +212,7 @@ loadGempa();
   0%, 100% { opacity: 0.4; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
   50% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.6); }
 }
-    /* ====================== iOS NETWORK POPUP ======================= */
+     /* ====================== iOS NETWORK POPUP ======================= */
 .net-popup-ios {
   position: fixed;
   top: -100px;
@@ -1044,34 +272,370 @@ loadGempa();
   backdrop-filter: blur(10px);
   z-index: 999999;
 }
-   /* #speakBtn {
-  background: linear-gradient(90deg,#4facfe,#00f2fe);
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 22px;
-  font-size: 13px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  cursor: pointer;
-}*/    
 </style>
-    
-<!-- =================== CARD SUMBER DATA =================== -->
+</head>
+<body>
+
+<h3 style="text-align:center;color: brown;margin:6px 0 14px 0;font-size: 14px;margin-top: 70px;margin-bottom: 2px;">Info Gempa BMKG — TTS Play / Stop</h3>
+
+<div class="info-gempa" id="infoBox">
+  <span id="scrollGempa" class="scrolling-text">Memuat data gempa terkini dari BMKG...</span>
+</div>
+
+<!-- tombol tunggal play / stop -->
+<button id="ttsToggle" class="pulse-btn" aria-pressed="false">🔊 Baca Info Gempa</button>
+
+<!-- Equalizer DJ -->
+<div id="equalizer" class="equalizer hidden">
+  <span></span><span></span><span></span><span></span><span></span>
+  <span></span><span></span><span></span><span></span><span></span>
+</div>
+  <!-- ============ PING INDICATOR ============ -->
+<div id="pingBox" class="ping-indicator">🔄 Ping...</div>  
+ <div id="netPopup" class="net-popup-ios"></div>  
+<!-- Suara Notifikasi -->
+<audio id="beepDisconnect" src="beep-off.mp3" preload="auto"></audio>
+<audio id="beepConnect" src="beep-on.mp3" preload="auto"></audio>
+  <!-- =================== CARD SUMBER DATA =================== -->
 <div class="card muted">
   <span class="dot-gradient left-dot">•</span>
   <span class="muted-text">Sumber data: BMKG Nasional</span>
   <span class="dot-gradient right-dot">•</span>
 </div>
-
-<!-- =================== POPUP NETWORK =================== -->
-<!-- ============ PING INDICATOR ============ -->
-<div id="pingBox" class="ping-indicator">🔄 Ping...</div>     
-<!-- Suara Notifikasi -->
-<audio id="beepDisconnect" src="beep-off.mp3" preload="auto"></audio>
-<audio id="beepConnect" src="beep-on.mp3" preload="auto"></audio>
-    
+  
 <script>
-window.addEventListener("load", () => {
+/* ---------------------------
+   Utility & state
+   --------------------------- */
+document.addEventListener('DOMContentLoaded', () => {
+  /**const ttsButton = document.getElementById('ttsButton');
+  const scrollEl = document.getElementById('scrollGempa');
+  const testBtn = document.getElementById('testVoice');
+
+  // state
+  let speaking = false;
+  let utterance = null;
+
+  // set initial style (force inline)
+  ttsButton.style.background = "linear-gradient(90deg, var(--blue1), var(--blue2))";
+  ttsButton.textContent = "🎧 Baca Info Gempa";**/
+  
+  const ttsToggle = document.getElementById("ttsToggle");
+let isSpeaking = false;
+let utter = null;
+
+function updateButton() {
+  if (isSpeaking) {
+    ttsToggle.textContent = "⏹ Stop Membaca";
+    ttsToggle.style.background = "linear-gradient(90deg, #ff5858, #ff2e63)";
+  } else {
+    ttsToggle.textContent = "🔊 Baca Info Gempa";
+    ttsToggle.style.background = "linear-gradient(90deg, #4facfe, #00f2fe)";
+  }
+}
+
+/****updateButton();
+  ttsToggle.addEventListener("click", () => {
+  if (!isSpeaking) {
+    const text = document.getElementById("scrollGempa").innerText.trim();
+    if (!text) return alert("Belum ada data gempa untuk dibaca.");
+
+    window.speechSynthesis.cancel();
+    utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "id-ID";
+
+    utter.onend = () => { isSpeaking = false; updateButton(); };
+    utter.onerror = () => { isSpeaking = false; updateButton(); };
+
+    isSpeaking = true;
+    updateButton();
+    window.speechSynthesis.speak(utter);
+
+  } else {
+    window.speechSynthesis.cancel();
+    isSpeaking = false;
+    updateButton();
+  }
+});****/
+  
+  let isPlaying = false;
+let utterance;
+
+const ttsBtn = document.getElementById("ttsToggle");
+const equalizer = document.getElementById("equalizer");
+const bars = equalizer.querySelectorAll("span");
+
+ttsBtn.addEventListener("click", toggleTTS);
+
+function toggleTTS() {
+  if (!isPlaying) startTTS();
+  else stopTTS();
+}
+
+function startTTS() {
+  const textGempa = document.getElementById("scrollGempa").innerText;
+  utterance = new SpeechSynthesisUtterance(textGempa);
+  utterance.lang = "id-ID";
+
+  speechSynthesis.speak(utterance);
+
+  isPlaying = true;
+  showEqualizer();
+  animateEqualizer();
+
+  ttsBtn.innerHTML = "⏹ Stop Baca";
+  ttsBtn.classList.add("stop");
+
+  utterance.onend = () => stopTTS();
+}
+
+function stopTTS() {
+  speechSynthesis.cancel();
+  isPlaying = false;
+
+  ttsBtn.innerHTML = "🔊 Baca Info Gempa";
+  ttsBtn.classList.remove("stop");
+  equalizer.classList.add("hidden");
+}
+
+function showEqualizer() {
+  equalizer.classList.remove("hidden");
+}
+
+function animateEqualizer() {
+  if (!isPlaying) return;
+
+  bars.forEach(bar => {
+    const height = 8 + Math.random() * 55;
+    bar.style.height = `${height}px`;
+  });
+
+  requestAnimationFrame(animateEqualizer);
+}
+
+  /* ============================
+     Fetch BMKG running text once & every 5 min
+     ============================ */
+   const scrollElem = document.getElementById('scrollGempa');
+
+  // 🔁 Efek ganti teks halus
+  function updateGempa(teks, magnitudo) {
+    scrollElem.style.opacity = 0;
+    setTimeout(() => {
+      scrollElem.textContent = teks;
+      scrollElem.className = 'scrolling-text';
+          
+      if (magnitudo < 4.0) scrollElem.classList.add('warna-hijau');
+      else if (magnitudo < 5.0) scrollElem.classList.add('warna-abu-emas');
+      else if (magnitudo >= 5.0 && magnitudo < 6.0) scrollElem.classList.add('warna-orange');
+      else scrollElem.classList.add('warna-merah-maron');       
+      scrollElem.style.opacity = 1;
+    }, 800);
+  }
+
+  // 🌍 Ambil data gempa dari API BMKG
+  async function fetchGempa() {
+    try {
+      const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
+      const data = await res.json();
+
+      const g = data.Infogempa.gempa;
+      const magnitudo = parseFloat(g.Magnitude);
+      const lokasi = g.Wilayah;
+      const waktu = g.Tanggal + ' ' + g.Jam;
+      const dirasakan = g.Dirasakan;
+      const teks = `🌋 GEMPA ${g.Tanggal} pukul ${g.Jam} | Magnitudo: ${g.Magnitude} SR | Kedalaman: ${g.Kedalaman} | Lokasi: ${g.Wilayah} | Koordinat: ${g.Lintang}, ${g.Bujur} | Dirasakan: ${dirasakan} | Potensi: ${g.Potensi}`;
+      
+      updateGempa(teks, magnitudo);
+    } catch (e) {
+      console.error('Gagal ambil data BMKG:', e);
+      updateGempa('⚠️ Gagal memuat data gempa dari BMKG.', 0);
+    }
+  }
+
+  // ⏱ Jalankan pertama kali & perbarui tiap 5 menit
+  fetchGempa();
+  setInterval(fetchGempa, 5 * 60 * 1000);
+   
+  /*async function fetchGempa() {
+    try {
+      const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json');
+      const data = await res.json();
+      const g = data.Infogempa.gempa; // object
+      // Build readable text
+      const teks = `Gempa tanggal ${g.Tanggal} pukul ${g.Jam} WIB. Magnitudo ${g.Magnitude} SR. Kedalaman ${g.Kedalaman}. Lokasi: ${g.Wilayah}. ${g.Potensi || ''}`;
+      scrollEl.textContent = teks;
+      // restart animation (ensure it restarts)
+      scrollEl.style.animation = 'none';
+      void scrollEl.offsetWidth;
+      scrollEl.style.animation = '';
+      scrollEl.style.animation = 'scroll-left 35s linear infinite';
+    } catch (err) {
+      console.error('fetchGempa error', err);
+      scrollEl.textContent = '⚠️ Gagal memuat data gempa dari BMKG.';
+    }
+  }
+  fetchGempa();
+  setInterval(fetchGempa, 5 * 60 * 1000);*/
+  
+
+  /* ============================
+     Feature detection: browser TTS available?
+     ============================ */
+  function supportsWebSpeech() {
+    return 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+  }
+
+  /* Check in-app WebView bridge (AppsGeyser etc). We'll fallback to send string if present */
+  function sendToHostTTS(text) {
+    try {
+      // AppInventor style
+      if (window.AppInventor && typeof window.AppInventor.setWebViewString === 'function') {
+        window.AppInventor.setWebViewString("TTS:" + text);
+        return true;
+      }
+      // generic bridge name used before
+      if (typeof window.setWebViewString === 'function') {
+        window.setWebViewString("TTS:" + text);
+        return true;
+      }
+      // Cordova/Android WebView can implement a global object, e.g. Android
+      if (window.Android && typeof window.Android.speak === 'function') {
+        window.Android.speak(text);
+        return true;
+      }
+    } catch(e) {
+      console.warn('sendToHostTTS failed', e);
+    }
+    return false;
+  }
+
+  /* ============================
+     Speak (browser) and control button visuals (inline style)
+     ============================ */
+  function startSpeak(text) {
+    if (!supportsWebSpeech()) {
+      // fallback: attempt host native TTS
+      const sent = sendToHostTTS(text);
+      if (sent) {
+        speaking = true;
+        updateBtnVisual();
+      } else {
+        alert('TTS tidak tersedia di WebView ini. Coba buka di Chrome atau gunakan native bridge.');
+      }
+      return;
+    }
+
+    // Cancel any existing
+    window.speechSynthesis.cancel();
+
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'id-ID';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+
+    // events
+    utterance.onend = () => {
+      speaking = false;
+      updateBtnVisual();
+    };
+    utterance.onerror = (e) => {
+      console.error('TTS error', e);
+      speaking = false;
+      updateBtnVisual();
+    };
+
+    speaking = true;
+    updateBtnVisual();
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function stopSpeak() {
+    // stop browser
+    if (supportsWebSpeech()) {
+      window.speechSynthesis.cancel();
+    }
+    // also notify host native to stop (if exists)
+    try {
+      if (window.AppInventor && typeof window.AppInventor.setWebViewString === 'function') {
+        window.AppInventor.setWebViewString("TTS:STOP");
+      } else if (typeof window.setWebViewString === 'function') {
+        window.setWebViewString("TTS:STOP");
+      } else if (window.Android && typeof window.Android.stopSpeak === 'function') {
+        window.Android.stopSpeak();
+      }
+    } catch(e) { /* ignore */ }
+
+    speaking = false;
+    updateBtnVisual();
+  }
+
+  function updateBtnVisual() {
+    // Use inline style so WebView's default won't override
+    if (speaking) {
+      ttsButton.textContent = "⏹ Stop Membaca";
+      ttsButton.style.background = "linear-gradient(90deg, var(--red1), var(--red2))";
+      ttsButton.setAttribute('aria-pressed','true');
+    } else {
+      ttsButton.textContent = "🔊 Baca Info Gempa";
+      ttsButton.style.background = "linear-gradient(90deg, var(--blue1), var(--blue2))";
+      ttsButton.setAttribute('aria-pressed','false');
+    }
+  }
+
+  /* ============================
+     toggle handler bound to button
+     ============================ */
+  ttsButton.addEventListener('click', () => {
+    // If currently not speaking, we MUST treat this as an explicit user gesture to unlock TTS
+    if (!speaking) {
+      // prefer running text content
+      const text = (document.getElementById('scrollGempa')?.innerText || '').trim();
+      if (!text) {
+        alert('Belum ada teks gempa untuk dibacakan.');
+        return;
+      }
+
+      // unlock issue on Chrome Android: sometimes need a short dummy utterance or resume
+      if (supportsWebSpeech()) {
+        try {
+          // Ensures engine ready
+          window.speechSynthesis.cancel();
+        } catch(e){}
+      }
+      startSpeak(text);
+      return;
+    }
+    // else stop
+    stopSpeak();
+  });
+  
+
+  /* Test voice button for debugging in browser */
+  testBtn.addEventListener('click', () => {
+    if (!supportsWebSpeech()) {
+      alert('SpeechSynthesis tidak tersedia pada WebView ini.');
+      return;
+    }
+    // Show voices in console
+    const voices = window.speechSynthesis.getVoices();
+    console.log('voices', voices);
+    alert('Voices: ' + (voices.length ? voices.map(v=>v.name+'('+v.lang+')').join(', ') : 'Tidak tersedia (akan muncul setelah onvoiceschanged).'));
+    const t = new SpeechSynthesisUtterance('Tes text to speech. Jika tidak terdengar, coba buka di Chrome.');
+    t.lang = 'id-ID';
+    window.speechSynthesis.speak(t);
+  });
+
+  /* if voices load later */
+  if (supportsWebSpeech()) {
+    window.speechSynthesis.onvoiceschanged = function() {
+      console.log('voiceschanged', window.speechSynthesis.getVoices());
+    };
+  }
+
+});
+  
+  window.addEventListener("load", () => {
 
   const popup = document.getElementById("netPopup");
   const pingBox = document.getElementById("pingBox");
@@ -1124,25 +688,7 @@ window.addEventListener("load", () => {
   setInterval(pingTest, 2500);
   pingTest();
 
-});
-    
- /* function speakGempa() {
-    const text = document.getElementById("scrollGempa").innerText; // ID dari teks gempa berjalan
-    const speech = new SpeechSynthesisUtterance(text);
-
-    // Set bahasa Indonesia
-    speech.lang = "id-ID";
-    speech.rate = 1.0;   // kecepatan bicara
-    speech.pitch = 1.0;  // nada bicara
-
-    window.speechSynthesis.speak(speech);
-  }
-    function updateMarquee(newText) {
-  document.getElementById("scrollGempa").innerText = newText;
-
-  const speech = new SpeechSynthesisUtterance(newText);
-  speech.lang = "id-ID";
-  speech.rate = 1;
-  window.speechSynthesis.speak(speech);
-}*/
+ }); 
 </script>
+</body>
+</html>
