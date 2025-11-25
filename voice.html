@@ -321,10 +321,15 @@
   <span id="scrollGempa" class="scrolling-text">Memuat data gempa terkini dari BMKG...</span>
 </div>
 
-<!-- tombol tunggal play / stop -->
-<button id="ttsToggle" class="pulse-btn" aria-pressed="false">🔊 Baca Info Gempa</button>
-  <audio id="beepClick">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+<!-- tombol tunggal play / stop 
+<button id="ttsToggle" class="pulse-btn" aria-pressed="false">🔊 Baca Info Gempa</button> -->
+
+<button id="ttsToggle" class="pulse-btn" aria-pressed="false" onclick="buttonClicked()">
+  🔊 Baca Info Gempa
+</button>
+    <!-- Sound -->
+<audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
 </audio>
 
 <!-- Equalizer DJ -->
@@ -410,7 +415,7 @@ const bars = equalizer.querySelectorAll("span");
 ttsBtn.addEventListener("click", toggleTTS);
 
 function toggleTTS() {
-  playBeep();  
+  //playBeep();  
   if (!isPlaying) startTTS();
   else stopTTS();
 }
@@ -456,12 +461,12 @@ function animateEqualizer() {
   requestAnimationFrame(animateEqualizer);
 }
 
-/*function toggleTTS() {
-  playBeep();   // <-- Tambahkan di sini
-  if (!isPlaying) startTTS();
-  else stopTTS();
-}*/
-
+function buttonClicked() {
+  const beep = document.getElementById("beepClick");
+  beep.currentTime = 0; // reset ke awal
+  beep.play();          // mainkan suara
+}
+  
   /* ============================
      Fetch BMKG running text once & every 5 min
      ============================ */
