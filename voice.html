@@ -410,6 +410,7 @@ const bars = equalizer.querySelectorAll("span");
 ttsBtn.addEventListener("click", toggleTTS);
 
 function toggleTTS() {
+  playBeep();  
   if (!isPlaying) startTTS();
   else stopTTS();
 }
@@ -455,11 +456,11 @@ function animateEqualizer() {
   requestAnimationFrame(animateEqualizer);
 }
 
-function toggleTTS() {
+/*function toggleTTS() {
   playBeep();   // <-- Tambahkan di sini
   if (!isPlaying) startTTS();
   else stopTTS();
-}
+}*/
 
   /* ============================
      Fetch BMKG running text once & every 5 min
