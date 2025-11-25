@@ -1,4 +1,4 @@
-doctype html>
+<!doctype html>
 <html lang="id">
 <head>
 <meta charset="utf-8" />
@@ -47,6 +47,12 @@ doctype html>
   .ping-indicator{position:fixed;top:10px;right:10px;padding:6px 10px;font-size:12px;font-weight:600;color:#fff;border-radius:14px;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);z-index:999}
   .net-popup-ios{position:fixed;top:-120px;left:50%;transform:translateX(-50%) scale(.95);padding:14px 26px;font-size:15px;font-weight:600;border-radius:22px;backdrop-filter:blur(12px);background:rgba(255,255,255,.18);color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.25);z-index:9999;display:none;text-align:center}
   .net-popup-ios.show{top:20px;transform:translateX(-50%) scale(1)}
+  .net-popup-ios.success {
+  background: rgba(26, 188, 156, 0.55);
+}
+  .net-popup-ios.error {
+  background: rgba(231, 76, 60, 0.55);
+}
 
   /* make app area safe for notch */
   main{padding:12px}
@@ -119,6 +125,33 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const equalizer = document.getElementById('equalizer');
   const bars = equalizer.querySelectorAll('span');
   const scrollEl = document.getElementById('scrollGempa');
+  
+  window.addEventListener("load", () => {
+  const popup = document.getElementById("netPopup");
+
+  function showPopup(msg, style) {
+    popup.innerHTML = msg;
+    popup.className = `net-popup-ios ${style}`;
+    popup.style.display = "block";
+
+    setTimeout(() => popup.classList.add("show"), 20);
+
+    setTimeout(() => {
+      popup.classList.remove("show");
+      setTimeout(() => popup.style.display = "none", 600);
+    }, 8000);
+  }
+
+  window.addEventListener("offline", () => {
+    showPopup("🔌 Jaringan Terputus", "error");
+    if (navigator.vibrate) navigator.vibrate([160,80,160]);
+  });
+
+  window.addEventListener("online", () => {
+    showPopup("📶 Internet Tersambung", "success");
+    if (navigator.vibrate) navigator.vibrate(120);
+  });
+});
 
   let isPlaying = false;
   let utterance = null;
@@ -177,7 +210,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
     // play beep then start TTS (small delay to let beep start)
     playBeep(); setTimeout(()=>{ if(!isPlaying) startTTS(); else stopTTS(); },140);
   });
-
+  
   // ping indicator
   const pingBox = document.getElementById('pingBox');
   async function pingTest(){ const start = performance.now(); try{ await fetch('https://www.google.com', {mode:'no-cors'}); const d = Math.round(performance.now()-start); pingBox.innerText = `📶 ${d} ms`; pingBox.style.background = d<80? 'rgba(76,175,80,.55)': d<150? 'rgba(255,193,7,.55)': 'rgba(244,67,54,.55)'; }catch(e){ pingBox.innerText='❌ Offline'; pingBox.style.background='rgba(244,67,54,.55)'; }}
