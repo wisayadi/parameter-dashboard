@@ -181,7 +181,7 @@
   margin-top: 14px;
 }
 
-.equalizer span {
+/*.equalizer span {
   width: 4px;
   background: linear-gradient(180deg,#1db954,#1ed760);
   border-radius: 6px;
@@ -191,7 +191,7 @@
 }
 
 /* Delay berbeda biar efek seperti Spotify */
-.equalizer span:nth-child(1) { animation-delay: 0ms; }
+/*.equalizer span:nth-child(1) { animation-delay: 0ms; }
 .equalizer span:nth-child(2) { animation-delay: 120ms; }
 .equalizer span:nth-child(3) { animation-delay: 240ms; }
 .equalizer span:nth-child(4) { animation-delay: 360ms; }
@@ -203,12 +203,60 @@
 .equalizer span:nth-child(10){ animation-delay: 1080ms; }
 
 /* Animasi lembut */
+/*@keyframes bounce {
+  0%   { transform: scaleY(0.2); }
+  50%  { transform: scaleY(1); }
+  100% { transform: scaleY(0.2); }
+}*/
+ /* 🎧 EQUALIZER RGB RAINBOW */
+.equalizer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 4px;
+  height: 60px;
+  margin-top: 14px;
+}
+
+.equalizer span {
+  width: 6px;
+  border-radius: 6px;
+  animation: bounce 0.9s ease-in-out infinite, rgbColor 3s linear infinite;
+  transform-origin: bottom;
+  box-shadow: 0 0 14px rgba(255,255,255,0.7);
+}
+
+/* Delay supaya gerak acak */
+.equalizer span:nth-child(1) { animation-delay: 0ms; }
+.equalizer span:nth-child(2) { animation-delay: 120ms; }
+.equalizer span:nth-child(3) { animation-delay: 240ms; }
+.equalizer span:nth-child(4) { animation-delay: 360ms; }
+.equalizer span:nth-child(5) { animation-delay: 480ms; }
+.equalizer span:nth-child(6) { animation-delay: 600ms; }
+.equalizer span:nth-child(7) { animation-delay: 720ms; }
+.equalizer span:nth-child(8) { animation-delay: 840ms; }
+.equalizer span:nth-child(9) { animation-delay: 960ms; }
+.equalizer span:nth-child(10){ animation-delay: 1080ms; }
+
+/* Animasi tinggi Bar */
 @keyframes bounce {
   0%   { transform: scaleY(0.2); }
   50%  { transform: scaleY(1); }
   100% { transform: scaleY(0.2); }
 }
-  
+
+/* 🌈 Animasi warna RGB pelangi */
+@keyframes rgbColor {
+  0%   { background: #ff0000; }
+  16%  { background: #ff7f00; }
+  33%  { background: #ffff00; }
+  50%  { background: #00ff00; }
+  66%  { background: #0000ff; }
+  83%  { background: #8b00ff; }
+  100% { background: #ff0000; }
+}
+
+.hidden { display: none; } 
   
   /* small helper */
   .muted { text-align:center; font-size:12px; color:#666; margin-top:8px; }
