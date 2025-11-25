@@ -328,10 +328,11 @@
   🔊 Baca Info Gempa
 </button>
     <!-- Sound -->
-<audio id="beepClick">
+<audio id="beepClick" preload="auto">
   <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
 </audio>
-
+  
 <!-- Equalizer DJ -->
 <div id="equalizer" class="equalizer hidden">
   <span></span><span></span><span></span><span></span><span></span>
@@ -464,7 +465,9 @@ function animateEqualizer() {
 function buttonClicked() {
   const beep = document.getElementById("beepClick");
   beep.currentTime = 0; // reset ke awal
-  beep.play();          // mainkan suara
+  //beep.play();   // mainkan suara
+  beep.play();
+setTimeout(startTTS, 150);
 }
   
   /* ============================
