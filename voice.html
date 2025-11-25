@@ -455,6 +455,13 @@ function animateEqualizer() {
   requestAnimationFrame(animateEqualizer);
 }
 
+function playBeep() {
+  const beep = document.getElementById("beepClick");
+  beep.currentTime = 0;   // mulai dari awal
+  beep.play();
+}
+
+
   /* ============================
      Fetch BMKG running text once & every 5 min
      ============================ */
