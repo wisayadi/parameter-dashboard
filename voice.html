@@ -216,7 +216,7 @@
   align-items: flex-end;
   gap: 4px;
   height: 60px;
-  margin-top: 14px;
+  margin-top: 20px;
 }
 
 .equalizer span {
@@ -518,6 +518,14 @@ function buttonClicked() {
   beep.play();
 setTimeout(startTTS, 150);
 }
+  function enableImmersive() {
+  if (navigator.userAgent.includes("Android")) {
+    goFullscreen();
+    screen.orientation.lock("portrait");
+  }
+}
+
+window.onload = enableImmersive;
   
   /* ============================
      Fetch BMKG running text once & every 5 min
