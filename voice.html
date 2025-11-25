@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="utf-8" />
@@ -126,33 +126,30 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const bars = equalizer.querySelectorAll('span');
   const scrollEl = document.getElementById('scrollGempa');
   
-  window.addEventListener("load", () => {
-  const popup = document.getElementById("netPopup");
+const popup = document.getElementById("netPopup");
+function showPopup(msg, style) {
+  popup.innerHTML = msg;
+  popup.className = `net-popup-ios ${style}`;
+  popup.style.display = "block";
 
-  function showPopup(msg, style) {
-    popup.innerHTML = msg;
-    popup.className = `net-popup-ios ${style}`;
-    popup.style.display = "block";
+  setTimeout(() => popup.classList.add("show"), 20);
 
-    setTimeout(() => popup.classList.add("show"), 20);
+  setTimeout(() => {
+    popup.classList.remove("show");
+    setTimeout(() => popup.style.display = "none", 600);
+  }, 8000);
+}
 
-    setTimeout(() => {
-      popup.classList.remove("show");
-      setTimeout(() => popup.style.display = "none", 600);
-    }, 8000);
-  }
-
-  window.addEventListener("offline", () => {
-    showPopup("🔌 Jaringan Terputus", "error");
-    if (navigator.vibrate) navigator.vibrate([160,80,160]);
-  });
-
-  window.addEventListener("online", () => {
-    showPopup("📶 Internet Tersambung", "success");
-    if (navigator.vibrate) navigator.vibrate(120);
-  });
+window.addEventListener("offline", () => {
+  showPopup("🔌 Jaringan Terputus", "error");
+  if (navigator.vibrate) navigator.vibrate([160,80,160]);
 });
 
+window.addEventListener("online", () => {
+  showPopup("📶 Internet Tersambung", "success");
+  if (navigator.vibrate) navigator.vibrate(120);
+});
+  
   let isPlaying = false;
   let utterance = null;
 
