@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard Cuaca Balikpapan</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <style>    
  /* 🌿 Umum */
     body {
@@ -56,6 +57,7 @@
       padding: 20px;
       text-align: center;
       transition: all 0.3s ease;
+      margin-top: 50px;
     }
     .card-waktu h3 {
       color: lightblue;
@@ -108,7 +110,7 @@
   /**background: linear-gradient(90deg, #e9f5db, #b5e48c, #76c893, #34a0a4, #168aad);**/
   /**background: linear-gradient(90deg, #e8f5e9, #c8e6c9, #a5d6a7, #66bb6a, #388e3c);**/  
   transition: all 0.3s ease;
-  margin: 20px auto;
+  margin-top: 10px;
   border: 1px solid #f3d7b6;
   max-width: 226px;
 }
@@ -301,10 +303,10 @@ function goDashboard() {
   
 </script>
   
-   <!-- Tombol Kembali ke dashboard -->
+   <!-- Tombol Kembali ke dashboard 
     <div class="back-container">
    
-<button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
+<button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button> -->
       
        <audio id="beepClick">
   <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
@@ -501,7 +503,7 @@ window.addEventListener("online", () => {
   background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);
   border-radius: 8px;
   margin-top: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 60px;
   width: 258px;
   padding: 8px 35px;
 }
@@ -591,7 +593,54 @@ window.addEventListener("online", () => {
   backdrop-filter: blur(10px);
   z-index: 999999;
 }
-    
+  .bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 14px;
+  background: /*rgba(255, 255, 255, 0.55)*/rgba(0,0,0,0.4);
+  backdrop-filter: blur(1px);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+}
+
+.nav-card {
+  /*display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  padding: 6px 0;*/
+  border-radius: 12px;
+  border: none;
+  /*background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: 0.25s ease;
+  margin-bottom: 2px;*/
+}
+
+.nav-card .nav-icon {
+  font-size: 20px;
+  color: blue;
+  margin-bottom: 3px;
+}
+
+.nav-card small {
+  font-size: 9px;
+  font-weight: 700;
+  color: /*#333*/brown;
+}
+
+.nav-card:active {
+  transform: scale(0.92);
+  background: /*#e8f4ff*/ gold;
+  box-shadow: 0 0 10px #77c4ff;
+}   
 </style>
 
 <!-- =================== CARD SUMBER DATA =================== -->
@@ -599,6 +648,29 @@ window.addEventListener("online", () => {
   <span class="dot-gradient left-dot">•</span>
   <span class="muted-text">Sumber data: OpenWeatherMap</span>
   <span class="dot-gradient right-dot">•</span>
+</div>
+
+<!-- Sound -->
+<audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
+<div class="bottom-nav">
+  
+  <button class="nav-card" onclick="goDashboard()">
+    <span class="material-icons nav-icon">home</span>
+    <small>Beranda</small>
+  </button>
+
+  <button class="nav-card" id="ttsToggle" onclick="buttonClicked()">
+    <span class="material-icons nav-icon">graphic_eq</span>
+    <small></small>
+  </button>
+
+ <button class="nav-card" onclick="reloadWithBeep()">   
+  <span class="material-icons nav-icon">restart_alt</span>
+    <small>Reload</small>
+  </button>  
 </div>
 
 <!-- =================== POPUP NETWORK =================== -->
@@ -665,4 +737,14 @@ window.addEventListener("load", () => {
   pingTest();
 
 });
+
+function reloadWithBeep() {
+  const beep = document.getElementById("beepClick");
+  beep.currentTime = 0;     // restart suara dari awal
+  beep.play();
+
+  setTimeout(() => {
+    location.reload();
+  }, 250); // jeda sedikit agar beep terdengar dulu
+}
 </script>
