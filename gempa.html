@@ -30,26 +30,14 @@ function goDashboard() {
   }, 200);
 }
 </script>
-  
+   
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <!-- 🔹 Info Gempa Berjalan -->
   <div class="info-gempa pulse-bg">
     <span id="scrollGempa" class="scrolling-text warna-abu-emas">
       Memuat data gempa terkini dari BMKG...
     </span>
-  </div>
-     
-<!-- Tombol Dashboard -->
-<button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
-
-<!-- Sound -->
-<audio id="beepClick">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
-</audio>
-
-<!-- Tombol Aktifkan TTS -->
-<button id="speakBtn" onclick="buttonClicked()">
-  🔊 Aktifkan Teks Suara
-</button>   
+  </div>  
 
    <style>  
       /* 🔹 Tombol kembali */
@@ -213,28 +201,8 @@ function goDashboard() {
   // ⏱ Jalankan pertama kali & perbarui tiap 5 menit
   fetchGempa();
   setInterval(fetchGempa, 5 * 60 * 1000);
-   
-   
-  /*function speakGempa() {
-    const text = document.getElementById("scrollGempa").innerText; // ID dari teks gempa berjalan
-    const speech = new SpeechSynthesisUtterance(text);
-
-    // Set bahasa Indonesia
-    speech.lang = "id-ID";
-    speech.rate = 1.0;   // kecepatan bicara
-    speech.pitch = 1.0;  // nada bicara
-
-    window.speechSynthesis.speak(speech);
-  }
-    function updateMarquee(newText) {
-  document.getElementById("scrollGempa").innerText = newText;
-
-  const speech = new SpeechSynthesisUtterance(newText);
-  speech.lang = "id-ID";
-  speech.rate = 1;
-  window.speechSynthesis.speak(speech);
-}*/
-   function buttonClicked() {
+     
+  function buttonClicked() {
   const beep = document.getElementById("beepClick");
   beep.currentTime = 0; // reset ke awal
   beep.play();          // mainkan suara
@@ -385,20 +353,6 @@ function openChrome() {
     margin-bottom: 10px;
   }
 
-  /*.btnZona {
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 10px;
-    border: none;
-    margin: 3px;
-    cursor: pointer;
-    background: #ddd;
-    transition: 0.3s;
-  }
-  .btnZona:hover {
-    background: #7B61FF;
-    color: white;
-  }*/
      /* 🧭 Tombol Zona */
   .Zona-container {
     display: flex;
@@ -822,10 +776,7 @@ window.addEventListener('load', initMap);
   border: 1px solid rgba(255, 183, 77, 0.4);
   transition: all 0.3s ease;
   }
-   /*.card-gempa:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 24px rgba(255, 140, 0, 0.35);
-    }*/
+
   .blink-text {
     text-align: center;
     font-size: 12px;
@@ -1044,16 +995,72 @@ loadGempa();
   backdrop-filter: blur(10px);
   z-index: 999999;
 }
-   /* #speakBtn {
-  background: linear-gradient(90deg,#4facfe,#00f2fe);
-  color: white;
+    
+   .bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px;
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 -2px 18px rgba(0,0,0,0.15);
+  border-top: 1px solid rgba(255,255,255,0.25);
+  z-index: 9999;
+}
+    .bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 14px;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(1px);
+  border-top-left-radius: 1px;
+  border-top-right-radius: 1px;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+}
+
+.nav-card {
+  /*display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  padding: 6px 0;*/
+  border-radius: 12px;
   border: none;
-  padding: 10px 18px;
-  border-radius: 22px;
-  font-size: 13px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  /*background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
   cursor: pointer;
-}*/    
+  transition: 0.25s ease;
+  margin-bottom: 2px;*/
+}
+
+.nav-card .nav-icon {
+  font-size: 20px;
+  color: blue;
+  margin-bottom: 3px;
+}
+
+.nav-card small {
+  font-size: 9px;
+  font-weight: 600;
+  color: /*#333*/brown;
+}
+
+.nav-card:active {
+  transform: scale(0.92);
+  background: /*#e8f4ff*/ gold;
+  box-shadow: 0 0 10px #77c4ff;
+}
+
 </style>
     
 <!-- =================== CARD SUMBER DATA =================== -->
@@ -1062,6 +1069,30 @@ loadGempa();
   <span class="muted-text">Sumber data: BMKG Nasional</span>
   <span class="dot-gradient right-dot">•</span>
 </div>
+
+<!-- Sound -->
+<audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
+<div class="bottom-nav">
+  
+  <button class="nav-card" onclick="goDashboard()">
+    <span class="material-icons nav-icon">home</span>
+    <small>Beranda</small>
+  </button>
+
+  <button class="nav-card" id="ttsToggle" onclick="buttonClicked()">
+    <span class="material-icons nav-icon">graphic_eq</span>
+    <small>Teks Suara</small>
+  </button>
+
+ <button class="nav-card" onclick="reloadWithBeep()">   
+  <span class="material-icons nav-icon">restart_alt</span>
+    <small>Reload</small>
+  </button>  
+</div>
+
 
 <!-- =================== POPUP NETWORK =================== -->
 <!-- ============ PING INDICATOR ============ -->
@@ -1125,24 +1156,14 @@ window.addEventListener("load", () => {
   pingTest();
 
 });
-    
- /* function speakGempa() {
-    const text = document.getElementById("scrollGempa").innerText; // ID dari teks gempa berjalan
-    const speech = new SpeechSynthesisUtterance(text);
+     
+function reloadWithBeep() {
+  const beep = document.getElementById("beepClick");
+  beep.currentTime = 0;     // restart suara dari awal
+  beep.play();
 
-    // Set bahasa Indonesia
-    speech.lang = "id-ID";
-    speech.rate = 1.0;   // kecepatan bicara
-    speech.pitch = 1.0;  // nada bicara
-
-    window.speechSynthesis.speak(speech);
-  }
-    function updateMarquee(newText) {
-  document.getElementById("scrollGempa").innerText = newText;
-
-  const speech = new SpeechSynthesisUtterance(newText);
-  speech.lang = "id-ID";
-  speech.rate = 1;
-  window.speechSynthesis.speak(speech);
-}*/
+  setTimeout(() => {
+    location.reload();
+  }, 250); // jeda sedikit agar beep terdengar dulu
+}
 </script>
