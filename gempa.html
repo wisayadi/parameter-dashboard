@@ -128,7 +128,7 @@ function goDashboard() {
   .warna-hijau { color: /*#00c853*/lightgreen; }
   .warna-abu-emas { color: /*#fdf5c4*/yellow; }
   .warna-orange { color: /*#ff8c00*/orange; }
-  .warna-merah-maron { color: /*#b71c1c*/darkred; }
+  .warna-merah-maron { color: /*#b71c1c*/red; }
 
   /* 💥 Efek gradient berdenyut untuk magnitudo ≥6 */
   @keyframes pulse-gradient {
@@ -897,6 +897,177 @@ loadGempa();
 </body>
 </html>
     
+    <!-- 🌿 Hidden Double-Point Unlock System + Fade Animation -->
+<style>
+  body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #f9fff9;
+  }
+
+  /* Area titik rahasia (tak terlihat) */
+  .secret-spot {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    z-index: 9999;
+  }
+
+  #spot-left {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  #spot-right {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  /* Aktifkan untuk debugging:
+  .secret-spot {
+    background: rgba(255,0,0,0.1);
+  } */
+
+  /* Area share dengan animasi */
+ #shareSection {
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff, #e8fff0);
+  border-radius: 18px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none;
+  transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, padding 0.6s ease, margin 0.6s ease;
+  
+  /* Tambahan penting */
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;         /* tidak memberi ruang */
+  margin: 0 auto;     /* hilangkan gap full */
+}
+
+#shareSection.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  margin: 15px auto;
+  padding: 25px 0;    /* tampil kembali saat show */
+  max-height: 500px;  /* cukup tinggi untuk konten */
+}
+
+  .share-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    text-decoration: none;
+    color: /*#333*/brown;
+    font-size: 8px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .share-btn img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 5px auto;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .share-btn:hover img {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  }
+
+  /* Notifikasi */
+  .info-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4caf50;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .info-toast.show {
+    opacity: 1;
+  }
+</style>
+
+<!-- 🔒 Area klik rahasia -->
+<div id="spot-left" class="secret-spot"></div>
+<div id="spot-right" class="secret-spot"></div>
+
+<!-- 🌐 Share Link Section -->
+<div id="shareSection">
+  <h4 style="margin-bottom:15px;font-size: 12px;color: grey;">Bagikan ke:</h4>
+  <div class="share-container">
+    <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">Facebook
+    </a>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?url=https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter">Twitter
+    </a>
+    <a class="share-btn" href="https://wa.me/?text=Parameter%20Balikpapan%20https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">WhatsApp
+    </a>
+    <a class="share-btn" href="https://t.me/share/url?url=https://wisayadi.github.io/parameter-dashboard/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">Telegram
+    </a>
+  </div>
+</div>
+
+<!-- 🔔 Notifikasi -->
+<div id="toast" class="info-toast">🔓 Share link dibuka</div>
+
+<script>
+  let lastTapLeft = 0;
+  let lastTapRight = 0;
+  let shareVisible = false;
+
+  const shareSection = document.getElementById("shareSection");
+  const toast = document.getElementById("toast");
+
+  document.getElementById("spot-left").addEventListener("click", () => {
+    lastTapLeft = Date.now();
+    checkUnlock();
+  });
+
+  document.getElementById("spot-right").addEventListener("click", () => {
+    lastTapRight = Date.now();
+    checkUnlock();
+  });
+
+  function checkUnlock() {
+    if (Math.abs(lastTapLeft - lastTapRight) < 3000 && lastTapLeft && lastTapRight) {
+      shareVisible = !shareVisible;
+      shareSection.classList.toggle("show", shareVisible);
+      showToast(shareVisible ? "🔓 Share link dibuka" : "🔒 Share link ditutup");
+      lastTapLeft = 0;
+      lastTapRight = 0;
+    }
+  }
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+</script>
+    
   <style>
 .card.muted {
   position: relative;
@@ -1078,17 +1249,18 @@ loadGempa();
 <div class="bottom-nav">
   
   <button class="nav-card" onclick="goDashboard()">
-    <span class="material-icons nav-icon">home</span>
+    <span class="material-icons nav-icon">home</span> 
     <small>Beranda</small>
   </button>
 
   <button class="nav-card" id="ttsToggle" onclick="buttonClicked()">
-    <span class="material-icons nav-icon">graphic_eq</span>
+    <!-- <span class="material-icons nav-icon">speaker</span> -->
+    <span class="material-icons nav-icon" style="color: red;">speaker</span>
     <small>Teks Suara</small>
   </button>
 
  <button class="nav-card" onclick="reloadWithBeep()">   
-  <span class="material-icons nav-icon">restart_alt</span>
+  <span class="material-icons nav-icon" style="color: green;">restart_alt</span>
     <small>Reload</small>
   </button>  
 </div>
