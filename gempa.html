@@ -1329,7 +1329,7 @@ window.addEventListener("load", () => {
 
 });
      
-function reloadWithBeep() {
+/*function reloadWithBeep() {
   const beep = document.getElementById("beepClick");
   beep.currentTime = 0;     // restart suara dari awal
   beep.play();
@@ -1337,5 +1337,21 @@ function reloadWithBeep() {
   setTimeout(() => {
     location.reload();
   }, 120); // jeda sedikit agar beep terdengar dulu
+}*/
+  function reloadWithBeep() {
+  const beep = document.getElementById("beepClick");
+  beep.currentTime = 0;
+
+  beep.play()
+    .then(() => {
+      // Jika audio berhasil, reload setelah beep selesai
+      beep.onended = () => {
+        location.reload();
+      };
+    })
+    .catch(() => {
+      // Jika audio diblokir browser (autoplay), tetap reload langsung
+      location.reload();
+    });
 }
 </script>
