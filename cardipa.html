@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard Parameter Cardipa</title>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style> 
@@ -198,6 +197,7 @@
   .card:nth-child(2){animation-delay:0.4s;}
   .card:nth-child(3){animation-delay:0.6s;}
   .card:nth-child(4){animation-delay:0.8s;}
+  .card:nth-child(5){animation-delay:1s;}
   .card:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,0.25); }
 
   .card-icon { font-size: 22px; margin-bottom: 5px; animation: float 3s ease-in-out infinite; }
@@ -223,7 +223,15 @@
   .udara { background: linear-gradient(135deg, #ff9800, #ffb74d); }
   .sholat { background: linear-gradient(135deg, #4caf50, #81c784); }
   .gempa { background: linear-gradient(135deg, #f44336, #e57373); }
-
+  /*.hijriah { background: linear-gradient(135deg, #f44336, #e57373); }*/
+  .hijriah { background: linear-gradient(135deg, #009688, #4db6ac); }  /*hijau tosca*/
+  /**.hijriah { background: linear-gradient(135deg, #795548, #a1887f);}**/ /*coklat kopi*/
+  /**.hijriah { background: linear-gradient(135deg, #b0bec5, #eceff1); }**/ /*silver*/
+  /**.hijriah { background: linear-gradient(135deg, #d4af37, #f7e98e); }**/  /*gold*/
+  /**.hijriah { background: linear-gradient(135deg, #8e44ad, #af7ac5); }**/ /*ungu*/
+  /**.hijriah { background: linear-gradient(135deg, #2ecc71, #58d68d); }**/ /* hijau emerald*/
+  /**.hijriah { background: linear-gradient(135deg, #2196f3, #64b5f6); }**/ /*biru elegan*/
+   
   /* Tombol suara */
   #soundBtn {
     margin-bottom:20px;
@@ -320,26 +328,6 @@
   100%{background-position: 0% 50%; }
 }
 
-/*.splash-title {
-  font-size: 40px;
-  font-weight: 700;
-  color: cyan;
-  text-shadow: 0 0 12px cyan, 0 0 28px cyan;
-  margin-bottom: 28px;
-  animation: fadeIn 1.4s ease forwards;
-  opacity: 0;
-}*/
-   /*.splash-title {
-  font-family: 'Great Vibes', cursive;
-  font-size: 40px;
-  font-weight: 700;
-  color: cyan;
-  letter-spacing: 3px;
-  text-shadow: 0 0 12px cyan, 0 0 35px cyan, 0 0 60px cyan;
-  margin-bottom: 28px;
-  animation: fadeIn 1.4s ease forwards;
-  opacity: 0;
-}*/
    .splash-title {
   font-family: 'Cinzel Decorative', serif;
   font-size: 40px;
@@ -449,51 +437,6 @@
 
 <!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
 <script>
-/*history.pushState(null, null, location.href);
-  window.onpopstate = function () {
-    if (!window.ignoreBack) {
-      history.pushState(null, null, location.href);
-    }
-  };
-
-  function goDashboard() {
-    const beepClick = document.getElementById("beepClick");
-    beepClick.play();                    // 🔊 bunyikan beep
-
-    setTimeout(() => {                   // ⏳ tunggu 250ms sebelum pindah
-      window.ignoreBack = true;
-      window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
-    }, 250);
-  }*/  
-   
-/*history.pushState(null, null, location.href);
-window.onpopstate = function () {
-  if (!window.ignoreBack) {
-    history.pushState(null, null, location.href);
-
-    // ⛔ Cegah scroll turun
-    window.scrollTo({ top: 0, behavior: "instant" });
-
-    // 🔒 Kunci scroll sementara
-    document.body.style.overflow = "hidden";
-
-    setTimeout(() => {
-      document.body.style.overflow = "auto";
-    }, 600); // unlock setelah 600ms
-  }
-};
-
-// tombol custom
-function goDashboard() {
-  const beepClick = document.getElementById("beepClick");
-  beepClick.play();
-
-  setTimeout(() => {
-    window.ignoreBack = true;
-    window.location.href =
-      "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
-  }, 250);
-}*/
 
 history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
 
@@ -572,11 +515,15 @@ function goDashboard() {
       <div class="card udara" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/udara.html')">
         <div class="card-number">2</div><div class="card-icon">🏭</div><h3>Kualitas Udara</h3>
       </div>
-      <div class="card sholat" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/sholat.html')">
+        
+          <div class="card sholat" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/sholat.html')">
         <div class="card-number">3</div><div class="card-icon">🕌</div><h3>Jadwal Sholat</h3>
       </div>
       <div class="card gempa" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/gempa.html')">
         <div class="card-number">4</div><div class="card-icon">🌋</div><h3>Info Gempa</h3>
+      </div>
+         <div class="card hijriah" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/hijri.html')">
+        <div class="card-number">5</div><div class="card-icon">🗓️</div><h3>Kalender Hijriah</h3>
       </div>
     </div>
   </div>
