@@ -321,6 +321,23 @@ tr:nth-child(even){ background:/*#eaf7f6*/rgba(0,0,0,0.02); }
   <audio id="beepConnect" src="" preload="auto"></audio>
 
 <script>
+    history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+
+    // Paksa kembali ke top
+    window.scrollTo(0, 0);
+
+    // Kunci scroll sementara
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+      document.body.style.overflow = "auto";
+    }, 500);
+  }
+};
+
 /* ============================================================
   THEME: follow system preference unless user override via localStorage
   - localStorage.theme = 'dark' | 'light' | null
