@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kalender Hijriah 2026 — Final</title>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style>
+/* =================== THEME (LIGHT & DARK) =================== */
+:root{
+  --bg:#f5f5f5; --text:#0b0b0b; --box:#ffffff; --border:#d0d0d0; --header:#00897b;
+  --accent:#004d40;
+  --event-bg:#fff3cd; --event-text:#7a5900;
+  --muted-card-bg: linear-gradient(90deg,#4caf50,#2196f3,#ff9800,#f44336);
+  --ping-bg: rgba(0,0,0,0.4);
+}
+body.dark{
+  --bg:#0d0d0d; --text:#eaeaea; --box:#161616; --border:#333; --header:#00695c;
+  --accent:#009688;
+  --event-bg:#3b2f00; --event-text:#ffdb6e;
+  --muted-card-bg: linear-gradient(90deg,#2b7a78,#145a87,#b45f06,#8b0000);
+  --ping-bg: rgba(255,255,255,0.06);
+}
+
+/* Base */
+* { box-sizing: border-box; }
+html,body { height:100%; }
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 14px;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* === LOADER BOX === */
+#loaderBox{
+  background: var(--box);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+  margin-bottom:12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+}
+#loadingProgress{
+  height:10px; width:0%;
+  background:linear-gradient(90deg,#4caf50,#81c784);
+  border-radius:6px; transition:0.25s;
+}
+#progress{ margin-top:8px; font-size:13px; text-align:center; color:var(--text); }
+
+/* TOP BUTTONS */
+.top-btn-group{ display:flex; gap:10px; justify-content:center; margin-bottom:10px; }
+.top-btn-group button{
+  padding:8px 12px; border-radius:8px; border:none; cursor:pointer;
+  background: var(--header); color:#fff; font-size:13px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* SEARCH */
+.search-container{ display:flex; justify-content:center; margin-bottom:8px; }
+#searchInput{ width:60%; padding:10px; border-radius:8px; font-size:13px; border:1px solid var(--border); background:var(--box); color:var(--text); }
+
+/* HIGHLIGHT */
+.highlight{ background: #ffeb3b; color:#000; padding:0 2px; border-radius:3px; }
+
+/* MONTH CARD / TABLE */
+.month-box{ background:var(--box); border:1px solid var(--border); border-radius:12px; margin-bottom:18px; overflow:auto; box-shadow: 0 6px 18px rgba(0,0,0,0.04); }
+.month-header{
+  background:var(--header); color:#fff; padding:12px; font-weight:700; font-size:14px;
+  display:flex; justify-content:space-between; align-items:center; border-radius:6px;
+  cursor:pointer;
+}
+.month-content{ display:none; max-height:480px; overflow:auto; border-top:1px solid var(--border); }
+table{ width:100%; border-collapse:separate; border-spacing:0; }
+thead th{ position:sticky; top:0; background:var(--accent); color:/*#fff*/lightgreen; padding:10px; z-index:40; font-size:13px; }
+/*th{ padding:8px; font-size:12px; color:#fff; background:var(--accent); }
+td{ border:1px solid rgba(0,0,0,0.06); padding:8px; text-align:center; font-size:12px; color:var(--text); font-weight:700; }
+tr:nth-child(even){ background: rgba(0,0,0,0.02); }*/
+th{ /*background:#004d4*/background:var(--accent); color:white; padding:8px; font-size:12px; }
+td{ border:1px solid #ddd; padding:8px; text-align:center; font-size:12px; /*color:#004d40*/color:var(--text); font-weight:700; }
+tr:nth-child(even){ background:/*#eaf7f6*/rgba(0,0,0,0.02); }
+
+.event-cell{ background: /*var(--event-bg)*/lightgreen; color: /*var(--event-text)*/red; font-weight:700; border-radius:4px; padding:6px; }
+.today{ background:#2e7d32 !important; color:white !important; }
+
+/* Hijri small label */
+.hijri-month{ font-size:11px; padding:4px 8px; background:var(--accent); color:orange; border-radius:8px; margin-left:8px; }
+.masehi-small{ font-size:12px; color:gold; font-weight:700; }
+
+/* GRID VIEW */
+.grid-card{ background:var(--box); padding:12px; margin-bottom:10px; border-radius:10px; border-left:6px solid var(--header); }
+.grid-title{ font-size:18px; font-weight:700; margin-bottom:12px; text-align:center; }
+
+/* =================== SHARE & SECRET SPOTS =================== */
+.secret-spot{ position:fixed; width:56px; height:56px; bottom:12px; z-index:9999; }
+#spot-left{ left:10px; } #spot-right{ right:10px; }
+
+#shareSection{
+  text-align:center; background: linear-gradient(180deg,#ffffff,#e8fff0); border-radius:16px;
+  width:92%; max-width:420px; margin:0 auto; box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  opacity:0; transform:translateY(25px); pointer-events:none ; transition:0.45s; max-height:0; overflow:hidden; padding:0; margin-top:0; 
+}
+  /*#shareSection {
+  z-index: 99999;
+}*/
+#shareSection.show{ opacity:1; transform:translateY(0); pointer-events:auto ; max-height:420px; padding:20px 0; margin-top:14px; }
+.share-container{ display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+.share-btn{ text-decoration:none; color:brown; font-size:8px; font-weight:700; text-align:center; display:block; }
+.share-btn img{ width:36px; height:36px; border-radius:8px; display:block; margin:0 auto 6px; }
+
+/* toast */
+.info-toast{ position:fixed; bottom:92px; left:50%; transform:translateX(-50%); background:#4caf50; color:#fff; padding:10px 16px; border-radius:10px; font-weight:700; opacity:0; transition:0.35s; z-index:999999; }
+.info-toast.show{ opacity:1; }
+
+/* =================== MUTED CARD (source) =================== */
+.card.muted{
+  position:relative; text-align:center; font-size:12px; color:purple;
+  background: var(--muted-card-bg); border-radius:10px; margin:18px auto 75px auto; width:260px; padding:10px 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+.muted-text{ font-family:'Poppins',sans-serif; font-weight:600; color:#fff; letter-spacing:0.3px; }
+
+/* dot gradient decorations */
+.dot-gradient{ position:absolute; top:50%; transform:translateY(-50%); font-weight:bold; font-size:18px; -webkit-background-clip:text; -webkit-text-fill-color:transparent; left:12px; }
+.dot-gradient.right-dot{ right:12px; left:auto; }
+
+/* =================== NETWORK POPUP & PING =================== */
+.net-popup-ios{
+  position:fixed; top:-120px; left:50%; transform:translateX(-50%) scale(0.96); padding:14px 22px; font-weight:700; border-radius:22px;
+  backdrop-filter: blur(10px); background: rgba(255,255,255,0.18); color:#fff; box-shadow:0 8px 24px rgba(0,0,0,0.25);
+  z-index:999999; display:none; transition: all .45s cubic-bezier(.22,1.1,.32,1); text-align:center;
+}
+.net-popup-ios.show{ top:22px; transform:translateX(-50%) scale(1); display:block; }
+.net-popup-ios.success{ background: rgba(26,188,156,0.5); }
+.net-popup-ios.error{ background: rgba(231,76,60,0.5); }
+
+/* wifi icon blink */
+.wifi-icon{ display:inline-block; margin-right:8px; animation: blink 1s infinite alternate; }
+@keyframes blink { 0%{ opacity:0.35; transform:scale(.94);} 100%{opacity:1; transform:scale(1);} }
+
+/* ping indicator */
+.ping-indicator{ position:fixed; top:12px; right:12px; padding:6px 10px; font-weight:700; color:#fff; border-radius:14px; background:var(--ping-bg); z-index:999999; }
+
+/* =================== BOTTOM NAV =================== */
+/*.bottom-nav{
+  position:fixed; bottom:0; left:0; width:100%; display:flex; justify-content:space-around; padding:10px 0 14px;
+  background: rgba(0,0,0,0.28); backdrop-filter: blur(6px); border-top-left-radius:12px; border-top-right-radius:12px; z-index:9999;
+}
+.nav-card{ border-radius:5px; border:none; background:transparent; padding:6px 8px; cursor:pointer; color:var(--text); text-align:center; }
+.nav-card .nav-icon{ font-size:17px; display:block; margin-bottom:2px; color:inherit; }
+.nav-card small{ font-size: 9px; margin-bottom: 3px; font-weight:700; color:var(--text); }*/
+ .ping-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  z-index: 999999;
+}
+ .bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 14px;
+  background: /*rgba(255, 255, 255, 0.55)*/rgba(0,0,0,0.4);
+  backdrop-filter: blur(1px);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+}
+
+.nav-card {
+  /*display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  padding: 6px 0;*/
+  border-radius: 12px;
+  border: none;
+  /*background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: 0.25s ease;
+  margin-bottom: 2px;*/
+}
+
+.nav-card .nav-icon {
+  font-size: 20px;
+  color: blue;
+  margin-bottom: 3px;
+}
+
+.nav-card small {
+  font-size: 9px;
+  font-weight: 700;
+  color: /*#333*/brown;
+}
+
+.nav-card:active {
+  transform: scale(0.92);
+  background: /*#e8f4ff*/ gold;
+  box-shadow: 0 0 10px #77c4ff;
+}  
+  
+
+/* responsive tweaks */
+@media (min-width:900px){
+  body{ padding:22px; }
+  #searchInput{ width:420px; }
+}
+</style>
+</head>
+<body>
+  <h2 style="text-align:center; font-size:15px; margin-top:33px; color:brown;">📅 Kalender Hijriah 2026</h2>
+
+  <!-- loader -->
+  <div id="loaderBox">
+    <div id="loadingProgress"></div>
+    <div id="progress">Menyiapkan...</div>
+  </div>
+
+  <!-- top buttons -->
+  <div class="top-btn-group">
+    <button id="reloadBtn">🔄 Reload</button>
+    <button id="themeBtn">🌙 Mode Gelap</button>
+  </div>
+
+  <!-- search -->
+  <div class="search-container">
+    <input id="searchInput" type="text" placeholder="Cari tanggal / bulan / event ..." />
+  </div>
+
+  <!-- calendar container -->
+  <div id="eventList"></div>
+  <div id="calendarContainer"></div>
+
+  <!-- grid view detail -->
+  <div id="gridView" style="display:none; margin-top:10px;"></div>
+
+  <!-- hidden tap spots -->
+  <div id="spot-left" class="secret-spot" aria-hidden="true"></div>
+  <div id="spot-right" class="secret-spot" aria-hidden="true"></div>
+
+  <!-- share panel 
+  <div id="shareSection" aria-hidden="true">
+    <h4 style="margin-bottom:10px; font-size:13px;">Bagikan Kalender</h4>
+    <div class="share-container">
+      <a class="share-btn" href="#" onclick="copyLink(event)">
+        <img src="https://cdn-icons-png.flaticon.com/512/6422/6422202.png" alt="copy">Salin Link
+      </a>
+      <a class="share-btn" href="https://wa.me/?text=Lihat%20Kalender%20Hijriah%202026%20ini!" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="wa">WhatsApp
+      </a>
+      <a class="share-btn" href="https://twitter.com/intent/tweet?text=Kalender%20Hijriah%202026" target="_blank">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="tw">Twitter
+      </a>
+    </div>
+  </div> -->
+  <!-- 🌐 Share Link Section -->
+<div id="shareSection">
+  <h4 style="margin-bottom:15px;font-size: 12px;color: grey;">Bagikan ke:</h4>
+  <div class="share-container">
+    <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=https://wisayadi.github.io/parameter-dashboard/soc_hijri.html/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">Facebook
+    </a>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?url=https://wisayadi.github.io/parameter-dashboard/soc_hijri.html/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter">Twitter
+    </a>
+       <a class="share-btn" href="https://wa.me/?text=Kalender%20Hijriah%202026%20https://wisayadi.github.io/parameter-dashboard/soc_hijri.html/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">WhatsApp 
+    </a> 
+    <a class="share-btn" href="https://t.me/share/url?url=https://wisayadi.github.io/parameter-dashboard/soc_hijri.html/" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">Telegram
+    </a>
+  </div>
+</div>
+
+
+  <div id="toast" class="info-toast">Tersalin!</div>
+
+  <!-- muted data source card -->
+  <div class="card muted" aria-hidden="true">
+    <span class="dot-gradient left-dot">•</span>
+    <span class="muted-text">Sumber data: Kemenag</span>
+    <span class="dot-gradient right-dot">•</span>
+  </div>
+
+  <!-- bottom nav -->
+  <div class="bottom-nav" role="navigation" aria-label="navigasi bawah">
+    <button class="nav-card" onclick="goDashboard()" title="Home">
+      <span class="material-icons nav-icon">home</span>
+      <small>Home</small>
+    </button>
+    <button class="nav-card" onclick="playBeep(); toggleShare()" title="Share">
+      <span class="material-icons nav-icon" style="color:tomato">share</span>
+      <small>Share</small>
+    </button>
+     <button class="nav-card" onclick="reloadWithBeep()" title="Reload"> 
+      <span class="material-icons nav-icon" style="color: green">restart_alt</span>
+      <small>Reload</small>
+    </button>
+  </div>
+
+  <!-- network popup and ping -->
+  <div id="netPopup" class="net-popup-ios" role="status" aria-live="polite"></div>
+  <div id="pingBox" class="ping-indicator">🔄 Ping...</div>
+
+  <!-- audio cues -->
+  <audio id="beepClick"><source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg"></audio>
+  <audio id="beepDisconnect" src="" preload="auto"></audio>
+  <audio id="beepConnect" src="" preload="auto"></audio>
+
+<script>
+    history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+
+    // Paksa kembali ke top
+    window.scrollTo(0, 0);
+
+    // Kunci scroll sementara
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+      document.body.style.overflow = "auto";
+    }, 500);
+  }
+};
+
+/* ============================================================
+  THEME: follow system preference unless user override via localStorage
+  - localStorage.theme = 'dark' | 'light' | null
+  - if null -> follow prefers-color-scheme
+============================================================ */
+const themeBtn = document.getElementById('themeBtn');
+
+function applyThemeClass(isDark){
+  document.body.classList.toggle('dark', !!isDark);
+  themeBtn.textContent = isDark ? '☀ Mode Terang' : '🌙 Mode Gelap';
+}
+
+function readPreferred(){
+  const stored = localStorage.getItem('theme');
+  if(stored === 'dark') return true;
+  if(stored === 'light') return false;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+// initialize theme
+applyThemeClass(readPreferred());
+
+// listen to system changes when user didn't set manual preference
+const mq = window.matchMedia('(prefers-color-scheme: dark)');
+mq.addEventListener?.('change', e=>{
+  if(!localStorage.getItem('theme')) applyThemeClass(e.matches);
+});
+
+// toggle by button -> set manual preference (overrides system)
+themeBtn.addEventListener('click', ()=>{
+  const nowDark = document.body.classList.contains('dark');
+  const next = !nowDark;
+  applyThemeClass(next);
+  // store manual choice
+  localStorage.setItem('theme', next ? 'dark' : 'light');
+});
+
+/* ============================================================
+  LOADER (simulated concurrency)
+============================================================ */
+const progressEl = document.getElementById('progress');
+const loadingBar = document.getElementById('loadingProgress');
+const reloadBtn = document.getElementById('reloadBtn');
+
+const CONCURRENCY = 4;
+const YEAR = 2026;
+
+let tasks = Array.from({length:20}, (_,i)=> async ()=>{
+  progressEl.textContent = `Memuat data ${i+1} / ${20} ...`;
+  loadingBar.style.width = ((i+1)/20*100) + '%';
+  await new Promise(r=>setTimeout(r,110));
+});
+
+async function loadAll(){
+  progressEl.textContent = 'Memulai…';
+  loadingBar.style.width = '0%';
+  const queue = tasks.slice();
+  const workers = Array.from({length: CONCURRENCY}, async function worker(){
+    while(queue.length){
+      const t = queue.shift();
+      if(!t) break;
+      try{ await t(); }catch(e){}
+    }
+  });
+  await Promise.all(workers);
+  progressEl.textContent = 'Selesai memuat data...';
+  loadingBar.style.width = '100%';
+  // reset calendar data & generate
+  months = {};
+  document.getElementById('calendarContainer').innerHTML = '';
+  document.getElementById('eventList').innerHTML = '';
+  document.getElementById('gridView').style.display = 'none';
+  setTimeout(()=> generateCalendar(YEAR), 300);
+}
+reloadBtn.addEventListener('click', ()=> { playBeep(); loadAll(); });
+loadAll();
+
+/* ============================================================
+  CALENDAR LOGIC (Hijri via Intl)
+============================================================ */
+const fallbackEvents=[
+  { masehi:"01/01/2026",name:"Tahun Baru Masehi" },
+  { masehi:"16/01/2026",name:"Isra' Mi'raj" },
+  { masehi:"18/02/2026",name:"Awal Ramadhan" },
+  { masehi:"05/03/2026",name:"Nuzulul Qur’an" },
+  { masehi:"19/03/2026",name:"Idul Fitri" },
+  { masehi:"27/05/2026",name:"Idul Adha" },
+  { masehi:"16/06/2026",name:"Tahun Baru Hijriyah" },
+  { masehi:"24/08/2026",name:"Maulid Nabi" }
+];
+
+function normalize(d){
+  let [day,month,year] = d.split("/");
+  if(day.length === 1) day = "0" + day;
+  if(month.length === 1) month = "0" + month;
+  return `${day}/${month}/${year}`;
+}
+function getHijri(date){
+  const parts = new Intl.DateTimeFormat("ar-TN-u-ca-islamic",{day:"numeric",month:"long",year:"numeric"}).formatToParts(date);
+  let d,m,y;
+  parts.forEach(p=>{ if(p.type==="day")d=p.value; if(p.type==="month")m=p.value; if(p.type==="year")y=p.value; });
+  const tr={
+    "محرم":"Muharram","صفر":"Safar","ربيع الأول":"Rabiul Awal","ربيع الآخر":"Rabiul Akhir",
+    "جمادى الأولى":"Jumadil Awal","جمادى الآخرة":"Jumadil Akhir","رجب":"Rajab","شعبان":"Sya'ban",
+    "رمضان":"Ramadhan","شوال":"Syawal","ذو القعدة":"Dzulqa'dah","ذو الحجة":"Dzulhijjah"
+  };
+  return `${d} ${tr[m]||m} ${y} H`;
+}
+function formatMasehi(d){
+  const [day, month, year] = d.split("/");
+  const namaBulan = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  return `${day} ${namaBulan[Number(month)-1]} ${year}`;
+}
+
+let months = {}; // container
+
+async function generateCalendar(year){
+  let events;
+  try{
+    const r = await fetch("https://api-kemenag.caliph.my.id/api/v1/holiday");
+    const j = await r.json();
+    events = j.data.map(e=>({masehi:e.masehi,name:e.event}));
+  }catch(err){
+    events = fallbackEvents;
+  }
+  events = events.map(e => ({ masehi: normalize(e.masehi), name: e.name }));
+
+  const start = new Date(year,0,1), end = new Date(year,11,31);
+  let date = new Date(start);
+  while(date <= end){
+    const masehiNorm = normalize(date.toLocaleDateString('id-ID'));
+    const hari = date.toLocaleDateString('id-ID',{weekday:'short'});
+    const bulan = date.toLocaleDateString('id-ID',{month:'long'});
+    const hijri = getHijri(date);
+    let ev = '';
+    events.forEach(e=> { if(e.masehi === masehiNorm) ev = e.name; });
+    if(!months[bulan]) months[bulan] = [];
+    months[bulan].push({ hari, masehi: masehiNorm, hijri, event: ev });
+    date.setDate(date.getDate()+1);
+  }
+  renderCards();
+}
+
+function renderCards(){
+  const cont = document.getElementById('calendarContainer');
+  cont.innerHTML = '';
+  Object.keys(months).forEach(name=>{
+    const first = months[name][0].hijri.split(' ');
+    const last = months[name][months[name].length -1].hijri.split(' ');
+    let hijriLabel = first[1];
+    if(last[1] && last[1] !== first[1]) hijriLabel += ' / ' + last[1];
+    const hijriYear = first[2] || '';
+    const headerTitle = `<span class="masehi-small">${name} 2026</span> <span class="hijri-month">${hijriLabel} ${hijriYear}</span>`;
+    let html = `<div class="month-box"><div class="month-header" onclick="toggleMonth(this)">${headerTitle}</div><div class="month-content"><table><thead><tr><th>Hari</th><th>Tanggal Masehi</th><th>Tanggal Hijriah</th><th>Hari Besar Islam</th></tr></thead><tbody>`;
+    months[name].forEach(d=>{
+      const encoded = encodeURIComponent(JSON.stringify(d));
+      const todayClass = (d.masehi === new Date().toLocaleDateString('id-ID')) ? 'today' : '';
+      /*html += `<tr data-item="${encoded}" onclick="showGrid(JSON.parse(decodeURIComponent(this.dataset.item)))" class="${todayClass}"><td>${d.hari}</td><td>${d.masehi}</td><td>${d.hijri}</td><td class="${d.event?'event-cell':''}">${d.event||''}</td></tr>`;*/
+      html += `<tr data-item="${encoded}" onclick="showGrid(JSON.parse(decodeURIComponent(this.dataset.item)))" class="${todayClass}">
+  <td>${d.hari}</td>
+  <td>${formatMasehi(d.masehi)}</td>
+  <td>${d.hijri}</td>
+  <td class="${d.event ? 'event-cell' : ''}">${d.event || ''}</td>
+</tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+    cont.insertAdjacentHTML('beforeend', html);
+  });
+}
+  
+/* toggle month */
+function toggleMonth(h){
+  const c = h.nextElementSibling;
+  c.style.display = c.style.display === 'block' ? 'none' : 'block';
+}
+
+/* show grid */
+function showGrid(d){
+  const box = document.getElementById('gridView');
+  box.innerHTML = `
+    <button class="back-btn-grid" onclick="closeGrid()">⬅ Kembali</button>
+    <div class="grid-title">📅 Detail Hari</div>
+    <div class="grid-card"><b>Hari:</b> ${d.hari}</div>
+    <div class="grid-card"><b>Tanggal Masehi:</b> ${d.masehi}</div>
+    <div class="grid-card"><b>Tanggal Hijriah:</b> ${d.hijri}</div>
+    <div class="grid-card"><b>Hari Besar Islam:</b> ${d.event || '-'}</div>
+  `;
+  box.style.display = 'block';
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+function closeGrid(){ document.getElementById('gridView').style.display = 'none'; }
+
+/* search highlight */
+document.getElementById('searchInput').addEventListener('input', e=>{
+  const val = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.month-content').forEach(c=> c.style.display = 'block');
+  document.querySelectorAll('td').forEach(td => td.innerHTML = td.textContent);
+  if(!val){
+    document.querySelectorAll('tr').forEach(r=> r.style.display = '');
+    return;
+  }
+  document.querySelectorAll('tr').forEach(r=>{
+    if(r.querySelector('th')) return;
+    const text = r.textContent.toLowerCase();
+    if(text.includes(val)){
+      r.style.display = '';
+      r.querySelectorAll('td').forEach(td=>{
+        const t = td.textContent;
+        const idx = t.toLowerCase().indexOf(val);
+        if(idx >= 0){
+          const m = t.substr(idx, val.length);
+          td.innerHTML = t.replace(new RegExp(m, 'i'), `<span class="highlight">${m}</span>`);
+        }
+      });
+    } else {
+      r.style.display = 'none';
+    }
+  });
+});
+
+/* ============================================================
+  SHARE HIDDEN SPOTS & TOAST
+============================================================ */
+let tapLeft=false, tapRight=false;
+document.getElementById('spot-left').addEventListener('click', ()=>{
+  tapLeft = true; checkUnlock(); setTimeout(()=> tapLeft=false, 1200);
+});
+document.getElementById('spot-right').addEventListener('click', ()=>{
+  tapRight = true; checkUnlock(); setTimeout(()=> tapRight=false, 1200);
+});
+function checkUnlock(){
+  if(tapLeft && tapRight){
+    toggleShare();
+  }
+}
+const shareSection = document.getElementById('shareSection');
+const toast = document.getElementById('toast');
+let shareVisible = false;
+function toggleShare(){
+  shareVisible = !shareVisible;
+  shareSection.classList.toggle('show', shareVisible);
+  showToast(shareVisible ? '🔓 Share dibuka' : '🔒 Share ditutup');
+}
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(()=> toast.classList.remove('show'), 1500);
+}
+function copyLink(e){
+  e.preventDefault();
+  navigator.clipboard?.writeText(location.href).then(()=> showToast('Link disalin!')).catch(()=> showToast('Gagal salin'));
+}
+  
+  
+/* ============================================================
+  NETWORK POPUP & PING CHECK
+============================================================ */
+const popup = document.getElementById('netPopup');
+const pingBox = document.getElementById('pingBox');
+const beepDC = document.getElementById('beepDisconnect');
+const beepCN = document.getElementById('beepConnect');
+
+function showNetworkPopup(msg, style){
+  popup.innerHTML = `<span class="wifi-icon">📶</span> ${msg}`;
+  popup.className = `net-popup-ios ${style} show`;
+  // auto hide
+  setTimeout(()=> {
+    popup.classList.remove('show');
+    popup.classList.remove('success','error');
+    setTimeout(()=> popup.style.display = 'none', 450);
+  }, 5000);
+  popup.style.display = 'block';
+}
+
+window.addEventListener('offline', ()=> {
+  showNetworkPopup('Jaringan Terputus', 'error');
+  try { beepDC.play(); } catch(e){}
+  if(navigator.vibrate) navigator.vibrate([200,80,150]);
+});
+window.addEventListener('online', ()=> {
+  showNetworkPopup('Internet Tersambung', 'success');
+  try { beepCN.play(); } catch(e){}
+  if(navigator.vibrate) navigator.vibrate(120);
+});
+
+async function pingTest(){
+  const start = performance.now();
+  try{
+    await fetch('https://www.google.com', {mode:'no-cors'});
+    const delay = Math.round(performance.now() - start);
+    pingBox.innerText = `📶 ${delay} ms`;
+    if(delay < 80) pingBox.style.background = 'rgba(76,175,80,0.55)';
+    else if(delay < 150) pingBox.style.background = 'rgba(255,193,7,0.55)';
+    else pingBox.style.background = 'rgba(244,67,54,0.55)';
+  }catch(err){
+    pingBox.innerText = '❌ Offline';
+    pingBox.style.background = 'rgba(244,67,54,0.55)';
+  }
+}
+setInterval(pingTest, 2500);
+pingTest();
+
+/* ============================================================
+  Bottom nav helpers & beep
+============================================================ */
+/*function goDashboard(){
+  const b = document.getElementById('beepClick');
+  try{ b.currentTime = 0; b.play(); }catch(e){}
+  window.ignoreBack = true;
+  setTimeout(()=> location.href = 'https://wisayadi.github.io/parameter-dashboard/cardipa.html', 220);
+}*/
+function reloadWithBeep(){
+  try{ const b = document.getElementById('beepClick'); b.currentTime = 0; b.play(); }catch(e){}
+  setTimeout(()=> location.reload(), 260);
+}
+function playBeep(){
+  try{ const b = document.getElementById('beepClick'); b.currentTime = 0; b.play(); }catch(e){}
+}
+  
+  
+/* ============================================================
+  INIT: generate calendar when file loaded
+============================================================ */
+window.addEventListener('load', ()=> {
+  // if user hasn't set a manual theme, ensure UI follows system initial
+  if(!localStorage.getItem('theme')){
+    applyThemeClass(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+  // load calendar already called by loadAll after loader simulation
+});
+</script>
+</body>
+</html>
