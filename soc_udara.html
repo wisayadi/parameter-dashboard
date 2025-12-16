@@ -1,1 +1,1001 @@
-dfh
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Indek Kualitas Udara (AQI)</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    /* 🌿 Umum */
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f5fff8, #fffef9);
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* 🔙 Tombol kembali */
+    .back-container {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      margin-top: 12px;
+    }
+    .back-btn {
+      background: linear-gradient(90deg, #ff5f6d, #ffc371);
+      color: #111;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 12px;
+      font-size: 7px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    .back-btn:hover {
+      transform: scale(1.08);
+      background: linear-gradient(90deg, #ff7a7a, #ffb86b);
+    }
+
+    /* 🕒 Card Zona Waktu */
+    .card-waktu {
+      max-width: /*330px*/285px;
+      /*margin: 25px auto 10px;*/
+      /*background: linear-gradient(180deg, #ffffff, #f8fbff);*/
+      /*background: #f3fff6;*/
+      /**background: linear-gradient(90deg, #6a11cb, #2575fc, #43cea2, #f9d423, #ff4b2b);**/
+      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);
+      /**background: linear-gradient(90deg, #f5f5f5, #e0e0e0, #bdbdbd, #757575, #424242);**/
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #f3d7b6;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+      margin-top: 50px;
+    }
+    .card-waktu h3 {
+      color: orange;
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .btnZona {
+      background: linear-gradient(135deg, #e0e0e0, #ffffff);
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      padding: 7px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 7px;
+      color: #555;
+      margin: 0 5px;
+    }
+    .btnZona:hover {
+      background: linear-gradient(135deg, #d4e2fc, #f0f8ff);
+      transform: scale(1.08);
+    }
+    /*.btnZona.active {
+      background: linear-gradient(135deg, #4a90e2, #5cc6ff);
+      color: white;
+      border-color: #4a90e2;
+      box-shadow: 0 0 12px rgba(0, 150, 255, 0.6);
+    }*/
+    .waktu-display {
+      font-weight: bold;
+      color: brown;
+      font-size: 12px;
+      background: lightblue;
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: inline-block;
+      border: 1px solid #f3d7b6;
+      margin-top: 10px;
+    }
+
+ /* 🌫️ Card Kualitas Udara */
+    .aqi-card {
+      text-align: center;
+      padding: 30px;
+      border-radius: 18px;
+      /*background: linear-gradient(180deg, #f8fff9, #fff8f3);*/
+      /**background: linear-gradient(90deg, #ff7e5f, #feb47b, #fddb92, #f2fcfe, #a1c4fd);**/
+      /**background: linear-gradient(90deg, #56ab2f, #a8e063, #f3e7b3, #ffd89b*, #ff9a9e, #2575fc);**/
+      /**background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);**/
+      /***background: linear-gradient(90deg, #6a11cb, #2575fc, #43cea2, #f9d423, #ff4b2b);***/
+      background: linear-gradient(90deg, #e3f2fd, #bbdefb, #64b5f6, #2196f3, #0d47a1);
+      /***background: linear-gradient(90deg, #d0f8ce, #a8e6cf, #81c784, #4caf50, #2e7d32);***/
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #f3d7b6;
+      max-width: /*420px*/270px;
+      margin: 15px auto 20px;
+      transition: all 0.3s ease;
+    }
+    .aqi-card:hover {
+      transform: scale(1.01);
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    }
+    .aqi-card h2 {
+      color: #a52a2a;
+      font-size: 15px;
+      margin-bottom: 15px;
+    }
+    .aqi-search {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+    .aqi-search input {
+      padding: 9px 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: /*#f7f7f7*/lightgrey;
+      outline: none;
+      width: 65%;
+      font-size: 13px;
+      color: brown;
+      transition: all 0.3s ease;
+    }
+     .aqi-search input:hover {
+     border-color: /*#007bff*/orange;
+     box-shadow: 0 0 6px rgba(255, 165, 0, 0.6);
+   }
+    .aqi-search button:hover {
+    background: linear-gradient(90deg,#0056b3,#003d80);
+    transform: scale(1.05);
+   }
+    .aqi-search button {
+      background: orange;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .aqi-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 25px;
+      color: white;
+      font-weight: bold;
+      background: linear-gradient(90deg, #4caf50, #8bc34a);
+      margin-bottom: 10px;
+    }
+
+    /* 🌈 Grid Parameter Udara */
+    .aqi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, #f6d365, #fda085);
+      box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.6);
+      margin-top: 15px;
+    }
+    .aqi-box {
+      background: white;
+      border-radius: 14px;
+      padding: 12px 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+      transition: transform 0.25s ease, background 0.3s ease;
+    }
+    .aqi-box:hover {
+      transform: scale(1.05);
+      background: #fef6e4;
+    }
+    .aqi-box .icon {
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .aqi-box h4 {
+      color: #6a1b9a;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .aqi-box p {
+      font-size: 14px;
+      font-weight: bold;
+      color: #111;
+      margin: 0;
+    }
+    .aqi-box span {
+      font-size: 9px;
+      color: green;
+    }
+    .aqi-update {
+      margin-top: 10px;
+      font-size: 13px;
+      color: /*#2e7d32*/red;
+    }
+
+    /* 🧾 Penjelasan tabel */
+    /*.table-title {
+      background: #f3e5f5;
+      text-align: center;
+      border: 1px solid #f3d7b6;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: brown;
+      margin-top: 20px;
+    }
+    .grid-udara {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .card-udara {
+      background: #fff8f0;
+      border: 1px solid #f3d7b6;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      color: #444;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .card-udara h5 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #d97706;
+    }*/
+   /*<!-- Tambahan Card Penjelasan -->*/
+  
+     .grid-udara {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .card-udara {
+      /*background: #fff8f0;*/
+      background: linear-gradient(90deg, #0f2027, #203a43, #2c5364, #485563, #29323c);
+      border: 1px solid #f3d7b6;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      font-size: 10px;
+      color: /*#444*/silver;
+      max-width: 310px;
+      min-height: 40px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .card-udara h5 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      text-align: center;
+      font-weight: bold;
+      color: #d97706;
+    }
+  
+  /* judul keterangan tabel */
+    .table-title {
+     /*background: #f3e5f5;*/
+     background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);
+     text-align: center; 
+     border: 1px solid #f3d7b6;
+     border-bottom: 2px solid #ddd;
+     padding: 8px 12px;
+     border-radius: 6px 6px 0 0; /* sudut atas agak membulat */
+     font-size: 11px;
+     font-weight: 600;
+     color: brown;
+     width: 310px;
+     margin-bottom: 3px;
+  }
+  /*.net-popup {
+  position: fixed;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 99999;
+  display: none;
+  animation: fadeInOut 3s ease;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}*/  
+  </style>
+</head>
+<body>
+   <!-- 🚫 Cegah hanya tombol "back" sistem, tapi izinkan tombol custom -->
+<script>
+  /*history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    // Jika pengguna tekan tombol back sistem, tetap di halaman ini
+    if (!window.ignoreBack) {
+      history.pushState(null, null, location.href);
+    }
+  };
+
+  // Fungsi aman untuk kembali ke dashboard
+  function goDashboard() {
+    // Aktifkan flag agar sistem back tidak di-block
+    window.ignoreBack = true;
+    window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }*/
+ 
+  /**history.pushState(null, null, location.href);
+  window.onpopstate = function () {
+    if (!window.ignoreBack) {
+      history.pushState(null, null, location.href);
+    }
+  };
+
+  function goDashboard() {
+    const beepClick = document.getElementById("beepClick");
+    beepClick.play();                    // 🔊 bunyikan beep
+
+    setTimeout(() => {                   // ⏳ tunggu 250ms sebelum pindah
+      window.ignoreBack = true;
+      window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+    }, 250);
+  }**/
+  
+  history.scrollRestoration = "manual";   // ⛔ Matikan restore posisi scroll
+
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+  if (!window.ignoreBack) {
+    history.pushState(null, null, location.href);
+
+    // Paksa kembali ke top
+    window.scrollTo(0, 0);
+
+    // Kunci scroll sementara
+    document.body.style.overflow = "hidden";
+    setTimeout(() => {
+      document.body.style.overflow = "auto";
+    }, 500);
+  }
+};
+
+/*function goDashboard() {
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
+  window.ignoreBack = true;
+  setTimeout(() => {
+    window.location.href = "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 200);
+}*/
+  
+</script>
+
+  <!-- 🔙 Tombol kembali 
+  <div class="back-container">
+  <button class="back-btn" onclick="goDashboard()">⬅️ Kembali ke Dashboard</button>
+  </div> -->
+   <audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/mpeg">
+</audio>
+  
+  <audio id="beepDisconnect">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3" type="audio/mpeg">
+</audio>
+<audio id="beepConnect">
+  <source src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" type="audio/mpeg">
+</audio>
+  
+
+  <!-- 🕒 Card Zona Waktu -->
+  <div class="card-waktu">
+    <h3>🕒 Zona Waktu</h3>
+    <div>
+      <button class="btnZona active" onclick="setZona('WIB')">WIB</button>
+      <button class="btnZona" onclick="setZona('WITA')">WITA</button>
+      <button class="btnZona" onclick="setZona('WIT')">WIT</button>
+    </div>
+    <div id="waktuSekarang" class="waktu-display">Memuat waktu...</div>
+  </div>
+
+  <!-- 🌫️ Kualitas Udara -->
+  <div class="aqi-card">
+    <h2>🏭 Kualitas Udara <span id="aqiCity">Balikpapan</span> (Realtime)</h2>
+    <div class="aqi-search">
+      <input type="text" id="cityAirInput" placeholder="Cari kota lain di Indonesia...">
+      <button onclick="loadAirQuality()">🔎</button>
+    </div>
+    <div id="aqiBadge" class="aqi-badge">AQI: --</div>
+
+    <div class="aqi-grid">
+      <div class="aqi-box"><div class="icon">🌫️</div><h4>AQI</h4><p id="v_aqi">--</p><span id="k_aqi">--</span></div>
+      <div class="aqi-box"><div class="icon">🌪️</div><h4>PM<sub>2.5</sub></h4><p id="v_pm25">-- µg/m³</p><span>Kecil lebih baik</span></div>
+      <div class="aqi-box"><div class="icon">🌬️</div><h4>PM<sub>10</sub></h4><p id="v_pm10">-- µg/m³</p><span>Kecil lebih baik</span></div>
+      <div class="aqi-box"><div class="icon">☁️</div><h4>O<sub>3</sub></h4><p id="v_o3">-- µg/m³</p><span>Iritasi bila tinggi</span></div>
+      <div class="aqi-box"><div class="icon">🚗</div><h4>NO<sub>2</sub></h4><p id="v_no2">-- µg/m³</p><span>Kendaraan/Industri</span></div>
+      <div class="aqi-box"><div class="icon">🏭</div><h4>SO<sub>2</sub></h4><p id="v_so2">-- µg/m³</p><span>Iritasi pernapasan</span></div>
+      <div class="aqi-box"><div class="icon">🔥</div><h4>CO</h4><p id="v_co">-- µg/m³</p><span>Pembakaran</span></div>
+    </div>
+    <div id="updatedAt" class="aqi-update">Diperbarui: --</div>
+  </div>
+
+     <!-- judul keterangan tabel -->
+<div class="table-title">Keterangan Tabel Kualitas Udara:</div>
+  <div class="grid-udara">
+    <div class="card-udara">
+      <h5>AQI</h5>
+      (Air Quality Index) - Indeks kualitas udara secara umum, makin tinggi nilainya makin buruk.
+    </div>
+    <div class="card-udara">
+      <h5>PM2.5</h5>
+      (Particulate Matter) - Partikel sangat halus (2.5 &micro;m), berbahaya karena masuk ke paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>PM10</h5>
+      (Particulate Matter) - Partikel debu (10 &micro;m), bisa mengiritasi saluran pernapasan.
+    </div>
+    <div class="card-udara">
+      <h5>O<sub>3</sub></h5>
+      Gas ozon di permukaan bumi, dapat mengiritasi paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>SO<sub>2</sub></h5>
+      (Sulfur Dioksida) - Gas dari pembakaran batu bara/minyak, penyebab iritasi pernapasan.
+    </div>
+    <div class="card-udara">
+      <h5>NO<sub>2</sub></h5>
+      (Nitrogen Dioksida) - Gas hasil pembakaran kendaraan & industri, berbahaya bagi paru-paru.
+    </div>
+    <div class="card-udara">
+      <h5>CO</h5>
+      (Karbon Monoksida) - Gas beracun tak berbau dari pembakaran tidak sempurna.
+    </div>
+  </div>
+</div>
+
+     <script>
+  // 🔧 Simpan zona waktu ke localStorage
+  function setZona(zona) {
+    localStorage.setItem('zonaWaktu', zona);
+    tampilkanWaktu();
+  }
+
+  // 🔄 Tampilkan waktu sesuai zona
+  function tampilkanWaktu() {
+    let zona = localStorage.getItem('zonaWaktu') || 'WITA'; // default WIB
+    let now = new Date();
+
+    // Konversi offset zona waktu
+    let offset = 8; // WIB default
+    if (zona === 'WIB') offset = 7;
+    if (zona === 'WIT') offset = 9;
+
+    // Hitung waktu lokal
+    let utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    let waktuZona = new Date(utc + (3600000 * offset));
+
+    // Format tanggal dan waktu
+    const hari = waktuZona.toLocaleDateString('id-ID', { weekday: 'long' });
+    const tanggal = waktuZona.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    const jam = waktuZona.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    document.getElementById('waktuSekarang').innerHTML =
+      `${hari}, ${tanggal} pukul ${jam} (${zona})`;
+
+    // Simpan zona aktif di tombol
+     document.querySelectorAll('.btnZona').forEach(btn => {
+      btn.style.background = (btn.textContent === zona) ? '#7B61FF' : '#ddd';
+      btn.style.color = (btn.textContent === zona) ? '#fff' : '#000';
+    });
+  }
+
+  // Jalankan otomatis
+  setInterval(tampilkanWaktu, 1000);
+  tampilkanWaktu();
+  
+  // <!-- ⚙️ SCRIPT -->
+const API_KEY = "20f6d784f501f4a976a63ecf4a7a53fd";
+
+// 🌍 Gradasi warna berdasarkan AQI 0–500 (standar US EPA)
+function getAQIColor(aqi) {
+  if (aqi <= 50) return "#4CAF50";      // Good
+  if (aqi <= 100) return "#CDDC39";   // Moderate 
+  if (aqi <= 150) return "#FF9800";     // Unhealthy for Sensitive Groups
+  if (aqi <= 200) return "#F44336";     // Unhealthy
+  if (aqi <= 300) return "#9C27B0";     // Very Unhealthy
+  return "#7E0023";                     // Hazardous
+}
+
+function getAQIText(aqi) {
+  if (aqi <= 50) return "Baik";
+  if (aqi <= 100) return "Sedang";
+  if (aqi <= 150) return "Tidak sehat (sensitif)";
+  if (aqi <= 200) return "Tidak sehat";
+  if (aqi <= 300) return "Sangat tidak sehat";
+  return "Berbahaya";
+}
+
+async function loadAirQuality() {
+  const city = document.getElementById("cityAirInput").value.trim() || "Balikpapan";
+  try {
+    const geo = await fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${city},id&appid=${API_KEY}`);
+    const loc = await geo.json();
+    if (!loc.length) throw new Error("Kota tidak ditemukan");
+    const { lat, lon, name } = loc[0];
+
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${API_KEY}`);
+    const data = await res.json();
+    const aq = data.list[0];
+    const c = aq.components;
+
+    // 🧮 Skala AQI global dikonversi dari rentang 0–500 (karena OWM hanya 1–5)
+    const aqiValue = Math.round((aq.main.aqi / 5) * 500);
+    const warna = getAQIColor(aqiValue);
+    const teks = getAQIText(aqiValue);
+
+    document.getElementById("aqiCity").textContent = name;
+    document.getElementById("v_aqi").textContent = aqiValue;
+    document.getElementById("k_aqi").textContent = teks;
+
+    document.getElementById("v_pm25").textContent = c.pm2_5.toFixed(1) + " µg/m³";
+    document.getElementById("v_pm10").textContent = c.pm10.toFixed(1) + " µg/m³";
+    document.getElementById("v_o3").textContent   = c.o3.toFixed(1) + " µg/m³";
+    document.getElementById("v_no2").textContent  = c.no2.toFixed(1) + " µg/m³";
+    document.getElementById("v_so2").textContent  = c.so2.toFixed(1) + " µg/m³";
+    document.getElementById("v_co").textContent   = c.co.toFixed(1) + " µg/m³";
+
+    const badge = document.getElementById("aqiBadge");
+    badge.textContent = `AQI: ${aqiValue} (${teks})`;
+    badge.style.background = `linear-gradient(90deg, ${warna}, ${warna}CC)`;
+
+    document.getElementById("updatedAt").textContent =
+      "Diperbarui: " + new Date(aq.dt * 1000).toLocaleString("id-ID", { timeZone: "Asia/Makassar" });
+
+  } catch (e) {
+    alert("⚠️ " + e.message);
+    console.error(e);
+  }
+}
+
+loadAirQuality();
+ </script>
+</body>
+</html>
+
+<!-- 🌿 Hidden Double-Point Unlock System + Fade Animation -->
+<style>
+  body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: #f9fff9;
+  }
+
+  /* Area titik rahasia (tak terlihat) */
+  .secret-spot {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    z-index: 9999;
+  }
+
+  #spot-left {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  #spot-right {
+    bottom: 10px;
+    right: 10px;
+  }
+
+#shareSection {
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff, #e8fff0);
+  border-radius: 18px;
+  width: 90%;
+  max-width: 420px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none;
+  transition: opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, padding 0.6s ease, margin 0.6s ease;
+  
+  /* Tambahan penting */
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;         /* tidak memberi ruang */
+  margin: 0 auto;     /* hilangkan gap full */
+}
+
+#shareSection.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  margin: 15px auto;
+  padding: 25px 0;    /* tampil kembali saat show */
+  max-height: 500px;  /* cukup tinggi untuk konten */
+}
+
+  .share-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    text-decoration: none;
+    color: /*#333*/brown;
+    font-size: 8px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .share-btn img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto 5px auto;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .share-btn:hover img {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  }
+
+  /* Notifikasi */
+  .info-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #4caf50;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .info-toast.show {
+    opacity: 1;
+  }
+</style>
+
+<!-- 🔒 Area klik rahasia -->
+<div id="spot-left" class="secret-spot"></div>
+<div id="spot-right" class="secret-spot"></div>
+
+<!-- 🌐 Share Link Section -->
+<div id="shareSection">
+  <h4 style="margin-bottom:15px;font-size: 12px;color: grey;">Bagikan ke:</h4>
+  <div class="share-container">
+    <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=https://wisayadi.github.io/parameter-dashboard/soc_udara.html" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook">Facebook
+    </a>
+    <a class="share-btn" href="https://twitter.com/intent/tweet?url=https://wisayadi.github.io/parameter-dashboard/soc_udara.html&text=Indek%20Kualitas-Udara" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter">Twitter
+    </a>
+    <a class="share-btn" href="https://wa.me/?text=Indek%20Kualitas%20Udara%20https://wisayadi.github.io/parameter-dashboard/soc_udara.html" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">WhatsApp
+    </a>
+    <a class="share-btn" href="https://t.me/share/url?url=https://wisayadi.github.io/parameter-dashboard/soc_udara.html&text=Indek%20kualitas-Udara" target="_blank">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram">Telegram
+    </a>
+  </div>
+</div>
+
+<!-- 🔔 Notifikasi -->
+<div id="toast" class="info-toast">🔓 Share link dibuka</div>
+
+<script>
+
+  let shareVisible = false;
+
+  const shareSection = document.getElementById("shareSection");
+  const toast = document.getElementById("toast");
+
+  // 🔥 Fungsi baru untuk tombol navigasi tengah
+  function toggleShare() {
+    shareVisible = !shareVisible;
+    shareSection.classList.toggle("show", shareVisible);
+    showToast(shareVisible ? "🔓 Share link dibuka" : "🔒 Share link ditutup");
+  }
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 2000);
+  }
+</script>
+ 
+
+<style>
+.card.muted {
+  position: relative;
+  text-align: center;
+  font-size: 11px;
+  color: purple;
+  background: linear-gradient(90deg, #4caf50, #2196f3, #ff9800, #f44336);
+  border-radius: 8px;
+  margin-top: 8px;
+  margin-bottom: 60px;
+  width: 258px;
+  padding: 8px 35px;
+}
+
+.muted-text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.dot-gradient {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-weight: bold;
+  font-size: 18px;
+  background: linear-gradient(90deg, #fff, #ffd, #fff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 2s infinite ease-in-out;
+}
+.left-dot { left: 12px; }
+.right-dot { right: 12px; }
+
+@keyframes glow {
+  0%, 100% { opacity: 0.4; text-shadow: 0 0 6px rgba(255,255,255,0.3); }
+  50% { opacity: 1; text-shadow: 0 0 10px rgba(255,255,255,0.6); }
+}
+
+    /* ====================== iOS NETWORK POPUP ======================= */
+.net-popup-ios {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.95);
+  padding: 14px 26px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 22px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.23);
+  color: #fff;
+  box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
+  z-index: 999999;
+  display: none;
+  transition: all 0.6s cubic-bezier(.22,1.25,.32,1);
+  letter-spacing: 0.4px;
+  text-align: center;
+}
+
+.net-popup-ios.show {
+  top: 20px;
+  transform: translateX(-50%) scale(1);
+}
+
+.net-popup-ios.success {
+  background: rgba(26, 188, 156, 0.55);
+}
+
+.net-popup-ios.error {
+  background: rgba(231, 76, 60, 0.55);
+}
+
+/* Icon WiFi animasi */
+.wifi-icon {
+  display: inline-block;
+  margin-right: 6px;
+  animation: blink 1s infinite alternate ease-in-out;
+}
+@keyframes blink {
+  0% { opacity: .3; transform: scale(0.9); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ===================== PING INDICATOR ===================== */
+.ping-indicator {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+  z-index: 999999;
+}
+   .bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 14px;
+  background: /*rgba(255, 255, 255, 0.55)*/rgba(0,0,0,0.4);
+  backdrop-filter: blur(1px);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+}
+
+.nav-card {
+  /*display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 90px;
+  padding: 6px 0;*/
+  border-radius: 12px;
+  border: none;
+  /*background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: 0.25s ease;
+  margin-bottom: 2px;*/
+}
+
+.nav-card .nav-icon {
+  font-size: 20px;
+  color: blue;
+  margin-bottom: 3px;
+}
+
+.nav-card small {
+  font-size: 9px;
+  font-weight: 700;
+  color: /*#333*/brown;
+}
+
+.nav-card:active {
+  transform: scale(0.92);
+  background: /*#e8f4ff*/ gold;
+  box-shadow: 0 0 10px #77c4ff;
+}    
+</style>
+
+<!-- =================== CARD SUMBER DATA =================== -->
+<div class="card muted">
+  <span class="dot-gradient left-dot">•</span>
+  <span class="muted-text">Sumber data: OpenWeatherMap</span>
+  <span class="dot-gradient right-dot">•</span>
+</div>
+
+<!-- Sound -->
+<audio id="beepClick">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
+<div class="bottom-nav">
+  
+  <button class="nav-card" onclick="goDashboard()">
+    <span class="material-icons nav-icon">home</span>
+    <small>Beranda</small>
+  </button>
+
+  <button class="nav-card" onclick="playBeep(); toggleShare()">
+  <span class="material-icons nav-icon" style="color: red;">share</span>
+  <small>Share</small>
+</button>                <!--🔗--> 
+
+ <button class="nav-card" onclick="reloadWithBeep()">   
+  <span class="material-icons nav-icon"style="color: green;">restart_alt</span>
+    <small>Reload</small>
+  </button>  
+</div>
+
+<!-- =================== POPUP NETWORK =================== -->
+<div id="netPopup" class="net-popup-ios"></div>
+<!-- ============ PING INDICATOR ============ -->
+<div id="pingBox" class="ping-indicator">🔄 Ping...</div>
+    
+<!-- Suara Notifikasi -->
+<audio id="beepDisconnect" src="beep-off.mp3" preload="auto"></audio>
+<audio id="beepConnect" src="beep-on.mp3" preload="auto"></audio>
+
+<script>   
+window.addEventListener("load", () => {
+
+  const popup = document.getElementById("netPopup");
+  const pingBox = document.getElementById("pingBox");
+
+  const beepDC = document.getElementById("beepDisconnect");
+  const beepCN = document.getElementById("beepConnect");
+
+  function showPopup(msg, style) {
+    popup.innerHTML = `<span class="wifi-icon">📶</span> ${msg}`;
+    popup.className = `net-popup-ios ${style}`;
+    popup.style.display = "block";
+
+    setTimeout(() => popup.classList.add("show"), 20);
+
+    setTimeout(() => {
+      popup.classList.remove("show");
+      setTimeout(() => popup.style.display = "none", 600);
+    }, 10000);
+  }
+
+  window.addEventListener("offline", () => {
+    showPopup("Jaringan Terputus", "error");
+    beepDC.play().catch(()=>{});
+    if (navigator.vibrate) navigator.vibrate([180,80,120]);
+  });
+
+  window.addEventListener("online", () => {
+    showPopup("Internet Tersambung", "success");
+    beepCN.play().catch(()=>{});
+    if (navigator.vibrate) navigator.vibrate(120);
+  });
+
+  // ====================== PING CHECKER ======================
+  async function pingTest() {
+    const start = performance.now();
+    try {
+      await fetch("https://www.google.com", {mode: "no-cors"});
+      const delay = Math.round(performance.now() - start);
+      pingBox.innerText = `📶 ${delay} ms`;
+
+      if(delay < 80) pingBox.style.background = "rgba(76,175,80,0.55)";
+      else if(delay < 150) pingBox.style.background = "rgba(255,193,7,0.55)";
+      else pingBox.style.background = "rgba(244,67,54,0.55)";
+
+    } catch {
+      pingBox.innerText = "❌ Offline";
+      pingBox.style.background = "rgba(244,67,54,0.55)";
+    }
+  }
+  setInterval(pingTest, 2500);
+  pingTest();
+});
+  /*function reloadWithBeep() {
+  const beep = document.getElementById("beepClick");
+  beep.currentTime = 0;     // restart suara dari awal
+  beep.play();
+
+  setTimeout(() => {
+    location.reload();
+  }, 250); // jeda sedikit agar beep terdengar dulu
+}*/
+function reloadWithBeep() {
+  const beep = document.getElementById("beepClick");
+  if (beep) {
+    beep.currentTime = 0;
+    beep.play().catch(()=>{}); // cegah error berhenti script
+  }
+
+  setTimeout(() => {
+    location.reload();
+  }, 250);
+}
+
+function playBeep() {
+  const beep = document.getElementById("beepClick");
+  if (beep) {
+    beep.currentTime = 0;
+    beep.play().catch(()=>{}); // cegah error berhenti script
+  }
+  setTimeout(() => {
+    location.share();
+  }, 250);
+}
+
+</script>
