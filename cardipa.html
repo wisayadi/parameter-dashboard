@@ -631,7 +631,7 @@ setTimeout(() => {
 }, 10000); // waktu ideal
 
 // Hilangkan splash & aktifkan scroll + auto scroll ke kartu
-setTimeout(() => {
+/*setTimeout(() => {
   const splash = document.getElementById("splash");
   if (splash) splash.remove();
 
@@ -644,7 +644,26 @@ setTimeout(() => {
     top: offset,
     behavior: "smooth"
   });
-}, 10000); // sinkron dengan whiteFlash + animasi fade
+}, 10000); // sinkron dengan whiteFlash + animasi fade*/
+
+ setTimeout(() => {
+  const splash = document.getElementById("splash");
+  if (splash) splash.remove();
+
+  document.body.style.visibility = "visible";
+  document.body.style.opacity = "1";
+  document.body.style.transition = "opacity 0.8s ease";
+
+  document.body.style.overflow = "auto";
+
+  const target = document.querySelector(".title-card");
+  const offset = target.offsetTop - 276;
+
+  window.scrollTo({
+    top: offset,
+    behavior: "smooth"
+  });
+}, 10000);
    
   /*document.getElementById("watermark").innerText =
 " CARDIPA  CARDIPA  CARDIPA  CARDIPA  CARDIPA  CARDIPA ".repeat(40);*/
