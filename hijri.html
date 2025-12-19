@@ -142,7 +142,7 @@ tr:nth-child(even){ background:/*#eaf7f6*/rgba(0,0,0,0.02); }
 @keyframes blink { 0%{ opacity:0.35; transform:scale(.94);} 100%{opacity:1; transform:scale(1);} }
 
 /* ping indicator */
-.ping-indicator{ position:fixed; top:12px; right:12px; padding:6px 10px; font-weight:700; color:#fff; border-radius:14px; background:var(--ping-bg); z-index:999999; }
+/*.ping-indicator{ position:fixed; top:12px; right:12px; padding:6px 10px; font-weight:700; color:#fff; border-radius:14px; background:var(--ping-bg); z-index:999999; }*/
 
 /* =================== BOTTOM NAV =================== */
 /*.bottom-nav{
@@ -164,6 +164,10 @@ tr:nth-child(even){ background:/*#eaf7f6*/rgba(0,0,0,0.02); }
   background: rgba(0,0,0,0.4);
   backdrop-filter: blur(10px);
   z-index: 999999;
+}
+  .ping-indicator{
+  transform: scale(0.7);
+  transform-origin: top right;
 }
  .bottom-nav {
   position: fixed;
