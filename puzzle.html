@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Modern Puzzle Game</title>
+
+<link rel="manifest" id="manifest">
+<meta name="theme-color" content="#020617">
+
+<style>
+:root{--accent:#22d3ee}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,sans-serif;
+  background:radial-gradient(circle at top,#1e293b,#020617);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.app{
+  width:340px;
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(14px);
+  border-radius:18px;
+  padding:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+}
+.header h2{margin:0;color:var(--accent)}
+
+.board{
+  margin-top:10px;
+  width:100%;
+  aspect-ratio:1/1;
+  background:#020617;
+  border-radius:14px;
+  position:relative;
+  overflow:hidden;
+}
+
+.tile{
+  position:absolute;
+  border-radius:10px;
+  background-size:cover;
+  box-shadow:0 5px 12px rgba(0,0,0,.5);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:700;
+  color:white;
+  font-size:14px;
+  text-shadow:0 1px 4px black;
+  transition:transform .12s linear, box-shadow .3s;
+}
+
+.tile.correct{
+  box-shadow:0 0 14px var(--accent),0 0 30px rgba(34,211,238,.7);
+}
+
+.controls{
+  display:flex;
+  gap:6px;
+  margin-top:10px;
+}
+select,button,label{
+  flex:1;
+  padding:6px;
+  border-radius:10px;
+  border:none;
+  font-size:11px;
+  background:linear-gradient(135deg,#22d3ee,#6366f1);
+  color:white;
+  text-align:center;
+  cursor:pointer;
+}
+
+input[type=file]{display:none}
+
+.footer{
+  text-align:center;
+  font-size:10px;
+  opacity:.7;
+  margin-top:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="header">
+    <h2>Puzzle</h2>
+    <div>Moves: <span id="moves">0</span></div>
+  </div>
+
+  <div class="controls">
+    <select id="level">
+      <option value="3">3×3</option>
+      <option value="4" selected>4×4</option>
+      <option value="5">5×5</option>
+    </select>
+
+    <label for="imgInput">📷</label>
+    <input type="file" id="imgInput" accept="image/*">
+
+    <button onclick="shuffle()">🔀</button>
+    <button onclick="toggleNumber()">🔢</button>
+    <button onclick="toggleFullscreen()">⛶</button>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="footer">High Score: <span id="high">-</span></div>
+</div>
+
+<script>
+/* ================= CORE ================= */
+let SIZE=4, tiles=[], moves=0;
+let imageSrc="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600";
+let numberOn=true;
+
+const board=document.getElementById("board");
+const movesEl=document.getElementById("moves");
+const highEl=document.getElementById("high");
+
+const audio=new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+const winAudio=new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+
+function vibrate(){navigator.vibrate&&navigator.vibrate(15);}
+
+/* ================= FULLSCREEN ================= */
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen();
+  }else{
+    document.exitFullscreen();
+  }
+}
+
+/* ================= TOGGLE ANGKA ================= */
+function toggleNumber(){
+  numberOn=!numberOn;
+  document.querySelectorAll(".tile").forEach(t=>{
+    t.textContent = numberOn ? t.dataset.id : "";
+  });
+}
+
+/* ================= IMAGE ================= */
+imgInput.onchange=e=>{
+  const f=e.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{imageSrc=r.result;init()};
+  r.readAsDataURL(f);
+};
+
+/* ================= INIT ================= */
+function init(){
+  SIZE=parseInt(level.value);
+  tiles=[...Array(SIZE*SIZE-1).keys()].map(n=>n+1).concat(0);
+  moves=0;movesEl.textContent=0;
+  board.innerHTML="";
+
+  const s=100/SIZE;
+
+  for(let i=1;i<SIZE*SIZE;i++){
+    const t=document.createElement("div");
+    t.className="tile";
+    t.dataset.id=i;
+    t.textContent=numberOn?i:"";
+    t.style.width=t.style.height=s+"%";
+    t.style.backgroundImage=`url(${imageSrc})`;
+    t.style.backgroundSize=`${SIZE}00% ${SIZE}00%`;
+    t.style.backgroundPosition=
+      `${-((i-1)%SIZE)*100}% ${-Math.floor((i-1)/SIZE)*100}%`;
+    t.onclick=()=>move(tiles.indexOf(i));
+    board.appendChild(t);
+  }
+  render();updateHigh();
+}
+
+/* ================= RENDER ================= */
+function render(){
+  tiles.forEach((n,i)=>{
+    if(!n) return;
+    const t=document.querySelector(`[data-id="${n}"]`);
+    t.style.transform=
+      `translate(${(i%SIZE)*100}%,${Math.floor(i/SIZE)*100}%)`;
+    t.classList.toggle("correct",n===i+1);
+  });
+}
+
+/* ================= MOVE ================= */
+function move(i){
+  const e=tiles.indexOf(0);
+  const x=i%SIZE,y=i/SIZE|0,ex=e%SIZE,ey=e/SIZE|0;
+  if(Math.abs(x-ex)+Math.abs(y-ey)!==1) return;
+
+  [tiles[i],tiles[e]]=[tiles[e],tiles[i]];
+  moves++;movesEl.textContent=moves;
+  audio.currentTime=0;audio.play().catch(()=>{});
+  vibrate();render();checkWin();
+}
+
+/* ================= SHUFFLE ================= */
+function shuffle(){
+  numberOn=false; // otomatis sembunyikan angka
+  document.querySelectorAll(".tile").forEach(t=>t.textContent="");
+
+  for(let i=0;i<300;i++){
+    const e=tiles.indexOf(0);
+    const n=[e-1,e+1,e-SIZE,e+SIZE].filter(x=>x>=0&&x<SIZE*SIZE);
+    const p=n[Math.random()*n.length|0];
+    [tiles[e],tiles[p]]=[tiles[p],tiles[e]];
+  }
+  moves=0;movesEl.textContent=0;render();
+}
+
+/* ================= WIN ================= */
+function checkWin(){
+  for(let i=0;i<SIZE*SIZE-1;i++) if(tiles[i]!==i+1) return;
+
+  winAudio.play().catch(()=>{});
+  const k=`high_${SIZE}`;
+  const b=localStorage.getItem(k);
+  if(!b||moves<b) localStorage.setItem(k,moves);
+  updateHigh();
+  setTimeout(()=>alert("🎉 Puzzle Selesai!"),200);
+}
+
+function updateHigh(){
+  highEl.textContent=localStorage.getItem(`high_${SIZE}`)||"-";
+}
+
+level.onchange=init;
+init();
+
+/* ================= PWA ================= */
+const manifest={
+  name:"Modern Puzzle Game",
+  short_name:"Puzzle",
+  start_url:".",
+  display:"fullscreen",
+  background_color:"#020617",
+  theme_color:"#020617",
+  icons:[{
+    src:"https://cdn-icons-png.flaticon.com/512/751/751381.png",
+    sizes:"512x512",
+    type:"image/png"
+  }]
+};
+document.getElementById("manifest").href=
+  URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:"application/json"}));
+
+if("serviceWorker" in navigator){
+  const sw=`self.addEventListener("fetch",e=>{
+    e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)))
+  })`;
+  navigator.serviceWorker.register(
+    URL.createObjectURL(new Blob([sw],{type:"text/javascript"}))
+  );
+}
+</script>
+</body>
+</html>
