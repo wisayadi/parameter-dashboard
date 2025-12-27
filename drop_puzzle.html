@@ -92,7 +92,6 @@ const finalScoreEl=document.getElementById("finalScore");
 
 const GRID=10,CELL=30;
 const BOARD_X=20,BOARD_Y=20;
-
 const PREVIEW_SCALE=0.85;
 const PREVIEW_Y=370;
 
@@ -101,20 +100,17 @@ let gameOver=false;
 
 /* ================= FX ================= */
 let floatingTexts=[];
-let particles=[];
+let glassParticles=[];
 
 /* ================= AUDIO ================= */
 const AudioCtx=window.AudioContext||window.webkitAudioContext;
 const audioCtx=new AudioCtx();
-const compressor=audioCtx.createDynamicsCompressor();
-compressor.connect(audioCtx.destination);
-
 function sound(f,t="square",d=0.25,v=0.6){
  if(audioCtx.state!=="running") audioCtx.resume();
  const o=audioCtx.createOscillator();
  const g=audioCtx.createGain();
  o.type=t;o.frequency.value=f;g.gain.value=v;
- o.connect(g);g.connect(compressor);
+ o.connect(g);g.connect(audioCtx.destination);
  o.start();o.stop(audioCtx.currentTime+d);
 }
 const dropSound=()=>sound(220);
@@ -125,10 +121,16 @@ const gameOverSound=()=>sound(80,"triangle",0.8);
 const board=Array.from({length:GRID},()=>Array(GRID).fill(null));
 
 const SHAPES=[
- [[1]],[[1,1]],[[1,1,1]],[[1],[1]],[[1],[1],[1]],
- [[1,1],[1,1]],[[1,0],[1,1]],[[1,1],[0,1]],
- [[1,0],[1,0],[1,1]],[[1,1],[1,0],[1,0]],
- [[1,1,1],[0,1,0]],[[1,1,1,1]],[[1],[1],[1],[1]]
+ [[1]],[[1]],[[1]],[[1]],
+ [[1,1]],[[1,1,1]],
+ [[1],[1]],[[1],[1],[1]],
+ [[1,1],[1,1]],
+ [[1,1,1,1]],[[1],[1],[1],[1]],
+ [[1,0],[1,1]],[[1,1],[0,1]],
+ [[1,1,1],[0,1,0]],
+ [[0,1,1],[1,1,0]],
+ [[1,0,0],[1,1,1]],
+ [[0,0,1],[1,1,1]]
 ];
 
 const COLORS=[
@@ -141,16 +143,15 @@ const COLORS=[
 
 let pieces=[];
 
-/* ======== SPAWN ======== */
+/* ================= SPAWN ================= */
 function spawnPieces(){
  pieces=[];
- let xCursor=30;
+ let x=30;
  while(pieces.length<3){
   const shape=SHAPES[Math.random()*SHAPES.length|0];
-  const color=COLORS[pieces.length%COLORS.length];
-  const w=shape[0].length*34*PREVIEW_SCALE;
-  pieces.push({shape,color,scale:PREVIEW_SCALE,x:xCursor,y:PREVIEW_Y});
-  xCursor+=w+28;
+  const color=COLORS[Math.random()*COLORS.length|0];
+  pieces.push({shape,color,scale:PREVIEW_SCALE,x,y:PREVIEW_Y});
+  x+=shape[0].length*34*PREVIEW_SCALE+28;
  }
  if(!canAnyMove()) endGame();
 }
@@ -168,9 +169,23 @@ function canPlace(shape,gx,gy){
  return shape.every((r,dy)=>r.every((v,dx)=>{
   if(!v) return true;
   const x=gx+dx,y=gy+dy;
-  if(x<0||x>=GRID||y<0||y>=GRID) return false;
-  return board[y][x]==null;
+  return x>=0&&x<GRID&&y>=0&&y<GRID&&board[y][x]==null;
  }));
+}
+
+/* ================= GLASS FX ================= */
+function spawnGlass(x,y,color){
+ for(let i=0;i<6;i++){
+  glassParticles.push({
+   x,y,
+   vx:(Math.random()-0.5)*4,
+   vy:(Math.random()-1.2)*4,
+   r:Math.random()*Math.PI,
+   vr:(Math.random()-0.5)*0.3,
+   life:1,
+   color
+  });
+ }
 }
 
 /* ================= PLACE ================= */
@@ -180,12 +195,7 @@ function place(shape,color,gx,gy){
   if(v){
    board[gy+dy][gx+dx]=color;
    blocks++;
-   floatingTexts.push({
-    text:"+10",
-    x:BOARD_X+(gx+dx)*34+8,
-    y:BOARD_Y+(gy+dy)*34+12,
-    life:1
-   });
+   floatingTexts.push({text:"+10",x:BOARD_X+(gx+dx)*34+8,y:BOARD_Y+(gy+dy)*34+12,life:1});
   }
  }));
  score+=blocks*10;
@@ -194,36 +204,36 @@ function place(shape,color,gx,gy){
  clearLines();
 }
 
-/* ================= CLEAR ================= */
+/* ================= DESTROYER + GLASS ================= */
 function clearLines(){
  let cleared=0;
+
  for(let y=GRID-1;y>=0;y--){
   if(board[y].every(v=>v)){
-   board[y].forEach((col,x)=>{
-    for(let i=0;i<6;i++){
-     particles.push({
-      x:BOARD_X+x*34+15,
-      y:BOARD_Y+y*34+15,
-      vx:(Math.random()-.5)*4,
-      vy:(Math.random()-.5)*4,
-      life:1,
-      color:col
-     });
-    }
+   board[y].forEach((c,x)=>{
+    spawnGlass(BOARD_X+x*34+15,BOARD_Y+y*34+15,c);
    });
    board.splice(y,1);
    board.unshift(Array(GRID).fill(null));
    cleared++; y++;
   }
  }
+
+ for(let x=0;x<GRID;x++){
+  if(board.every(r=>r[x])){
+   for(let y=0;y<GRID;y++){
+    spawnGlass(BOARD_X+x*34+15,BOARD_Y+y*34+15,board[y][x]);
+    board[y][x]=null;
+   }
+   cleared++;
+  }
+ }
+
  if(cleared){
   const bonus=cleared*150;
   score+=bonus;
   scoreEl.textContent=score;
-  floatingTexts.push({
-   text:`CLEAR +${bonus}`,
-   x:120,y:160,life:1.2
-  });
+  floatingTexts.push({text:`DESTROY +${bonus}`,x:120,y:160,life:1.3});
   clearSound();
  }
 }
@@ -238,7 +248,7 @@ function draw(){
  }
 
  pieces.forEach(p=>{
-  const s=p.scale||1;
+  const s=p.scale;
   p.shape.forEach((r,dy)=>r.forEach((v,dx)=>{
    if(v){
     ctx.fillStyle=p.color;
@@ -247,40 +257,43 @@ function draw(){
   }));
  });
 
+ glassParticles.forEach(p=>{
+  ctx.save();
+  ctx.translate(p.x,p.y);
+  ctx.rotate(p.r);
+  ctx.globalAlpha=p.life;
+  ctx.fillStyle=p.color;
+  ctx.fillRect(-4,-4,8,8);
+  ctx.restore();
+  p.x+=p.vx;
+  p.y+=p.vy;
+  p.vy+=0.08;
+  p.r+=p.vr;
+  p.life-=0.03;
+ });
+ glassParticles=glassParticles.filter(p=>p.life>0);
+
  floatingTexts.forEach(t=>{
   ctx.globalAlpha=t.life;
   ctx.fillStyle="#fff";
-  ctx.font="bold 16px system-ui";
   ctx.fillText(t.text,t.x,t.y);
-  t.y-=0.6;
-  t.life-=0.02;
+  t.y-=0.6;t.life-=0.02;
  });
  floatingTexts=floatingTexts.filter(t=>t.life>0);
  ctx.globalAlpha=1;
-
- particles.forEach(p=>{
-  ctx.fillStyle=p.color;
-  ctx.fillRect(p.x,p.y,4,4);
-  p.x+=p.vx;p.y+=p.vy;p.life-=0.03;
- });
- particles=particles.filter(p=>p.life>0);
 
  requestAnimationFrame(draw);
 }
 
 /* ================= INPUT ================= */
 canvas.onpointerdown=e=>{
- if(gameOver)return;
  const mx=e.offsetX,my=e.offsetY;
  for(const p of pieces){
-  const s=p.scale||1;
-  const w=p.shape[0].length*34*s;
-  const h=p.shape.length*34*s;
+  const w=p.shape[0].length*34*p.scale;
+  const h=p.shape.length*34*p.scale;
   if(mx>p.x&&mx<p.x+w&&my>p.y&&my<p.y+h){
-   dragging=p;
-   dragOffset={x:mx-p.x,y:my-p.y};
+   dragging=p;dragOffset={x:mx-p.x,y:my-p.y};
    p.startX=p.x;p.startY=p.y;
-   break;
   }
  }
 };
@@ -291,13 +304,10 @@ canvas.onpointermove=e=>{
  }
 };
 canvas.onpointerup=()=>{
- if(!dragging||gameOver)return;
-
+ if(!dragging)return;
  const gx=Math.round((dragging.x-BOARD_X)/34);
  const gy=Math.round((dragging.y-BOARD_Y)/34);
-
  if(canPlace(dragging.shape,gx,gy)){
-  dragging.scale=1;
   place(dragging.shape,dragging.color,gx,gy);
   pieces=pieces.filter(p=>p!==dragging);
   if(!pieces.length) spawnPieces();
@@ -305,14 +315,12 @@ canvas.onpointerup=()=>{
   dragging.x=dragging.startX;
   dragging.y=dragging.startY;
  }
-
  dragging=null;
  if(!canAnyMove()) endGame();
 };
 
 /* ================= GAME OVER ================= */
 function endGame(){
- if(gameOver) return;
  gameOver=true;
  finalScoreEl.textContent=score;
  panel.classList.add("show");
@@ -320,8 +328,7 @@ function endGame(){
 }
 function restart(){
  board.forEach(r=>r.fill(null));
- score=0;
- scoreEl.textContent=0;
+ score=0;scoreEl.textContent=0;
  gameOver=false;
  panel.classList.remove("show");
  spawnPieces();
