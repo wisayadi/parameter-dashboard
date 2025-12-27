@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Glass Puzzle</title>
+
+<style>
+body{
+  margin:0;
+  background:linear-gradient(135deg,#0f172a,#020617);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
+  font-family:system-ui;
+  overflow:hidden;
+}
+canvas{
+  background:rgba(255,255,255,.08);
+  border-radius:22px;
+  backdrop-filter:blur(20px);
+  touch-action:none;
+}
+.score{
+  position:absolute;
+  top:16px;
+  font-size:18px;
+  font-weight:600;
+}
+#gameOverPanel{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.35s;
+}
+#gameOverPanel.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.panel{
+  background:rgba(255,255,255,.14);
+  border-radius:22px;
+  padding:28px 36px;
+  text-align:center;
+}
+.panel h1{margin:0;font-size:28px;}
+.panel .finalScore{
+  font-size:38px;
+  font-weight:800;
+  margin:16px 0 24px;
+}
+.panel button{
+  border:none;
+  padding:12px 30px;
+  border-radius:18px;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  color:#020617;
+}
+</style>
+</head>
+<body>
+
+<div class="score">Score: <span id="score">0</span></div>
+<canvas id="game" width="380" height="520"></canvas>
+
+<div id="gameOverPanel">
+  <div class="panel">
+    <h1>GAME OVER</h1>
+    <div class="finalScore" id="finalScore">0</div>
+    <button onclick="restart()">Play Again</button>
+  </div>
+</div>
+
+<script>
+/* ================= CORE ================= */
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+const scoreEl=document.getElementById("score");
+const panel=document.getElementById("gameOverPanel");
+const finalScoreEl=document.getElementById("finalScore");
+
+const GRID=10,CELL=30;
+const BOARD_X=20,BOARD_Y=20;
+
+const PREVIEW_SCALE=0.85;
+const PREVIEW_Y=370;
+
+let score=0,dragging=null,dragOffset={x:0,y:0};
+let gameOver=false;
+
+/* ================= FX ================= */
+let floatingTexts=[];
+let particles=[];
+
+/* ================= AUDIO ================= */
+const AudioCtx=window.AudioContext||window.webkitAudioContext;
+const audioCtx=new AudioCtx();
+const compressor=audioCtx.createDynamicsCompressor();
+compressor.connect(audioCtx.destination);
+
+function sound(f,t="square",d=0.25,v=0.6){
+ if(audioCtx.state!=="running") audioCtx.resume();
+ const o=audioCtx.createOscillator();
+ const g=audioCtx.createGain();
+ o.type=t;o.frequency.value=f;g.gain.value=v;
+ o.connect(g);g.connect(compressor);
+ o.start();o.stop(audioCtx.currentTime+d);
+}
+const dropSound=()=>sound(220);
+const clearSound=()=>sound(140,"sawtooth",0.4);
+const gameOverSound=()=>sound(80,"triangle",0.8);
+
+/* ================= DATA ================= */
+const board=Array.from({length:GRID},()=>Array(GRID).fill(null));
+
+const SHAPES=[
+ [[1]],[[1,1]],[[1,1,1]],[[1],[1]],[[1],[1],[1]],
+ [[1,1],[1,1]],[[1,0],[1,1]],[[1,1],[0,1]],
+ [[1,0],[1,0],[1,1]],[[1,1],[1,0],[1,0]],
+ [[1,1,1],[0,1,0]],[[1,1,1,1]],[[1],[1],[1],[1]]
+];
+
+const COLORS=[
+ "rgba(255,140,140,.75)",
+ "rgba(140,255,200,.75)",
+ "rgba(140,180,255,.75)",
+ "rgba(255,220,140,.75)",
+ "rgba(200,160,255,.75)"
+];
+
+let pieces=[];
+
+/* ======== SPAWN ======== */
+function spawnPieces(){
+ pieces=[];
+ let xCursor=30;
+ while(pieces.length<3){
+  const shape=SHAPES[Math.random()*SHAPES.length|0];
+  const color=COLORS[pieces.length%COLORS.length];
+  const w=shape[0].length*34*PREVIEW_SCALE;
+  pieces.push({shape,color,scale:PREVIEW_SCALE,x:xCursor,y:PREVIEW_Y});
+  xCursor+=w+28;
+ }
+ if(!canAnyMove()) endGame();
+}
+
+/* ================= CHECK ================= */
+function canAnyMove(){
+ return pieces.some(p=>{
+  for(let y=0;y<GRID;y++)
+   for(let x=0;x<GRID;x++)
+    if(canPlace(p.shape,x,y)) return true;
+  return false;
+ });
+}
+function canPlace(shape,gx,gy){
+ return shape.every((r,dy)=>r.every((v,dx)=>{
+  if(!v) return true;
+  const x=gx+dx,y=gy+dy;
+  if(x<0||x>=GRID||y<0||y>=GRID) return false;
+  return board[y][x]==null;
+ }));
+}
+
+/* ================= PLACE ================= */
+function place(shape,color,gx,gy){
+ let blocks=0;
+ shape.forEach((r,dy)=>r.forEach((v,dx)=>{
+  if(v){
+   board[gy+dy][gx+dx]=color;
+   blocks++;
+   floatingTexts.push({
+    text:"+10",
+    x:BOARD_X+(gx+dx)*34+8,
+    y:BOARD_Y+(gy+dy)*34+12,
+    life:1
+   });
+  }
+ }));
+ score+=blocks*10;
+ scoreEl.textContent=score;
+ dropSound();
+ clearLines();
+}
+
+/* ================= CLEAR ================= */
+function clearLines(){
+ let cleared=0;
+ for(let y=GRID-1;y>=0;y--){
+  if(board[y].every(v=>v)){
+   board[y].forEach((col,x)=>{
+    for(let i=0;i<6;i++){
+     particles.push({
+      x:BOARD_X+x*34+15,
+      y:BOARD_Y+y*34+15,
+      vx:(Math.random()-.5)*4,
+      vy:(Math.random()-.5)*4,
+      life:1,
+      color:col
+     });
+    }
+   });
+   board.splice(y,1);
+   board.unshift(Array(GRID).fill(null));
+   cleared++; y++;
+  }
+ }
+ if(cleared){
+  const bonus=cleared*150;
+  score+=bonus;
+  scoreEl.textContent=score;
+  floatingTexts.push({
+   text:`CLEAR +${bonus}`,
+   x:120,y:160,life:1.2
+  });
+  clearSound();
+ }
+}
+
+/* ================= DRAW ================= */
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+
+ for(let y=0;y<GRID;y++)for(let x=0;x<GRID;x++){
+  ctx.fillStyle=board[y][x]||"rgba(255,255,255,.12)";
+  ctx.fillRect(BOARD_X+x*34,BOARD_Y+y*34,CELL,CELL);
+ }
+
+ pieces.forEach(p=>{
+  const s=p.scale||1;
+  p.shape.forEach((r,dy)=>r.forEach((v,dx)=>{
+   if(v){
+    ctx.fillStyle=p.color;
+    ctx.fillRect(p.x+dx*34*s,p.y+dy*34*s,CELL*s,CELL*s);
+   }
+  }));
+ });
+
+ floatingTexts.forEach(t=>{
+  ctx.globalAlpha=t.life;
+  ctx.fillStyle="#fff";
+  ctx.font="bold 16px system-ui";
+  ctx.fillText(t.text,t.x,t.y);
+  t.y-=0.6;
+  t.life-=0.02;
+ });
+ floatingTexts=floatingTexts.filter(t=>t.life>0);
+ ctx.globalAlpha=1;
+
+ particles.forEach(p=>{
+  ctx.fillStyle=p.color;
+  ctx.fillRect(p.x,p.y,4,4);
+  p.x+=p.vx;p.y+=p.vy;p.life-=0.03;
+ });
+ particles=particles.filter(p=>p.life>0);
+
+ requestAnimationFrame(draw);
+}
+
+/* ================= INPUT ================= */
+canvas.onpointerdown=e=>{
+ if(gameOver)return;
+ const mx=e.offsetX,my=e.offsetY;
+ for(const p of pieces){
+  const s=p.scale||1;
+  const w=p.shape[0].length*34*s;
+  const h=p.shape.length*34*s;
+  if(mx>p.x&&mx<p.x+w&&my>p.y&&my<p.y+h){
+   dragging=p;
+   dragOffset={x:mx-p.x,y:my-p.y};
+   p.startX=p.x;p.startY=p.y;
+   break;
+  }
+ }
+};
+canvas.onpointermove=e=>{
+ if(dragging){
+  dragging.x=e.offsetX-dragOffset.x;
+  dragging.y=e.offsetY-dragOffset.y;
+ }
+};
+canvas.onpointerup=()=>{
+ if(!dragging||gameOver)return;
+
+ const gx=Math.round((dragging.x-BOARD_X)/34);
+ const gy=Math.round((dragging.y-BOARD_Y)/34);
+
+ if(canPlace(dragging.shape,gx,gy)){
+  dragging.scale=1;
+  place(dragging.shape,dragging.color,gx,gy);
+  pieces=pieces.filter(p=>p!==dragging);
+  if(!pieces.length) spawnPieces();
+ }else{
+  dragging.x=dragging.startX;
+  dragging.y=dragging.startY;
+ }
+
+ dragging=null;
+ if(!canAnyMove()) endGame();
+};
+
+/* ================= GAME OVER ================= */
+function endGame(){
+ if(gameOver) return;
+ gameOver=true;
+ finalScoreEl.textContent=score;
+ panel.classList.add("show");
+ gameOverSound();
+}
+function restart(){
+ board.forEach(r=>r.fill(null));
+ score=0;
+ scoreEl.textContent=0;
+ gameOver=false;
+ panel.classList.remove("show");
+ spawnPieces();
+}
+
+spawnPieces();
+draw();
+</script>
+</body>
+</html>
