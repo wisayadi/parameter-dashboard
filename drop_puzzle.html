@@ -3,12 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Glass Puzzle</title>
+<title>Glass Puzzle Neo – 3D Bevel</title>
 
 <style>
-body{
-  margin:0;
-  background:linear-gradient(135deg,#0f172a,#020617);
+   /* 🌳 BACKGROUND PAPAN KAYU */
+  body{
+  position:relative; /* ⬅️ WAJIB */
+  margin:1;
+  background:
+    /* serat kayu halus */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 2px,
+      rgba(0,0,0,0.04) 4px,
+      rgba(0,0,0,0.04) 6px
+    ),
+    /* warna dasar kayu */
+    linear-gradient(
+      180deg,
+      #6f3f1f 0%,
+      #5a3118 40%,
+      #3f220f 100%
+    ),
+    /* vignette */
+    radial-gradient(
+      circle at center,
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.45) 100%
+    );
+
+  background-blend-mode:overlay,normal,normal;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -17,23 +42,103 @@ body{
   font-family:system-ui;
   overflow:hidden;
 }
-canvas{
-  background:rgba(255,255,255,.08);
-  border-radius:22px;
-  backdrop-filter:blur(20px);
-  touch-action:none;
+  
+  /* 🏆 SCORE BOARD KAYU */
+.score-board{
+  z-index:1000;        /* ⬅️ NAIK KE ATAS */
+  pointer-events:auto;
+  position:absolute;
+  top:14px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:10px 18px;
+  background:linear-gradient(180deg,#7a4a2e,#4b2a16);
+  border-radius:18px;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.25),
+    inset 0 -3px 6px rgba(0,0,0,.5),
+    0 10px 30px rgba(0,0,0,.6);
 }
+
+/* SCORE BOX */
+.score-box{
+  min-width:72px;
+  padding:8px 14px;
+  background:linear-gradient(180deg,#8b5a3c,#5a3722);
+  border-radius:12px;
+  text-align:center;
+  font-weight:900;
+  font-size:20px;
+  color:#ffe8b0;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.3),
+    inset 0 -2px 6px rgba(0,0,0,.6);
+}
+
+/* TROPHY */
+.trophy{
+  font-size:26px;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
+}
+
+/* PAUSE BUTTON */
+.pause-btn{
+  margin-left:6px;
+  width:38px;
+  height:38px;
+  border:none;
+  border-radius:10px;
+  background:linear-gradient(180deg,#d4a94c,#a97c1a);
+  font-size:18px;
+  cursor:pointer;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.35),
+    inset 0 -3px 6px rgba(0,0,0,.6);
+}
+.pause-btn:active{
+  transform:scale(.95);
+}
+  
 .score{
   position:absolute;
-  top:16px;
-  font-size:18px;
-  font-weight:600;
+  top:18px;
+  padding:10px 20px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(14px);
+  border-radius:20px;
+  font-weight:700;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
 }
-#gameOverPanel{
+  /* HIGH SCORE */
+.highscore{
   position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.55);
+  top:18px;
+  right:18px;
+  padding:10px 18px;
+  background:rgba(0,0,0,.35);
   backdrop-filter:blur(10px);
+  border-radius:18px;
+  font-weight:700;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+canvas{
+  position:relative;
+  z-index:1;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
+  border-radius:26px;
+  backdrop-filter:blur(18px);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),
+             0 25px 60px rgba(0,0,0,.45);
+  touch-action:none;
+}
+  #gameOverPanel{
+  position:fixed;     /* ⬅️ FIX #1 */
+  inset:0;
+  z-index:9999;       /* ⬅️ FIX #2 (PALING PENTING) */
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(14px);
   display:flex;
   justify-content:center;
   align-items:center;
@@ -41,178 +146,339 @@ canvas{
   pointer-events:none;
   transition:.35s;
 }
-#gameOverPanel.show{
-  opacity:1;
-  pointer-events:auto;
-}
+#gameOverPanel.show{opacity:1;pointer-events:auto}
 .panel{
-  background:rgba(255,255,255,.14);
-  border-radius:22px;
-  padding:28px 36px;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.08));
+  border-radius:26px;
+  padding:34px 42px;
   text-align:center;
-}
-.panel h1{margin:0;font-size:28px;}
-.panel .finalScore{
-  font-size:38px;
-  font-weight:800;
-  margin:16px 0 24px;
 }
 .panel button{
   border:none;
-  padding:12px 30px;
-  border-radius:18px;
-  font-size:16px;
-  font-weight:600;
-  cursor:pointer;
+  padding:14px 36px;
+  border-radius:22px;
+  font-weight:700;
   background:linear-gradient(135deg,#38bdf8,#818cf8);
-  color:#020617;
 }
+  /* LEADERBOARD */
+.leaderboard{
+  margin-top:16px;
+  text-align:left;
+  font-size:14px;
+}
+.leaderboard h3{
+  margin:8px 0;
+  font-size:16px;
+}
+.leaderboard li{
+  list-style:none;
+  padding:4px 0;
+  opacity:.9;
+}
+  .reset-btn{
+ margin-top:15px;
+ padding:5px 9px;
+ border:none;
+ border-radius:8px;
+ background:linear-gradient(135deg,#ff4d4d,#ff9800);
+ color:/*#fff*/gold;
+ font-size:10px;
+ font-weight:bold;
+ cursor:pointer;
+ transition:.2s;
+ margin-bottom: 10px;
+}
+
+.reset-btn:hover{
+ transform:scale(0.23);
+ opacity:.9;
+}
+ 
+/* === APP CONTROLS (FULLSCREEN KECIL) === */
+.app-controls{
+  position:absolute;
+  top:2px;          /* ⬅️ di atas scoreboard */
+  left:1px;        /* ⬅️ pojok kiri */
+  z-index:2001;     /* ⬅️ di atas scoreboard */
+}
+
+.app-controls button{
+  width:28px;       /* ⬅️ kecil */
+  height:28px;
+  padding:0;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:10px;   /* ⬅️ ikon pas */
+  font-weight:900;
+  color:white;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.35),
+    0 4px 10px rgba(0,0,0,.45);
+}
+
+.app-controls button:active{
+  transform:scale(.92);
+}  
 </style>
 </head>
 <body>
 
-<div class="score">Score: <span id="score">0</span></div>
+  <!-- <div class="score">SCORE <span id="score">0</span></div>
+ <div class="highscore">HIGH <span id="highScore">0</span></div> -->
+  <div class="score-board">
+  <div class="score-box left">
+    <span id="score">0</span>
+  </div>
+
+  <div class="trophy">
+    🏆
+  </div>
+
+  <div class="score-box right">
+    <span id="highScore">0</span>
+  </div>
+
+  <button class="pause-btn">⏸</button>
+</div>
+  <!-- === APP CONTROLS (FULLSCREEN & INSTALL) === -->
+<div class="app-controls">
+  <button id="fsBtn" title="Fullscreen">⛶</button>
+  <button id="installBtn" hidden title="Install App">⬇</button>
+</div>
+
 <canvas id="game" width="380" height="520"></canvas>
 
 <div id="gameOverPanel">
   <div class="panel">
     <h1>GAME OVER</h1>
-    <div class="finalScore" id="finalScore">0</div>
-    <button onclick="restart()">Play Again</button>
+    <div id="finalScore" style="font-size:40px;font-weight:900;margin:20px">0</div>
+    
+       <div class="leaderboard">
+      <h3>🏆 LEADERBOARD</h3>
+      <ol id="leaderboardList"></ol>
+    </div>
+    
+    <button class="reset-btn" onclick="resetLeaderboard()">
+ 🔄 RESET
+</button>
+
+    <button onclick="restart()">PLAY AGAIN</button>
   </div>
 </div>
 
 <script>
-/* ================= CORE ================= */
-const canvas=document.getElementById("game");
+  /* === FULLSCREEN === */
+const fsBtn = document.getElementById("fsBtn");
+
+fsBtn.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+  /* === PWA INSTALL === */
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.hidden = false;
+});
+
+installBtn.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.hidden = true;
+});
+  /* === MANIFEST INLINE === */
+const manifest = {
+  name: "Glass Puzzle Neo",
+  short_name: "GlassPuzzle",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#3f220f",
+  theme_color: "#3f220f",
+  icons: [{
+    src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA",
+    sizes: "192x192",
+    type: "image/png"
+  }]
+};
+
+const manifestBlob = new Blob(
+  [JSON.stringify(manifest)],
+  { type: "application/json" }
+);
+
+const manifestURL = URL.createObjectURL(manifestBlob);
+const link = document.createElement("link");
+link.rel = "manifest";
+link.href = manifestURL;
+document.head.appendChild(link);
+  
+ const canvas=document.getElementById("game");
 const ctx=canvas.getContext("2d");
 const scoreEl=document.getElementById("score");
 const panel=document.getElementById("gameOverPanel");
 const finalScoreEl=document.getElementById("finalScore");
-
+const highScoreEl=document.getElementById("highScore");
+const leaderboardList=document.getElementById("leaderboardList");
+  
+const FLOAT_OFFSET_Y = 80; // jarak puzzle di atas jari (px)
 const GRID=10,CELL=30;
-const BOARD_X=20,BOARD_Y=20;
+/*const BOARD_X=20,BOARD_Y=20;*/
+const BOARD_X = 20;
+const BOARD_Y = 70; // ⬅️ turun dari scoreboard
 const PREVIEW_SCALE=0.85;
-const PREVIEW_Y=370;
+/*const PREVIEW_Y=370;*/
+const BOARD_HEIGHT = GRID * 34;
+const PREVIEW_Y = BOARD_Y + BOARD_HEIGHT + 30; // ⬅️ jarak aman
 
-let score=0,dragging=null,dragOffset={x:0,y:0};
-let gameOver=false;
+let score=0,dragging=null,dragOffset={x:0,y:0},gameOver=false;
+let floatingTexts=[],glassParticles=[];
 
-/* ================= FX ================= */
-let floatingTexts=[];
-let glassParticles=[];
+/* ===== HIGH SCORE & LEADERBOARD ===== */
+let leaderboard=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+let highScore=Number(localStorage.getItem("highScore")||0);
+highScoreEl.textContent=highScore;
 
-/* ================= AUDIO ================= */
-const AudioCtx=window.AudioContext||window.webkitAudioContext;
-const audioCtx=new AudioCtx();
-function sound(f,t="square",d=0.25,v=0.6){
- if(audioCtx.state!=="running") audioCtx.resume();
- const o=audioCtx.createOscillator();
- const g=audioCtx.createGain();
+function saveScore(val){
+ leaderboard.push(val);
+ leaderboard.sort((a,b)=>b-a);
+ leaderboard=leaderboard.slice(0,5);
+ localStorage.setItem("leaderboard",JSON.stringify(leaderboard));
+
+ if(val>highScore){
+  highScore=val;
+  localStorage.setItem("highScore",val);
+ }
+ highScoreEl.textContent=highScore;
+}
+
+function renderLeaderboard(){
+ leaderboardList.innerHTML="";
+ leaderboard.forEach((s,i)=>{
+  const li=document.createElement("li");
+  li.textContent=`${i+1}. ${s}`;
+  leaderboardList.appendChild(li);
+ });
+}
+  function resetLeaderboard(){
+ if(!confirm("Reset semua leaderboard dan high score?")) return;
+
+ leaderboard = [];
+ highScore = 0;
+
+ localStorage.removeItem("leaderboard");
+ localStorage.removeItem("highScore");
+
+ leaderboardList.innerHTML = "";
+ highScoreEl.textContent = "0";
+
+ alert("Leaderboard berhasil direset!");
+}
+   
+/* ===== AUDIO ===== */
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const sound=(f,t="square",d=.25,v=.6)=>{
+ if(audioCtx.state!=="running")audioCtx.resume();
+ const o=audioCtx.createOscillator(),g=audioCtx.createGain();
  o.type=t;o.frequency.value=f;g.gain.value=v;
  o.connect(g);g.connect(audioCtx.destination);
  o.start();o.stop(audioCtx.currentTime+d);
-}
+};
 const dropSound=()=>sound(220);
-const clearSound=()=>sound(140,"sawtooth",0.4);
-const gameOverSound=()=>sound(80,"triangle",0.8);
+const clearSound=()=>sound(140,"sawtooth",.45);
+const gameOverSound=()=>sound(80,"triangle",.8);
 
-/* ================= DATA ================= */
+/* ===== DATA ===== */
 const board=Array.from({length:GRID},()=>Array(GRID).fill(null));
-
-const SHAPES=[
- [[1]],[[1]],[[1]],[[1]],
- [[1,1]],[[1,1,1]],
- [[1],[1]],[[1],[1],[1]],
- [[1,1],[1,1]],
- [[1,1,1,1]],[[1],[1],[1],[1]],
- [[1,0],[1,1]],[[1,1],[0,1]],
- [[1,1,1],[0,1,0]],
- [[0,1,1],[1,1,0]],
- [[1,0,0],[1,1,1]],
- [[0,0,1],[1,1,1]]
-];
-
-const COLORS=[
- "rgba(255,140,140,.75)",
- "rgba(140,255,200,.75)",
- "rgba(140,180,255,.75)",
- "rgba(255,220,140,.75)",
- "rgba(200,160,255,.75)"
-];
-
+const SHAPES=[[[1]],[[1,1]],[[1,1,1]],[[1],[1],[1]],[[1,1],[1,1]],
+ [[1,0],[1,1]],[[1,1],[0,1]],[[1,1,1],[0,1,0]]];
+const COLORS=["#ff4d4d","#4dff88","#4da6ff","#ffd24d","#b366ff"];
 let pieces=[];
 
-/* ================= SPAWN ================= */
+/* ===== SPAWN ===== */
 function spawnPieces(){
  pieces=[];
  let x=30;
  while(pieces.length<3){
-  const shape=SHAPES[Math.random()*SHAPES.length|0];
-  const color=COLORS[Math.random()*COLORS.length|0];
-  pieces.push({shape,color,scale:PREVIEW_SCALE,x,y:PREVIEW_Y});
-  x+=shape[0].length*34*PREVIEW_SCALE+28;
+  const s=SHAPES[Math.random()*SHAPES.length|0];
+  const c=COLORS[Math.random()*COLORS.length|0];
+  pieces.push({shape:s,color:c,scale:PREVIEW_SCALE,x,y:PREVIEW_Y});
+  x+=s[0].length*34*PREVIEW_SCALE+28;
  }
- if(!canAnyMove()) endGame();
+ if(!canAnyMove())endGame();
 }
 
-/* ================= CHECK ================= */
-function canAnyMove(){
- return pieces.some(p=>{
-  for(let y=0;y<GRID;y++)
-   for(let x=0;x<GRID;x++)
-    if(canPlace(p.shape,x,y)) return true;
-  return false;
- });
-}
-function canPlace(shape,gx,gy){
- return shape.every((r,dy)=>r.every((v,dx)=>{
-  if(!v) return true;
-  const x=gx+dx,y=gy+dy;
-  return x>=0&&x<GRID&&y>=0&&y<GRID&&board[y][x]==null;
- }));
-}
+/* ===== CHECK ===== */
+const canAnyMove=()=>pieces.some(p=>{
+ for(let y=0;y<GRID;y++)
+  for(let x=0;x<GRID;x++)
+   if(canPlace(p.shape,x,y))return true;
+});
+const canPlace=(s,gx,gy)=>s.every((r,dy)=>r.every((v,dx)=>{
+ if(!v)return true;
+ const x=gx+dx,y=gy+dy;
+ return x>=0&&x<GRID&&y>=0&&y<GRID&&board[y][x]==null;
+}));
 
-/* ================= GLASS FX ================= */
+/* ===== GLASS FX ===== */
 function spawnGlass(x,y,color){
- for(let i=0;i<6;i++){
+ for(let i=0;i<6;i++)
   glassParticles.push({
-   x,y,
-   vx:(Math.random()-0.5)*4,
-   vy:(Math.random()-1.2)*4,
-   r:Math.random()*Math.PI,
-   vr:(Math.random()-0.5)*0.3,
-   life:1,
-   color
+    x,y,
+    vx:(Math.random()-.5)*4,
+    vy:(Math.random()-1.2)*4,
+    r:Math.random()*6,
+    vr:(Math.random()-.5)*.3,
+    life:1,color
   });
- }
 }
 
-/* ================= PLACE ================= */
+/* ===== BLOCK DRAW ===== */
+function drawBlock3D(x,y,s,c){
+ ctx.fillStyle="rgba(0,0,0,.35)";
+ ctx.fillRect(x+3,y+6,s,s);
+ ctx.fillStyle=c;
+ ctx.fillRect(x,y,s,s);
+ const g=ctx.createLinearGradient(x,y,x,y+s);
+ g.addColorStop(0,"rgba(255,255,255,.55)");
+ g.addColorStop(.4,"rgba(255,255,255,.15)");
+ g.addColorStop(.7,"rgba(0,0,0,.15)");
+ g.addColorStop(1,"rgba(0,0,0,.45)");
+ ctx.fillStyle=g;
+ ctx.fillRect(x+5,y+5,s-10,s-10);
+ ctx.strokeStyle="rgba(0,0,0,.6)";
+ ctx.strokeRect(x+.5,y+.5,s-1,s-1);
+}
+  
+/* ===== PLACE / DESTROY (H + V) ===== */
 function place(shape,color,gx,gy){
- let blocks=0;
+ let b=0;
  shape.forEach((r,dy)=>r.forEach((v,dx)=>{
   if(v){
    board[gy+dy][gx+dx]=color;
-   blocks++;
-   floatingTexts.push({text:"+10",x:BOARD_X+(gx+dx)*34+8,y:BOARD_Y+(gy+dy)*34+12,life:1});
+   b++;
+   floatingTexts.push({text:"+10",x:BOARD_X+(gx+dx)*34+8,y:BOARD_Y+(gy+dy)*34+14,life:1});
   }
  }));
- score+=blocks*10;
- scoreEl.textContent=score;
- dropSound();
- clearLines();
+ score+=b*10;scoreEl.textContent=score;
+ dropSound();clearLines();
 }
 
-/* ================= DESTROYER + GLASS ================= */
 function clearLines(){
  let cleared=0;
 
  for(let y=GRID-1;y>=0;y--){
   if(board[y].every(v=>v)){
-   board[y].forEach((c,x)=>{
-    spawnGlass(BOARD_X+x*34+15,BOARD_Y+y*34+15,c);
-   });
+   board[y].forEach((c,x)=>spawnGlass(BOARD_X+x*34+15,BOARD_Y+y*34+15,c));
    board.splice(y,1);
    board.unshift(Array(GRID).fill(null));
    cleared++; y++;
@@ -233,51 +499,57 @@ function clearLines(){
   const bonus=cleared*150;
   score+=bonus;
   scoreEl.textContent=score;
-  floatingTexts.push({text:`DESTROY +${bonus}`,x:120,y:160,life:1.3});
+  floatingTexts.push({text:`DESTROY +${bonus}`,x:90,y:180,life:1.4});
   clearSound();
  }
 }
 
-/* ================= DRAW ================= */
+/* ===== DRAW LOOP ===== */
 function draw(){
  ctx.clearRect(0,0,canvas.width,canvas.height);
 
- for(let y=0;y<GRID;y++)for(let x=0;x<GRID;x++){
-  ctx.fillStyle=board[y][x]||"rgba(255,255,255,.12)";
-  ctx.fillRect(BOARD_X+x*34,BOARD_Y+y*34,CELL,CELL);
- }
+ for(let y=0;y<GRID;y++)
+  for(let x=0;x<GRID;x++)
+   board[y][x]
+    ?drawBlock3D(BOARD_X+x*34,BOARD_Y+y*34,CELL,board[y][x])
+    :(ctx.fillStyle="rgba(255,255,255,.08)",
+      ctx.fillRect(BOARD_X+x*34,BOARD_Y+y*34,CELL,CELL));
 
- pieces.forEach(p=>{
-  const s=p.scale;
-  p.shape.forEach((r,dy)=>r.forEach((v,dx)=>{
+ /* 👻 GHOST SNAP PREVIEW */
+ if(dragging){
+  const gx=Math.round((dragging.x-BOARD_X)/34);
+  const gy=Math.round((dragging.y-BOARD_Y)/34);
+  const ok=canPlace(dragging.shape,gx,gy);
+  ctx.globalAlpha=.35;
+  dragging.shape.forEach((r,dy)=>r.forEach((v,dx)=>{
    if(v){
-    ctx.fillStyle=p.color;
-    ctx.fillRect(p.x+dx*34*s,p.y+dy*34*s,CELL*s,CELL*s);
+    drawBlock3D(
+     BOARD_X+(gx+dx)*34,
+     BOARD_Y+(gy+dy)*34,
+     CELL,
+     ok?dragging.color:"#ff4d4d"
+    );
    }
   }));
- });
+  ctx.globalAlpha=1;
+ }
+
+ pieces.forEach(p=>p.shape.forEach((r,dy)=>r.forEach((v,dx)=>{
+  if(v)drawBlock3D(p.x+dx*34*p.scale,p.y+dy*34*p.scale,CELL*p.scale,p.color);
+ })));
 
  glassParticles.forEach(p=>{
-  ctx.save();
-  ctx.translate(p.x,p.y);
-  ctx.rotate(p.r);
-  ctx.globalAlpha=p.life;
-  ctx.fillStyle=p.color;
-  ctx.fillRect(-4,-4,8,8);
-  ctx.restore();
-  p.x+=p.vx;
-  p.y+=p.vy;
-  p.vy+=0.08;
-  p.r+=p.vr;
-  p.life-=0.03;
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);
+  ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
+  ctx.fillRect(-4,-4,8,8);ctx.restore();
+  p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.life-=.03;
  });
  glassParticles=glassParticles.filter(p=>p.life>0);
 
  floatingTexts.forEach(t=>{
-  ctx.globalAlpha=t.life;
-  ctx.fillStyle="#fff";
+  ctx.globalAlpha=t.life;ctx.fillStyle="#fff";
   ctx.fillText(t.text,t.x,t.y);
-  t.y-=0.6;t.life-=0.02;
+  t.y-=.6;t.life-=.02;
  });
  floatingTexts=floatingTexts.filter(t=>t.life>0);
  ctx.globalAlpha=1;
@@ -285,47 +557,64 @@ function draw(){
  requestAnimationFrame(draw);
 }
 
-/* ================= INPUT ================= */
-canvas.onpointerdown=e=>{
- const mx=e.offsetX,my=e.offsetY;
+/* ===== INPUT ===== */
+function getCanvasPos(e){
+ const r=canvas.getBoundingClientRect();
+ return{
+  x:(e.clientX-r.left)*(canvas.width/r.width),
+  y:(e.clientY-r.top)*(canvas.height/r.height)
+ };
+}
+canvas.addEventListener("pointerdown",e=>{
+ const {x,y}=getCanvasPos(e);
+ canvas.setPointerCapture(e.pointerId);
  for(const p of pieces){
   const w=p.shape[0].length*34*p.scale;
   const h=p.shape.length*34*p.scale;
-  if(mx>p.x&&mx<p.x+w&&my>p.y&&my<p.y+h){
-   dragging=p;dragOffset={x:mx-p.x,y:my-p.y};
+  if(x>=p.x&&x<=p.x+w&&y>=p.y&&y<=p.y+h){
+   dragging=p;
+   dragOffset.x=x-p.x;
+   /*dragOffset.y=y-p.y;*/
+   dragOffset.y = y - p.y + FLOAT_OFFSET_Y;
    p.startX=p.x;p.startY=p.y;
+   break;
   }
  }
-};
-canvas.onpointermove=e=>{
- if(dragging){
-  dragging.x=e.offsetX-dragOffset.x;
-  dragging.y=e.offsetY-dragOffset.y;
- }
-};
-canvas.onpointerup=()=>{
+});
+canvas.addEventListener("pointermove",e=>{
+ if(!dragging)return;
+ const {x,y}=getCanvasPos(e);
+ dragging.x=x-dragOffset.x;
+ dragging.y=y-dragOffset.y;
+});
+canvas.addEventListener("pointerup",e=>{
  if(!dragging)return;
  const gx=Math.round((dragging.x-BOARD_X)/34);
  const gy=Math.round((dragging.y-BOARD_Y)/34);
  if(canPlace(dragging.shape,gx,gy)){
   place(dragging.shape,dragging.color,gx,gy);
   pieces=pieces.filter(p=>p!==dragging);
-  if(!pieces.length) spawnPieces();
+  if(!pieces.length)spawnPieces();
  }else{
   dragging.x=dragging.startX;
   dragging.y=dragging.startY;
  }
  dragging=null;
- if(!canAnyMove()) endGame();
-};
-
-/* ================= GAME OVER ================= */
-function endGame(){
+ canvas.releasePointerCapture(e.pointerId);
+ if(!canAnyMove())endGame();
+});
+  
+  function endGame(){
  gameOver=true;
  finalScoreEl.textContent=score;
+
+ saveScore(score);        // ⬅️ SIMPAN SCORE
+ renderLeaderboard();     // ⬅️ TAMPILKAN LEADERBOARD
+
  panel.classList.add("show");
  gameOverSound();
 }
+  
 function restart(){
  board.forEach(r=>r.fill(null));
  score=0;scoreEl.textContent=0;
@@ -333,9 +622,27 @@ function restart(){
  panel.classList.remove("show");
  spawnPieces();
 }
-
-spawnPieces();
-draw();
+  /* === SERVICE WORKER === */
+if ("serviceWorker" in navigator) {
+  const swCode = `
+    self.addEventListener("install", e => {
+      e.waitUntil(
+        caches.open("glass-puzzle").then(c => c.addAll(["./"]))
+      );
+    });
+    self.addEventListener("fetch", e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request))
+      );
+    });
+  `;
+  const swBlob = new Blob([swCode], { type: "text/javascript" });
+  navigator.serviceWorker.register(
+    URL.createObjectURL(swBlob)
+  );
+}
+renderLeaderboard();
+spawnPieces();draw();
 </script>
 </body>
 </html>
