@@ -338,9 +338,11 @@ const BOARD_Y = 70; // ⬅️ turun dari scoreboard
 const PREVIEW_SCALE=0.85;
 /*const PREVIEW_Y=370;*/
 const BOARD_HEIGHT = GRID * 34;
-const PREVIEW_Y = BOARD_Y + BOARD_HEIGHT + 30; // ⬅️ jarak aman
+const PREVIEW_Y = BOARD_Y + BOARD_HEIGHT + /*30*/10; // ⬅️ jarak aman
 
+/*let score=0,dragging=null,dragOffset={x:0,y:0},gameOver=false;*/
 let score=0,dragging=null,dragOffset={x:0,y:0},gameOver=false;
+let paused = false;  
 let floatingTexts=[],glassParticles=[];
 
 /* ===== HIGH SCORE & LEADERBOARD ===== */
@@ -396,6 +398,24 @@ const sound=(f,t="square",d=.25,v=.6)=>{
 const dropSound=()=>sound(220);
 const clearSound=()=>sound(140,"sawtooth",.45);
 const gameOverSound=()=>sound(80,"triangle",.8);
+  
+  /* ===== BACKGROUND MUSIC ===== */
+const bgm = new Audio(
+  /*"https://cdn.pixabay.com/download/audio/2022/03/15/audio_8b0f8f38e0.mp3"*/
+  "https://cdn.pixabay.com/audio/2023/03/07/audio_7c45e8c2f6.mp3"
+);
+bgm.loop = true;
+bgm.volume = 0.35;
+
+let bgmStarted = false;
+
+// start music setelah interaksi user (aturan browser)
+function startBGM(){
+  if(!bgmStarted){
+    bgm.play().catch(()=>{});
+    bgmStarted = true;
+  }
+}
 
 /* ===== DATA ===== */
 const board=Array.from({length:GRID},()=>Array(GRID).fill(null));
@@ -405,16 +425,40 @@ const COLORS=["#ff4d4d","#4dff88","#4da6ff","#ffd24d","#b366ff"];
 let pieces=[];
 
 /* ===== SPAWN ===== */
-function spawnPieces(){
- pieces=[];
- let x=30;
- while(pieces.length<3){
-  const s=SHAPES[Math.random()*SHAPES.length|0];
-  const c=COLORS[Math.random()*COLORS.length|0];
-  pieces.push({shape:s,color:c,scale:PREVIEW_SCALE,x,y:PREVIEW_Y});
-  x+=s[0].length*34*PREVIEW_SCALE+28;
- }
- if(!canAnyMove())endGame();
+  
+  function spawnPieces(){
+  pieces = [];
+
+  // 🔢 Hitung total lebar semua puzzle preview
+  let totalWidth = 0;
+  const temp = [];
+
+  for(let i=0;i<3;i++){
+    const shape = SHAPES[Math.random()*SHAPES.length|0];
+    const color = COLORS[Math.random()*COLORS.length|0];
+    const w = shape[0].length * 34 * PREVIEW_SCALE;
+    temp.push({ shape, color, w });
+    totalWidth += w;
+  }
+
+  const GAP = 28;
+  totalWidth += GAP * (temp.length - 1);
+
+  // 🎯 CENTER horizontal di canvas
+  let startX = (canvas.width - totalWidth) / 2;
+
+  temp.forEach(t=>{
+    pieces.push({
+      shape: t.shape,
+      color: t.color,
+      scale: PREVIEW_SCALE,
+      x: startX,
+      y: PREVIEW_Y
+    });
+    startX += t.w + GAP;
+  });
+
+  if(!canAnyMove()) endGame();
 }
 
 /* ===== CHECK ===== */
@@ -505,7 +549,14 @@ function clearLines(){
 }
 
 /* ===== DRAW LOOP ===== */
+/*function draw(){*/
 function draw(){
+ if(paused){
+  requestAnimationFrame(draw);
+  return;
+ }
+
+ ctx.clearRect(0,0,canvas.width,canvas.height);
  ctx.clearRect(0,0,canvas.width,canvas.height);
 
  for(let y=0;y<GRID;y++)
@@ -565,7 +616,10 @@ function getCanvasPos(e){
   y:(e.clientY-r.top)*(canvas.height/r.height)
  };
 }
+/*canvas.addEventListener("pointerdown",e=>{*/
 canvas.addEventListener("pointerdown",e=>{
+ if(paused) return;
+ startBGM();
  const {x,y}=getCanvasPos(e);
  canvas.setPointerCapture(e.pointerId);
  for(const p of pieces){
@@ -581,13 +635,17 @@ canvas.addEventListener("pointerdown",e=>{
   }
  }
 });
+/*canvas.addEventListener("pointermove",e=>{*/
 canvas.addEventListener("pointermove",e=>{
+ if(paused) return;
  if(!dragging)return;
  const {x,y}=getCanvasPos(e);
  dragging.x=x-dragOffset.x;
  dragging.y=y-dragOffset.y;
 });
+/*canvas.addEventListener("pointerup",e=>{*/
 canvas.addEventListener("pointerup",e=>{
+ if(paused) return;
  if(!dragging)return;
  const gx=Math.round((dragging.x-BOARD_X)/34);
  const gy=Math.round((dragging.y-BOARD_Y)/34);
@@ -604,8 +662,12 @@ canvas.addEventListener("pointerup",e=>{
  if(!canAnyMove())endGame();
 });
   
-  function endGame(){
+  /*function endGame(){
+ gameOver=true;*/
+    function endGame(){
  gameOver=true;
+ paused = true;
+ bgm.pause();   
  finalScoreEl.textContent=score;
 
  saveScore(score);        // ⬅️ SIMPAN SCORE
@@ -615,13 +677,34 @@ canvas.addEventListener("pointerup",e=>{
  gameOverSound();
 }
   
-function restart(){
+/*function restart(){*/
+  function restart(){
+ paused = false;
+ pauseBtn.textContent = "⏸";
+ bgm.play().catch(()=>{});
  board.forEach(r=>r.fill(null));
  score=0;scoreEl.textContent=0;
  gameOver=false;
  panel.classList.remove("show");
  spawnPieces();
 }
+  const pauseBtn = document.querySelector(".pause-btn");
+
+function togglePause(){
+  if(gameOver) return;
+
+  paused = !paused;
+  pauseBtn.textContent = paused ? "▶️" : "⏸";
+
+  if(paused){
+    bgm.pause();
+  }else{
+    bgm.play().catch(()=>{});
+  }
+}
+
+pauseBtn.addEventListener("click", togglePause);
+  
   /* === SERVICE WORKER === */
 if ("serviceWorker" in navigator) {
   const swCode = `
