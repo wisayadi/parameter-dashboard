@@ -142,7 +142,7 @@
 canvas{
   position:absolute;
   left:50%;
-  top:90px;
+  top:140px;
   transform:translateX(-50%);
   z-index:1;
   /*pointer-events: auto;*/
@@ -212,8 +212,8 @@ canvas{
 /* === APP CONTROLS (FULLSCREEN KECIL) === */
 .app-controls{
   position:absolute;
-  top:2px;          /* ⬅️ di atas scoreboard */
-  left:1px;        /* ⬅️ pojok kiri */
+  top:5px;          /* ⬅️ di atas scoreboard */
+  left:10px;        /* ⬅️ pojok kiri */
   z-index:2001;     /* ⬅️ di atas scoreboard */
   /*pointer-events: auto;*/
 }
@@ -373,11 +373,8 @@ const leaderboardList=document.getElementById("leaderboardList");
 const FLOAT_OFFSET_Y = 80; // jarak puzzle di atas jari (px)
 const GRID=10,CELL=30;
 const BOARD_X = (380 - GRID * 34) / 2; // ⬅️ CENTER BOARD
-const BOARD_Y = 30;                   // ⬅️ NAIK
+const BOARD_Y = 30;   // ⬅️ NAIK
 const PREVIEW_Y = BOARD_Y + GRID * 34 + 20;
-/*const BOARD_X=20,BOARD_Y=20;*/
-/*const BOARD_X = 20;
-const BOARD_Y = 70; // ⬅️ turun dari scoreboard*/
 const PREVIEW_SCALE=0.85;
 /*const PREVIEW_Y=370;*/
 const BOARD_HEIGHT = GRID * 34;
