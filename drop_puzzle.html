@@ -6,6 +6,23 @@
 <title>Glass Puzzle Neo – 3D Bevel</title>
 
 <style>
+    :root{
+  --custom-bg: none;
+}
+/* === CUSTOM BACKGROUND LAYER (AMAN) === */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:var(--custom-bg);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  z-index:-1;               /* ⬅️ DI BAWAH SEMUA */
+  pointer-events:none;      /* ⬅️ DRAG AMAN */
+  transition:.4s;
+}    
+  
    /* 🌳 BACKGROUND PAPAN KAYU */
   body{
   position:relative; /* ⬅️ WAJIB */
@@ -57,7 +74,7 @@
   padding:10px 18px;
   background:linear-gradient(180deg,#7a4a2e,#4b2a16);
   border-radius:18px;
-  margin-top: 25px;
+  margin-top: 35px;
   box-shadow:
     inset 0 2px 4px rgba(255,255,255,.25),
     inset 0 -3px 6px rgba(0,0,0,.5),
@@ -237,13 +254,57 @@ canvas{
 .app-controls button:active{
   transform:scale(.92);
 }  
+  .settings-btn{
+  position:absolute;
+  top:4px;
+  right:10px;
+  z-index:2002; /* ⬅️ di atas app-controls */
+  width:31px;
+  height:31px;
+  border:none;
+  border-radius:8px;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  color:white;
+  font-size:15px;
+  cursor:pointer;
+}
+  
+  .settings-panel{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:3000;
+}
+.settings-panel.show{display:flex}
+
+.settings-box{
+  background:rgba(30,30,30,.92);
+  padding:22px 26px;
+  border-radius:20px;
+  width:260px;
+  text-align:center;
+}
+.settings-box button{
+  width:100%;
+  margin-top:12px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+}
 
 </style>
 </head>
 <body>
 
-  <!-- <div class="score">SCORE <span id="score">0</span></div>
- <div class="highscore">HIGH <span id="highScore">0</span></div> -->
+  <!-- ⚙️ SETTINGS BUTTON -->
+<button class="settings-btn" onclick="openSettings()">⚙️</button>
+  
   <div class="score-board">
   <div class="score-box left">
     <span id="score">0</span>
@@ -259,6 +320,18 @@ canvas{
 
   <button class="pause-btn">⏸</button>
 </div>
+  
+  <div class="settings-panel" id="settingsPanel">
+  <div class="settings-box">
+    <h3>🎨 Background</h3>
+    <button onclick="pickBg()">📁 Pilih dari Galeri</button>
+    <button onclick="resetBg()">♻️ Kembali Default</button>
+    <button onclick="closeSettings()">❌ Tutup</button>
+  </div>
+</div>
+
+<input type="file" id="bgInput" accept="image/*" hidden>
+  
   <!-- === APP CONTROLS (FULLSCREEN & INSTALL) === -->
 <div class="app-controls">
   <button id="fsBtn" title="Fullscreen">⛶</button>
@@ -650,13 +723,6 @@ function draw(){
 }
 
 /* ===== INPUT ===== */
-/**function getCanvasPos(e){
- const r=canvas.getBoundingClientRect();
- return{
-  x:(e.clientX-r.left)*(canvas.width/r.width),
-  y:(e.clientY-r.top)*(canvas.height/r.height)
- };
-}**/
   function getCanvasPos(e){
   const r = canvas.getBoundingClientRect();
   const scaleX = 380 / r.width;
@@ -667,8 +733,6 @@ function draw(){
     y: (e.clientY - r.top)  * scaleY
   };
 }
-/*canvas.addEventListener("pointerdown",e=>{*/
-/*canvas.addEventListener("pointerdown",e=>{*/
   canvas.addEventListener("pointerdown", e => {
   e.preventDefault();      // ⬅️ WAJIB
   canvas.focus?.();
@@ -716,9 +780,8 @@ canvas.addEventListener("pointerup",e=>{
  if(!canAnyMove())endGame();
 });
   
-  /*function endGame(){
- gameOver=true;*/
-    function endGame(){
+  /*function endGame(){*/
+   function endGame(){
  gameOver=true;
  paused = true;
  bgm.pause();   
@@ -758,6 +821,48 @@ function togglePause(){
 }
 
 pauseBtn.addEventListener("click", togglePause);
+  
+  /* ================= CUSTOM BACKGROUND ================= */
+const bgInput = document.getElementById("bgInput");
+const settingsPanel = document.getElementById("settingsPanel");
+
+function openSettings(){
+  settingsPanel.classList.add("show");
+}
+function closeSettings(){
+  settingsPanel.classList.remove("show");
+}
+
+function pickBg(){
+  bgInput.click();
+}
+
+bgInput.addEventListener("change",()=>{
+  const file = bgInput.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    document.documentElement.style.setProperty(
+      "--custom-bg", `url(${e.target.result})`
+    );
+    localStorage.setItem("customBG", e.target.result);
+  };
+  reader.readAsDataURL(file);
+});
+
+function resetBg(){
+  document.documentElement.style.setProperty("--custom-bg","none");
+  localStorage.removeItem("customBG");
+}
+
+/* LOAD SAVED BG */
+const savedBg = localStorage.getItem("customBG");
+if(savedBg){
+  document.documentElement.style.setProperty(
+    "--custom-bg", `url(${savedBg})`
+  );
+}
   
   /* === SERVICE WORKER === */
 if ("serviceWorker" in navigator) {
