@@ -160,19 +160,6 @@ body::before{
   font-weight:700;
   box-shadow:0 10px 30px rgba(0,0,0,.45);
 }
-/*canvas{
-  position:absolute;
-  z-index:1;
-  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));
-  border-radius:26px;
-  backdrop-filter:blur(18px);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),
-             0 25px 60px rgba(0,0,0,.45);
-  touch-action:none;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-}*/
 
 canvas{
   position:absolute;
@@ -281,9 +268,9 @@ canvas{
   height:31px;
   border:none;
   border-radius:8px;
-  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  background:/*linear-gradient(135deg,#38bdf8,#818cf8)*/lightgreen;
   color:white;
-  font-size:15px;
+  font-size:14px;
   cursor:pointer;
 }
   
@@ -345,8 +332,10 @@ canvas{
 
   <!-- PRESET -->
   <button onclick="setPreset('wood')">🌳 Kayu</button>
-  <button onclick="setPreset('marble')">🪨 Marmer</button>
+        <button onclick="setPreset('marble')">🪨 Marmer</button> 
+       <!--;<button onclick="setPreset('marble')">🧱 Bata</button> -->    
   <button onclick="setPreset('glass')">🧊 Kaca</button>
+  <button onclick="setPreset('dark')">🌑 Dark Modern</button>     
 
   <hr style="opacity:.2;margin:12px 0">
 
@@ -356,7 +345,7 @@ canvas{
 
   <hr style="opacity:.2;margin:12px 0">
 
-  <button onclick="clearPreset()">❌ Matikan Preset</button>
+       <!-- <button onclick="clearPreset()">❌ Matikan Preset</button> -->
   <button onclick="closeSettings()">Tutup</button>
 </div>
 </div>
@@ -894,10 +883,17 @@ if(savedBg){
   );
 }
    /* LOAD SAVED PRESET */
+/*const savedPreset = localStorage.getItem("presetBG");
+if(savedPreset){
+  setPreset(savedPreset);
+}*/ 
+  /* LOAD SAVED PRESET (DEFAULT DARK) */
 const savedPreset = localStorage.getItem("presetBG");
 if(savedPreset){
   setPreset(savedPreset);
-} 
+}else{
+  setPreset("dark"); // ⬅️ DEFAULT BACKGROUND
+}
     
     /* ================= PRESET BACKGROUND ================= */
 function setPreset(type){
@@ -923,13 +919,20 @@ function setPreset(type){
       linear-gradient(180deg,#cfcfcf,#9f9f9f)
     `;
   }
-
-  if(type === "glass"){
+  
+ if(type === "glass"){
     bg = `
       linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,.05)),
       radial-gradient(circle at top,rgba(255,255,255,.45),transparent 60%)
     `;
   }
+  if(type === "dark"){
+  bg = `
+    radial-gradient(circle at top left, rgba(90,110,255,.25), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(255,80,120,.22), transparent 65%),
+    linear-gradient(180deg, #0f1220 0%, #151a2f 45%, #0a0d18 100%)
+  `;
+}
 
   document.documentElement.style.setProperty("--preset-bg", bg);
   localStorage.setItem("presetBG", type);
