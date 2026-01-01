@@ -6,9 +6,27 @@
 <title>Glass Puzzle Neo – 3D Bevel</title>
 
 <style>
-    :root{
+    /*:root{
   --custom-bg: none;
+}*/
+  :root{
+  --custom-bg: none;
+  --preset-bg: none;   /* ⬅️ BARU */
 }
+
+/* === PRESET BACKGROUND LAYER === */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:var(--preset-bg);
+  background-size:cover;
+  background-position:center;
+  z-index:-2;          /* ⬅️ DI BAWAH custom bg */
+  pointer-events:none;
+  transition:.4s;
+}
+  
 /* === CUSTOM BACKGROUND LAYER (AMAN) === */
 body::before{
   content:"";
@@ -322,14 +340,27 @@ canvas{
 </div>
   
   <div class="settings-panel" id="settingsPanel">
-  <div class="settings-box">
-    <h3>🎨 Background</h3>
-    <button onclick="pickBg()">📁 Pilih dari Galeri</button>
-    <button onclick="resetBg()">♻️ Kembali Default</button>
-    <button onclick="closeSettings()">❌ Tutup</button>
-  </div>
-</div>
+     <div class="settings-box">
+  <h3>🎨 Background</h3>
 
+  <!-- PRESET -->
+  <button onclick="setPreset('wood')">🌳 Kayu</button>
+  <button onclick="setPreset('marble')">🪨 Marmer</button>
+  <button onclick="setPreset('glass')">🧊 Kaca</button>
+
+  <hr style="opacity:.2;margin:12px 0">
+
+  <!-- CUSTOM -->
+  <button onclick="pickBg()">📁 Pilih dari Galeri</button>
+  <button onclick="resetBg()">♻️ Reset Custom</button>
+
+  <hr style="opacity:.2;margin:12px 0">
+
+  <button onclick="clearPreset()">❌ Matikan Preset</button>
+  <button onclick="closeSettings()">Tutup</button>
+</div>
+</div>
+  
 <input type="file" id="bgInput" accept="image/*" hidden>
   
   <!-- === APP CONTROLS (FULLSCREEN & INSTALL) === -->
@@ -339,7 +370,7 @@ canvas{
 </div>
 
   <!--<canvas id="game" width="380" height="520"></canvas> -->
-  <canvas id="game"></canvas>
+  <canvas id="game" width="380" height="520"></canvas>
 
 <div id="gameOverPanel">
   <div class="panel">
@@ -446,7 +477,7 @@ const leaderboardList=document.getElementById("leaderboardList");
 const FLOAT_OFFSET_Y = 80; // jarak puzzle di atas jari (px)
 const GRID=10,CELL=30;
 const BOARD_X = (380 - GRID * 34) / 2; // ⬅️ CENTER BOARD
-const BOARD_Y = 30;   // ⬅️ NAIK
+const BOARD_Y = 90;   // ⬅️ NAIK
 const PREVIEW_Y = BOARD_Y + GRID * 34 + 20;
 const PREVIEW_SCALE=0.85;
 /*const PREVIEW_Y=370;*/
@@ -861,6 +892,52 @@ if(savedBg){
   document.documentElement.style.setProperty(
     "--custom-bg", `url(${savedBg})`
   );
+}
+   /* LOAD SAVED PRESET */
+const savedPreset = localStorage.getItem("presetBG");
+if(savedPreset){
+  setPreset(savedPreset);
+} 
+    
+    /* ================= PRESET BACKGROUND ================= */
+function setPreset(type){
+  let bg = "none";
+
+  if(type === "wood"){
+    bg = `
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 2px,
+        rgba(0,0,0,0.04) 4px,
+        rgba(0,0,0,0.04) 6px
+      ),
+      linear-gradient(180deg,#7a4a2e,#4b2a16)
+    `;
+  }
+
+  if(type === "marble"){
+    bg = `
+      radial-gradient(circle at 30% 30%,rgba(255,255,255,.6),transparent 60%),
+      radial-gradient(circle at 70% 60%,rgba(255,255,255,.35),transparent 55%),
+      linear-gradient(180deg,#cfcfcf,#9f9f9f)
+    `;
+  }
+
+  if(type === "glass"){
+    bg = `
+      linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,.05)),
+      radial-gradient(circle at top,rgba(255,255,255,.45),transparent 60%)
+    `;
+  }
+
+  document.documentElement.style.setProperty("--preset-bg", bg);
+  localStorage.setItem("presetBG", type);
+}
+
+function clearPreset(){
+  document.documentElement.style.setProperty("--preset-bg", "none");
+  localStorage.removeItem("presetBG");
 }
   
   /* === SERVICE WORKER === */
