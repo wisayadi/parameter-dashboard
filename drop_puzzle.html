@@ -324,6 +324,37 @@ canvas{
   font-weight:700;
   cursor:pointer;
 }
+  /* ⏱ GAME TIMER */
+.game-timer{
+  position:fixed;
+  top:calc(env(safe-area-inset-top, 0px) + 115px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:999;
+
+  padding:6px 16px;
+  border-radius:14px;
+
+  font-family:var(--ui-font);
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:1px;
+
+  background:linear-gradient(180deg,#2b2b2b,#121212);
+  color:#00ffcc;
+
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.25),
+    0 6px 18px rgba(0,0,0,.6);
+}
+  .settings-box h3{
+  margin:8px 0 6px;
+  font-size:15px;
+}
+
+#timerOptions button{
+  margin-top:6px;
+}
 
 </style>
 </head>
@@ -348,14 +379,36 @@ canvas{
   <button class="pause-btn">⏸</button>
 </div>
   
+  <div class="game-timer" id="gameTimer">
+  ⏱ <span id="timeText">02:00</span>
+</div>
+  
   <div class="settings-panel" id="settingsPanel">
      <div class="settings-box">
   <h3>🎨 Background</h3>
+       
+     <hr style="opacity:.2;margin:12px 0">
+
+<h3>⏱️ Timer Game</h3>
+
+<label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+  <input type="checkbox" id="timerToggle">
+  Aktifkan Timer
+</label>
+
+<div id="timerOptions" style="margin-top:10px;">
+  <button onclick="setGameTime(180)">3 Menit</button>
+  <button onclick="setGameTime(360)">6 Menit</button>
+  <button onclick="setGameTime(600)">10 Menit</button>
+</div>
+
+<button onclick="setGameTime(0)" style="margin-top:10px;background:#555;">
+  ♾ Unlimited (Bypass)
+</button>
 
   <!-- PRESET -->
   <button onclick="setPreset('wood')">🌳 Kayu</button>
-        <button onclick="setPreset('marble')">🪨 Marmer</button> 
-       <!--;<button onclick="setPreset('marble')">🧱 Bata</button> -->    
+       <!-- <button onclick="setPreset('marble')">🪨 Marmer</button> -->   
   <button onclick="setPreset('glass')">🧊 Kaca</button>
   <button onclick="setPreset('dark')">🌑 Dark Modern</button>     
 
@@ -443,11 +496,125 @@ const manifest = {
     type: "image/png"
   }]
 };
+  
+/* ===== GAME TIMER ===== */
+let GAME_TIME = 120; // ⏱️ UBAH DI SINI (detik) → 120 = 2 menit
+let timeLeft = GAME_TIME;
+let timerInterval = null;
 
+const timeText = document.getElementById("timeText");
 const manifestBlob = new Blob(
   [JSON.stringify(manifest)],
   { type: "application/json" }
 );
+  function formatTime(sec){
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+  /*function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = GAME_TIME;
+  timeText.textContent = formatTime(timeLeft);
+
+  timerInterval = setInterval(()=>{
+    if(paused || gameOver) return;
+
+    timeLeft--;
+    timeText.textContent = formatTime(timeLeft);
+
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      timeText.textContent = "00:00";
+      paused = true;
+      pauseBtn.textContent = "▶️";
+      endGame();   // ⬅️ GAME BERAKHIR OTOMATIS
+    }
+  },1000);
+}*/
+  function startTimer(){
+  clearInterval(timerInterval);
+
+  if(!timerEnabled || GAME_TIME === 0){
+    return; // ⛔ BYPASS TIMER
+  }
+
+  timeLeft = GAME_TIME;
+  timeText.textContent = formatTime(timeLeft);
+
+  timerInterval = setInterval(()=>{
+    if(paused || gameOver) return;
+
+    timeLeft--;
+    timeText.textContent = formatTime(timeLeft);
+
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      timeText.textContent = "00:00";
+      paused = true;
+      pauseBtn.textContent = "▶️";
+      endGame();
+    }
+  },1000);
+}
+  
+  /* ===== TIMER SETTINGS ===== */
+let timerEnabled = true;
+
+// LOAD SETTING
+const savedTimerEnabled = localStorage.getItem("timerEnabled");
+const savedGameTime = localStorage.getItem("gameTime");
+
+if(savedTimerEnabled !== null){
+  timerEnabled = savedTimerEnabled === "true";
+}
+
+if(savedGameTime !== null){
+  GAME_TIME = Number(savedGameTime);
+}
+
+const timerToggle = document.getElementById("timerToggle");
+const timerOptions = document.getElementById("timerOptions");
+
+// INIT UI
+timerToggle.checked = timerEnabled;
+timerOptions.style.display = timerEnabled ? "block" : "none";
+document.getElementById("gameTimer").style.display =
+  timerEnabled && GAME_TIME > 0 ? "block" : "none";
+  
+  function setGameTime(sec){
+  GAME_TIME = sec;
+  localStorage.setItem("gameTime", sec);
+
+  if(sec === 0){
+    timerEnabled = false;
+    timerToggle.checked = false;
+    document.getElementById("gameTimer").style.display = "none";
+    clearInterval(timerInterval);
+  }else{
+    timerEnabled = true;
+    timerToggle.checked = true;
+    document.getElementById("gameTimer").style.display = "block";
+    startTimer();
+  }
+
+  localStorage.setItem("timerEnabled", timerEnabled);
+}
+  timerToggle.addEventListener("change", ()=>{
+  timerEnabled = timerToggle.checked;
+  localStorage.setItem("timerEnabled", timerEnabled);
+
+  if(!timerEnabled){
+    clearInterval(timerInterval);
+    document.getElementById("gameTimer").style.display = "none";
+  }else{
+    document.getElementById("gameTimer").style.display = "block";
+    startTimer();
+  }
+
+  timerOptions.style.display = timerEnabled ? "block" : "none";
+});
+  
 
 const manifestURL = URL.createObjectURL(manifestBlob);
 const link = document.createElement("link");
@@ -823,6 +990,8 @@ canvas.addEventListener("pointerup",e=>{
   
   /*function endGame(){*/
    function endGame(){
+    clearInterval(timerInterval);
+     
  gameOver=true;
  paused = true;
  bgm.pause();   
@@ -836,7 +1005,7 @@ canvas.addEventListener("pointerup",e=>{
 }
   
 /*function restart(){*/
-  function restart(){
+ /* function restart(){
  paused = false;
  pauseBtn.textContent = "⏸";
  bgm.play().catch(()=>{});
@@ -845,7 +1014,25 @@ canvas.addEventListener("pointerup",e=>{
  gameOver=false;
  panel.classList.remove("show");
  spawnPieces();
+}*/
+  function restart(){
+ paused = false;
+ pauseBtn.textContent = "⏸";
+ bgm.play().catch(()=>{});
+
+ board.forEach(r=>r.fill(null));
+ score = 0;
+ scoreEl.textContent = 0;
+ gameOver = false;
+
+ panel.classList.remove("show");
+
+ clearInterval(timerInterval);
+ startTimer();          // ⬅️ RESET TIMER
+
+ spawnPieces();
 }
+  
   const pauseBtn = document.querySelector(".pause-btn");
 
 function togglePause(){
@@ -985,7 +1172,9 @@ if ("serviceWorker" in navigator) {
   );
 }
 renderLeaderboard();
-spawnPieces();draw();
+spawnPieces();
+ startTimer();
+  draw();
 </script>
 </body>
 </html>
