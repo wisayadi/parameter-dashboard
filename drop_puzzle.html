@@ -6,10 +6,10 @@
 <title>Glass Puzzle Neo – 3D Bevel</title>
 
 <style>
-    /*:root{
-  --custom-bg: none;
-}*/
+  
+  /*:root{*/
   :root{
+  --ui-font: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --custom-bg: none;
   --preset-bg: none;   /* ⬅️ BARU */
 }
@@ -82,62 +82,84 @@ body::before{
   
   /* 🏆 SCORE BOARD KAYU */
 .score-board{
-  z-index:1000;        /* ⬅️ NAIK KE ATAS */
+  position:fixed;
+  top:calc(env(safe-area-inset-top, 0px) + 50px);
+  left:50%;
+  transform:translateX(-50%);
+
+  z-index:1000;
   pointer-events:auto;
-  position:absolute;
-  top:14px;
+
   display:flex;
   align-items:center;
-  gap:14px;
-  padding:10px 18px;
+  justify-content:center;
+  gap:10px;
+
+  padding:12px 20px;
+  min-height:56px;              /* ⬅️ KUNCI */
+  width:fit-content;            /* ⬅️ PAPAN IKUT ISI */
+  max-width:calc(100vw - 40px);
+
+  box-sizing:border-box;
+  overflow:hidden;              /* ⬅️ POTONG KELUAR */
+
   background:linear-gradient(180deg,#7a4a2e,#4b2a16);
-  border-radius:18px;
-  margin-top: 35px;
+  border-radius:20px;
+
   box-shadow:
     inset 0 2px 4px rgba(255,255,255,.25),
     inset 0 -3px 6px rgba(0,0,0,.5),
     0 10px 30px rgba(0,0,0,.6);
-}
-
-/* SCORE BOX */
-.score-box{
-  min-width:72px;
-  padding:8px 14px;
+} 
+  
+  .score-box{
+  min-width:64px;          /* lebih ramping */
+  padding:6px 12px;       /* ⬅️ kecil & proporsional */
   background:linear-gradient(180deg,#8b5a3c,#5a3722);
   border-radius:12px;
+
   text-align:center;
-  font-weight:900;
-  font-size:20px;
+  font-family:var(--ui-font);
+  font-weight:800;
+  font-size:16px;         /* ⬅️ sebelumnya 20px */
+  letter-spacing:.5px;   /* ⬅️ lebih elegan */
+
   color:#ffe8b0;
   box-shadow:
     inset 0 2px 4px rgba(255,255,255,.3),
     inset 0 -2px 6px rgba(0,0,0,.6);
 }
 
-/* TROPHY */
-.trophy{
-  font-size:26px;
+  .trophy{
+  font-size:22px;   /* ⬅️ dari 26px */
   filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
 }
 
 /* PAUSE BUTTON */
 .pause-btn{
-  margin-left:6px;
-  width:38px;
-  height:38px;
+  width:32px;        /* ⬅️ dari 36 */
+  height:32px;
   border:none;
-  border-radius:10px;
+  border-radius:9px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:14px;    /* ⬅️ dari 18 */
+  font-weight:700;
+
   background:linear-gradient(180deg,#d4a94c,#a97c1a);
-  font-size:18px;
   cursor:pointer;
+
   box-shadow:
     inset 0 2px 4px rgba(255,255,255,.35),
     inset 0 -3px 6px rgba(0,0,0,.6);
 }
+
 .pause-btn:active{
-  transform:scale(.95);
-}
-  
+  transform:scale(.92);
+}  
 .score{
   position:absolute;
   top:18px;
