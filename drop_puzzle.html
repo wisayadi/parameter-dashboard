@@ -347,15 +347,37 @@ canvas{
     inset 0 1px 2px rgba(255,255,255,.25),
     0 6px 18px rgba(0,0,0,.6);
 }
-  .settings-box h3{
-  margin:8px 0 6px;
-  font-size:15px;
+ /* 🚪 EXIT DI SETTINGS */
+.timer-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
 }
 
-#timerOptions button{
-  margin-top:6px;
+.exit-btn-settings{
+  padding:6px 10px;
+  border:none;
+  border-radius:10px;
+
+  font-family:var(--ui-font);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.5px;
+
+  color:white;
+  background:linear-gradient(135deg,#ff3b3b,#b30000);
+
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.3),
+    0 4px 10px rgba(0,0,0,.5);
+
+  cursor:pointer;
 }
 
+.exit-btn-settings:active{
+  transform:scale(.92);
+}
 </style>
 </head>
 <body>
@@ -378,10 +400,11 @@ canvas{
 
   <button class="pause-btn">⏸</button>
 </div>
-  
+   
   <div class="game-timer" id="gameTimer">
-  ⏱ <span id="timeText">02:00</span>
-</div>
+    ⏱ <span id="timeText">02:00</span>
+  </div>
+</div>  
   
   <div class="settings-panel" id="settingsPanel">
      <div class="settings-box">
@@ -391,11 +414,17 @@ canvas{
 
 <h3>⏱️ Timer Game</h3>
 
-<label style="display:flex;align-items:center;gap:8px;font-size:14px;">
-  <input type="checkbox" id="timerToggle">
-  Aktifkan Timer
-</label>
+<div class="timer-row">
+  <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+    <input type="checkbox" id="timerToggle">
+    Aktifkan Timer
+  </label>
 
+  <button class="exit-btn-settings" onclick="exitGame()">
+    EXIT
+  </button>
+</div>
+       
 <div id="timerOptions" style="margin-top:10px;">
   <button onclick="setGameTime(180)">3 Menit</button>
   <button onclick="setGameTime(360)">6 Menit</button>
@@ -1009,17 +1038,6 @@ canvas.addEventListener("pointerup",e=>{
  gameOverSound();
 }
   
-/*function restart(){*/
- /* function restart(){
- paused = false;
- pauseBtn.textContent = "⏸";
- bgm.play().catch(()=>{});
- board.forEach(r=>r.fill(null));
- score=0;scoreEl.textContent=0;
- gameOver=false;
- panel.classList.remove("show");
- spawnPieces();
-}*/
   function restart(){
  paused = false;
  pauseBtn.textContent = "⏸";
@@ -1036,6 +1054,26 @@ canvas.addEventListener("pointerup",e=>{
  startTimer();          // ⬅️ RESET TIMER
 
  spawnPieces();
+}
+  function exitGame(){
+  if(!confirm("Keluar dari permainan? Progress tidak disimpan.")) return;
+
+  bgm.pause();
+  clearInterval(timerInterval);
+
+  // keluar fullscreen jika aktif
+  if(document.fullscreenElement){
+    document.exitFullscreen();
+  }
+
+  // reset state
+  gameOver = true;
+  paused = true;
+
+  // arahkan keluar (ubah sesuai kebutuhanmu)
+  window.location.href = "about:blank";
+  // atau:
+  // window.history.back();
 }
   
   const pauseBtn = document.querySelector(".pause-btn");
