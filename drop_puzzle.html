@@ -1055,7 +1055,7 @@ canvas.addEventListener("pointerup",e=>{
 
  spawnPieces();
 }
-  function exitGame(){
+ /*function exitGame(){
   if(!confirm("Keluar dari permainan? Progress tidak disimpan.")) return;
 
   bgm.pause();
@@ -1074,6 +1074,23 @@ canvas.addEventListener("pointerup",e=>{
   window.location.href = "about:blank";
   // atau:
   // window.history.back();
+}*/
+ function exitGame(){
+  if(!confirm("Keluar dari permainan?")) return;
+
+  bgm.pause();
+  clearInterval(timerInterval);
+
+  if(document.fullscreenElement){
+    document.exitFullscreen();
+  }
+
+  // ⬅️ KEMBALI KE PAGE SEBELUMNYA
+  if(history.length > 1){
+    history.back();
+  }else{
+    window.location.href = "/";
+  }
 }
   
   const pauseBtn = document.querySelector(".pause-btn");
