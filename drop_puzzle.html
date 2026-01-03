@@ -655,7 +655,7 @@ const leaderboardList=document.getElementById("leaderboardList");
 const FLOAT_OFFSET_Y = 80; // jarak puzzle di atas jari (px)
 const GRID=10,CELL=30;
 const BOARD_X = (380 - GRID * 34) / 2; // ⬅️ CENTER BOARD
-const BOARD_Y = 90;   // ⬅️ NAIK
+const BOARD_Y = 75;   // ⬅️ NAIK
 const PREVIEW_Y = BOARD_Y + GRID * 34 + 20;
 const PREVIEW_SCALE=0.85;
 /*const PREVIEW_Y=370;*/
@@ -751,26 +751,30 @@ let pieces=[];
   function spawnPieces(){
   pieces = [];
 
-  // 🔢 Hitung total lebar semua puzzle preview
-  let totalWidth = 0;
-  const temp = [];
+  // 🔀 clone & shuffle agar unik
+  const shapePool = [...SHAPES].sort(() => Math.random() - 0.5);
+  const colorPool = [...COLORS].sort(() => Math.random() - 0.5);
 
-  for(let i=0;i<3;i++){
-    const shape = SHAPES[Math.random()*SHAPES.length|0];
-    const color = COLORS[Math.random()*COLORS.length|0];
+  const GAP = 28;
+  const temp = [];
+  let totalWidth = 0;
+
+  // 🎯 Ambil 3 SHAPE & WARNA berbeda
+  for(let i = 0; i < 3; i++){
+    const shape = shapePool[i];
+    const color = colorPool[i];
+
     const w = shape[0].length * 34 * PREVIEW_SCALE;
     temp.push({ shape, color, w });
     totalWidth += w;
   }
 
-  const GAP = 28;
   totalWidth += GAP * (temp.length - 1);
 
-  // 🎯 CENTER horizontal di canvas
-  /*let startX = (canvas.width - totalWidth) / 2;*/
-   let startX = (380 - totalWidth) / 2;
+  // 🎯 center horizontal
+  let startX = (380 - totalWidth) / 2;
 
-  temp.forEach(t=>{
+  temp.forEach(t => {
     pieces.push({
       shape: t.shape,
       color: t.color,
@@ -781,6 +785,7 @@ let pieces=[];
     startX += t.w + GAP;
   });
 
+  // ❌ jika tidak ada kemungkinan langkah → game over
   if(!canAnyMove()) endGame();
 }
 
