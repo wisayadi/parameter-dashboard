@@ -264,7 +264,7 @@ header p{margin:2px 0 0;font-size:9px;opacity:.85}
    
   /* Tombol suara */
   #soundBtn {
-    margin-bottom:20px;
+    margin-bottom:0;
     background: linear-gradient(90deg, #4facfe, #00f2fe);
     color: purple;
     border: none;
@@ -275,6 +275,47 @@ header p{margin:2px 0 0;font-size:9px;opacity:.85}
     transition: transform 0.2s ease;
   }
    #soundBtn:hover { transform: scale(1.05); }
+   
+   /* ================== BOTTOM ACTION BUTTONS ================== */
+.bottom-action{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin: 20px auto 10px;
+}
+
+/* BASE STYLE (BIAR UKURAN SAMA PERSIS) */
+#soundBtn,
+#gameBtn{
+  min-width: 100px;
+  height: 30px;
+  font-size: 11px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.25);
+  transition: all .25s ease;
+}
+
+/* HOVER EFFECT */
+#soundBtn:hover,
+#gameBtn:hover{
+  transform: translateY(-2px) scale(1.05);
+}
+   /* 🎮 GAME BUTTON - GREEN GLASS */
+#gameBtn{
+  background: linear-gradient(
+    135deg,
+    rgba(76,175,80,.45),
+    rgba(129,199,132,.35)
+  );
+  color: #eaffea;
+  border: 1px solid rgba(255,255,255,.35);
+  text-shadow: 0 0 6px rgba(0,255,120,.6);
+}
 
   footer { font-size: 9px; color: /*#666*/brown; padding: 6px 0; background: #f9fff9; border-top: 1px solid #e0e0e0; }
 
@@ -653,8 +694,11 @@ function goDashboard() {
 <!-- ============ PING INDICATOR ============ -->
 <div id="pingBox" class="ping-indicator">🔄 Ping...</div>
  
-
+<div class="bottom-action">
   <button id="soundBtn" onclick="toggleSound()">🔊 Aktifkan Suara</button>
+  <button id="gameBtn" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/drop_puzzle_1.html')">🎮 Game</button>
+</div>
+      <!-- <button id="soundBtn" onclick="toggleSound()">🔊 Aktifkan Suara</button> -->
   <footer>© 2025 Dashboard Cardipa</footer>
       
 <script>
