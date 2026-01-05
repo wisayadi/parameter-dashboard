@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Glass Puzzle Neo – Studio Edition</title>
+
+<meta name="theme-color" content="#3f220f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<style>
+/* ===================================================== */
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+html,body{width:100%;height:100%;overflow:hidden}
+
+/* ===================================================== */
+/* INTRO CINEMATIC */
+#intro{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+  background:
+    radial-gradient(circle at 30% 20%,#ffb74d,#ff7043 40%,#2a1208 80%),
+    linear-gradient(160deg,#140a05,#000);
+}
+
+.light{
+  position:absolute;
+  width:160%;
+  height:160%;
+  background:linear-gradient(120deg,
+    transparent 45%,
+    rgba(255,255,255,.25),
+    transparent 55%);
+  animation:sweep 3s ease-in-out infinite;
+}
+@keyframes sweep{
+  from{transform:translateX(-120%)}
+  to{transform:translateX(120%)}
+}
+
+.stage{
+  width:min(360px,88vw);
+  padding:48px 34px;
+  border-radius:32px;
+  background:rgba(255,255,255,.14);
+  backdrop-filter:blur(24px);
+  box-shadow:
+    0 40px 120px rgba(0,0,0,.85),
+    inset 0 0 25px rgba(255,255,255,.25);
+  text-align:center;
+  animation:stageIn 1.4s cubic-bezier(.2,1.4,.3,1);
+}
+@keyframes stageIn{
+  from{opacity:0;transform:scale(.6)}
+  to{opacity:1;transform:scale(1)}
+}
+
+.logo{
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:2px;
+  color:white;
+  text-shadow:
+    0 0 20px rgba(255,255,255,.6),
+    0 20px 50px rgba(0,0,0,.9);
+}
+
+.blocks{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin:30px 0;
+}
+.block{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.5),
+    0 12px 28px rgba(0,0,0,.7);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.block:nth-child(1){background:#ff5252}
+.block:nth-child(2){background:#ffeb3b;animation-delay:.2s}
+.block:nth-child(3){background:#4caf50;animation-delay:.4s}
+.block:nth-child(4){background:#2196f3;animation-delay:.6s}
+@keyframes pulse{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-22px)}
+}
+
+.text{color:#fff;font-size:14px;opacity:.9}
+.bar{
+  margin-top:14px;
+  width:100%;
+  height:10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.25);
+  overflow:hidden;
+}
+.fill{
+  height:100%;
+  width:0;
+  background:linear-gradient(90deg,#ffeb3b,#ff7043);
+  animation:load 3.2s ease forwards;
+}
+@keyframes load{to{width:100%}}
+
+#intro.hide{
+  animation:introOut 1s forwards;
+}
+@keyframes introOut{
+  to{opacity:0;transform:scale(1.3)}
+}
+
+/* ===================================================== */
+/* GAME WRAP */
+#gameWrap{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 1s;
+}
+  root{
+  --ui-font: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --custom-bg: none;
+  --preset-bg: none;   /* ⬅️ BARU */
+}
+
+/* === PRESET BACKGROUND LAYER === */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:var(--preset-bg);
+  background-size:cover;
+  background-position:center;
+  z-index:-2;          /* ⬅️ DI BAWAH custom bg */
+  pointer-events:none;
+  transition:.4s;
+}
+  
+/* === CUSTOM BACKGROUND LAYER (AMAN) === */
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:var(--custom-bg);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  z-index:-1;               /* ⬅️ DI BAWAH SEMUA */
+  pointer-events:none;      /* ⬅️ DRAG AMAN */
+  transition:.4s;
+}    
+  
+   /* 🌳 BACKGROUND PAPAN KAYU */
+  body{
+  position:relative; /* ⬅️ WAJIB */
+  margin:0;
+  overflow: hidden;
+  background:
+    /* serat kayu halus */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 2px,
+      rgba(0,0,0,0.04) 4px,
+      rgba(0,0,0,0.04) 6px
+    ),
+    /* warna dasar kayu */
+    linear-gradient(
+      180deg,
+      #6f3f1f 0%,
+      #5a3118 40%,
+      #3f220f 100%
+    ),
+    /* vignette */
+    radial-gradient(
+      circle at center,
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.45) 100%
+    );
+
+  background-blend-mode:overlay,normal,normal;
+  position: relative;
+  /*display:flex;
+  justify-content:center;
+  align-items:center;*/
+  height:100vh;
+  color:white;
+  font-family:system-ui;
+  overflow:hidden;
+}
+  
+  /* 🏆 SCORE BOARD KAYU */
+.score-board{
+  position:fixed;
+  top:calc(env(safe-area-inset-top, 0px) + 50px);
+  left:50%;
+  transform:translateX(-50%);
+
+  z-index:1000;
+  pointer-events:auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  padding:12px 20px;
+  min-height:56px;              /* ⬅️ KUNCI */
+  width:fit-content;            /* ⬅️ PAPAN IKUT ISI */
+  max-width:calc(100vw - 40px);
+
+  box-sizing:border-box;
+  overflow:hidden;              /* ⬅️ POTONG KELUAR */
+
+  background:linear-gradient(180deg,#7a4a2e,#4b2a16);
+  border-radius:20px;
+
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.25),
+    inset 0 -3px 6px rgba(0,0,0,.5),
+    0 10px 30px rgba(0,0,0,.6);
+} 
+  
+  .score-box{
+  min-width:64px;          /* lebih ramping */
+  padding:6px 12px;       /* ⬅️ kecil & proporsional */
+  background:linear-gradient(180deg,#8b5a3c,#5a3722);
+  border-radius:12px;
+
+  text-align:center;
+  font-family:var(--ui-font);
+  font-weight:800;
+  font-size:16px;         /* ⬅️ sebelumnya 20px */
+  letter-spacing:.5px;   /* ⬅️ lebih elegan */
+
+  color:#ffe8b0;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.3),
+    inset 0 -2px 6px rgba(0,0,0,.6);
+}
+
+  .trophy{
+  font-size:22px;   /* ⬅️ dari 26px */
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.6));
+}
+
+/* PAUSE BUTTON */
+.pause-btn{
+  width:32px;        /* ⬅️ dari 36 */
+  height:32px;
+  border:none;
+  border-radius:9px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:14px;    /* ⬅️ dari 18 */
+  font-weight:700;
+
+  background:linear-gradient(180deg,#d4a94c,#a97c1a);
+  cursor:pointer;
+
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.35),
+    inset 0 -3px 6px rgba(0,0,0,.6);
+}
+
+.pause-btn:active{
+  transform:scale(.92);
+}  
+.score{
+  position:absolute;
+  top:18px;
+  padding:10px 20px;
+  background:rgba(255,255,255,.12);
+  backdrop-filter:blur(14px);
+  border-radius:20px;
+  font-weight:700;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
+  /* HIGH SCORE */
+.highscore{
+  position:absolute;
+  top:18px;
+  right:18px;
+  padding:10px 18px;
+  background:rgba(0,0,0,.35);
+  backdrop-filter:blur(10px);
+  border-radius:18px;
+  font-weight:700;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);
+}
+
+canvas{
+  position:absolute;
+  left:50%;
+  top:140px;
+  transform:translateX(-50%);
+  z-index:1;
+  /*pointer-events: auto;*/
+  touch-action: none;     /* ✅ WAJIB UNTUK DRAG MOBILE */
+} 
+  #gameOverPanel{
+  position:fixed;     /* ⬅️ FIX #1 */
+  inset:0;
+  z-index:9999;       /* ⬅️ FIX #2 (PALING PENTING) */
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(14px);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  pointer-events:none;
+  transition:.35s;
+}
+#gameOverPanel.show{opacity:1;pointer-events:auto}
+.panel{
+  background:linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,.08));
+  border-radius:26px;
+  padding:34px 42px;
+  text-align:center;
+}
+.panel button{
+  border:none;
+  padding:14px 36px;
+  border-radius:22px;
+  font-weight:700;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+}
+  /* LEADERBOARD */
+.leaderboard{
+  margin-top:16px;
+  text-align:left;
+  font-size:14px;
+}
+.leaderboard h3{
+  margin:8px 0;
+  font-size:16px;
+}
+.leaderboard li{
+  list-style:none;
+  padding:4px 0;
+  opacity:.9;
+}
+  .reset-btn{
+ margin-top:15px;
+ padding:5px 9px;
+ border:none;
+ border-radius:8px;
+ background:linear-gradient(135deg,#ff4d4d,#ff9800);
+ color:/*#fff*/gold;
+ font-size:10px;
+ font-weight:bold;
+ cursor:pointer;
+ transition:.2s;
+ margin-bottom: 10px;
+}
+
+.reset-btn:hover{
+ transform:scale(0.23);
+ opacity:.9;
+}
+ 
+/* === APP CONTROLS (FULLSCREEN KECIL) === */
+.app-controls{
+  position:absolute;
+  top:5px;          /* ⬅️ di atas scoreboard */
+  left:10px;        /* ⬅️ pojok kiri */
+  z-index:2001;     /* ⬅️ di atas scoreboard */
+  /*pointer-events: auto;*/
+}
+
+.app-controls button{
+  width:28px;       /* ⬅️ kecil */
+  height:28px;
+  padding:0;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:10px;   /* ⬅️ ikon pas */
+  font-weight:900;
+  color:white;
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.35),
+    0 4px 10px rgba(0,0,0,.45);
+}
+
+.app-controls button:active{
+  transform:scale(.92);
+}  
+  .settings-btn{
+  position:absolute;
+  top:4px;
+  right:10px;
+  z-index:2002; /* ⬅️ di atas app-controls */
+  width:31px;
+  height:31px;
+  border:none;
+  border-radius:8px;
+  background:/*linear-gradient(135deg,#38bdf8,#818cf8)*/lightgreen;
+  color:white;
+  font-size:14px;
+  cursor:pointer;
+}
+  
+  .settings-panel{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(10px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:3000;
+}
+.settings-panel.show{display:flex}
+
+.settings-box{
+  background:rgba(30,30,30,.92);
+  padding:22px 26px;
+  border-radius:20px;
+  width:260px;
+  text-align:center;
+}
+.settings-box button{
+  width:100%;
+  margin-top:12px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+  /* ⏱ GAME TIMER */
+.game-timer{
+  position:fixed;
+  top:calc(env(safe-area-inset-top, 0px) + 115px);
+  left:50%;
+  transform:translateX(-50%);
+  z-index:999;
+
+  padding:6px 16px;
+  border-radius:14px;
+
+  font-family:var(--ui-font);
+  font-size:14px;
+  font-weight:800;
+  letter-spacing:1px;
+
+  background:linear-gradient(180deg,#2b2b2b,#121212);
+  color:#00ffcc;
+
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.25),
+    0 6px 18px rgba(0,0,0,.6);
+}
+ /* 🚪 EXIT DI SETTINGS */
+.timer-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.exit-btn-settings{
+  padding:6px 10px;
+  border:none;
+  border-radius:10px;
+
+  font-family:var(--ui-font);
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.5px;
+
+  color:white;
+  background:linear-gradient(135deg,#ff3b3b,#b30000);
+
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.3),
+    0 4px 10px rgba(0,0,0,.5);
+
+  cursor:pointer;
+}
+
+.exit-btn-settings:active{
+  transform:scale(.92);
+}
+
+/* ===================================================== */
+/* === (SEMUA STYLE GAME KAMU TETAP) === */
+/* TIDAK KUUBAH, HANYA DIPAKAI LANGSUNG */
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= INTRO ================= -->
+  <audio id="beepClick" preload="auto">
+    <!-- <source src="https://actions.google.com/sounds/v1/ui/click.ogg" type="audio/ogg">-->
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+  
+<div id="intro">
+  <div class="light"></div>
+  <div class="stage">
+    <div class="logo">GLASS PUZZLE</div>
+    <div class="blocks">
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+      <div class="block"></div>
+    </div>
+    <div class="text">Preparing Game</div>
+    <div class="bar"><div class="fill"></div></div>
+  </div>
+</div>
+
+<!-- ================= GAME ================= -->
+<div id="gameWrap">
+  <!-- ⚙️ SETTINGS BUTTON -->
+<button class="settings-btn" onclick="openSettings()">⚙️</button>
+  
+  <div class="score-board">
+  <div class="score-box left">
+    <span id="score">0</span>
+  </div>
+
+  <div class="trophy">
+    🏆
+  </div>
+
+  <div class="score-box right">
+    <span id="highScore">0</span>
+  </div>
+
+  <button class="pause-btn">⏸</button>
+</div>
+   
+  <div class="game-timer" id="gameTimer">
+    ⏱ <span id="timeText">02:00</span>
+  </div>
+</div>  
+  
+  <div class="settings-panel" id="settingsPanel">
+     <div class="settings-box">
+  <h3>🎨 Background</h3>
+       
+     <hr style="opacity:.2;margin:12px 0">
+
+<h3>⏱️ Timer Game</h3>
+
+<div class="timer-row">
+  <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+    <input type="checkbox" id="timerToggle">
+    Aktifkan Timer
+  </label>
+
+  <!-- <button class="exit-btn-settings" onclick="exitGame()">
+    EXIT
+  </button> -->
+  <button class="exit-btn-settings" onclick="goDashboard()">
+    EXIT
+  </button> 
+</div>
+       
+<div id="timerOptions" style="margin-top:10px;">
+  <button onclick="setGameTime(180)">3 Menit</button>
+  <button onclick="setGameTime(360)">6 Menit</button>
+  <button onclick="setGameTime(600)">10 Menit</button>
+</div>
+
+<button onclick="setGameTime(0)" style="margin-top:10px;background:#555;">
+  ♾ Unlimited (Bypass)
+</button>
+
+  <!-- PRESET -->
+  <button onclick="setPreset('wood')">🌳 Kayu</button>
+       <!-- <button onclick="setPreset('marble')">🪨 Marmer</button> -->   
+  <button onclick="setPreset('glass')">🧊 Kaca</button>
+  <button onclick="setPreset('dark')">🌑 Dark Modern</button>     
+
+  <hr style="opacity:.2;margin:12px 0">
+
+  <!-- CUSTOM -->
+  <button onclick="pickBg()">📁 Pilih dari Galeri</button>
+  <button onclick="resetBg()">♻️ Reset Custom</button>
+
+  <hr style="opacity:.2;margin:12px 0">
+
+       <!-- <button onclick="clearPreset()">❌ Matikan Preset</button> -->
+  <button onclick="closeSettings()">Tutup</button>
+</div>
+</div>
+  
+<input type="file" id="bgInput" accept="image/*" hidden>
+  
+  <!-- === APP CONTROLS (FULLSCREEN & INSTALL) === -->
+<div class="app-controls">
+  <button id="fsBtn" title="Fullscreen">⛶</button>
+  <button id="installBtn" hidden title="Install App">⬇</button>
+</div>
+
+  <!--<canvas id="game" width="380" height="520"></canvas> -->
+  <canvas id="game" width="380" height="520"></canvas>
+
+<div id="gameOverPanel">
+  <div class="panel">
+    <h1>GAME OVER</h1>
+    <div id="finalScore" style="font-size:40px;font-weight:900;margin:20px">0</div>
+    
+       <div class="leaderboard">
+      <h3>🏆 LEADERBOARD</h3>
+      <ol id="leaderboardList"></ol>
+    </div>
+    
+    <button class="reset-btn" onclick="resetLeaderboard()">
+ 🔄 RESET
+</button>
+
+    <button onclick="restart()">PLAY AGAIN</button>
+  </div>
+</div>
+
+
+  <!-- 🔥 SEMUA HTML GAME KAMU DI SINI (TIDAK DIUBAH) -->
+  <!-- SCOREBOARD, SETTINGS, CANVAS, GAME OVER, dll -->
+  <!-- ⬇️ LANGSUNG TEMPEL PUNYA KAMU ⬇️ -->
+
+  <!-- (aku tidak potong di sini demi jawaban tetap muat) -->
+
+</div>
+
+<!-- ================= AUDIO INTRO ================= -->
+<audio id="introSound" preload="auto">
+  <source src="https://cdn.pixabay.com/audio/2022/10/03/audio_946f0cda3c.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* ===================================================== */
+/* INTRO CONTROL (AMAN & TIDAK RUSAK GAME) */
+let started=false;
+document.body.addEventListener("pointerdown",()=>{
+  if(started)return;
+  started=true;
+
+  document.getElementById("introSound").play().catch(()=>{});
+
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
+  }
+},{once:true});
+
+setTimeout(()=>{
+  document.getElementById("intro").classList.add("hide");
+},3300);
+
+setTimeout(()=>{
+  document.getElementById("intro").remove();
+  const gw=document.getElementById("gameWrap");
+  gw.style.opacity=1;
+  gw.style.pointerEvents="auto";
+},4300);
+
+/* ===================================================== */
+/* SCRIPT GAME ASLI KAMU → TETAP DI SINI */
+/* TIDAK DIUBAH */
+/* === FULLSCREEN === */
+const fsBtn = document.getElementById("fsBtn");
+
+fsBtn.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+});
+  /* === PWA INSTALL === */
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.hidden = false;
+});
+
+installBtn.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.hidden = true;
+});
+  /* === MANIFEST INLINE === */
+const manifest = {
+  name: "Glass Puzzle Neo",
+  short_name: "GlassPuzzle",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#3f220f",
+  theme_color: "#3f220f",
+  icons: [{
+    src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA",
+    sizes: "192x192",
+    type: "image/png"
+  }]
+};
+  
+/* ===== GAME TIMER ===== */
+let GAME_TIME = 120; // ⏱️ UBAH DI SINI (detik) → 120 = 2 menit
+let timeLeft = GAME_TIME;
+let timerInterval = null;
+
+const timeText = document.getElementById("timeText");
+const manifestBlob = new Blob(
+  [JSON.stringify(manifest)],
+  { type: "application/json" }
+);
+  function formatTime(sec){
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+  /*function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = GAME_TIME;
+  timeText.textContent = formatTime(timeLeft);
+
+  timerInterval = setInterval(()=>{
+    if(paused || gameOver) return;
+
+    timeLeft--;
+    timeText.textContent = formatTime(timeLeft);
+
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      timeText.textContent = "00:00";
+      paused = true;
+      pauseBtn.textContent = "▶️";
+      endGame();   // ⬅️ GAME BERAKHIR OTOMATIS
+    }
+  },1000);
+}*/
+  function startTimer(){
+  clearInterval(timerInterval);
+
+  if(!timerEnabled || GAME_TIME === 0){
+    return; // ⛔ BYPASS TIMER
+  }
+
+  timeLeft = GAME_TIME;
+  timeText.textContent = formatTime(timeLeft);
+
+  timerInterval = setInterval(()=>{
+    if(paused || gameOver) return;
+
+    timeLeft--;
+    timeText.textContent = formatTime(timeLeft);
+
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      timeText.textContent = "00:00";
+      paused = true;
+      pauseBtn.textContent = "▶️";
+      endGame();
+    }
+  },1000);
+}
+  
+  /* ===== TIMER SETTINGS ===== */
+let timerEnabled = true;
+
+// LOAD SETTING
+const savedTimerEnabled = localStorage.getItem("timerEnabled");
+const savedGameTime = localStorage.getItem("gameTime");
+
+if(savedTimerEnabled !== null){
+  timerEnabled = savedTimerEnabled === "true";
+}
+
+if(savedGameTime !== null){
+  GAME_TIME = Number(savedGameTime);
+}
+
+const timerToggle = document.getElementById("timerToggle");
+const timerOptions = document.getElementById("timerOptions");
+
+// INIT UI
+timerToggle.checked = timerEnabled;
+timerOptions.style.display = timerEnabled ? "block" : "none";
+document.getElementById("gameTimer").style.display =
+  timerEnabled && GAME_TIME > 0 ? "block" : "none";
+  
+  function setGameTime(sec){
+  GAME_TIME = sec;
+  localStorage.setItem("gameTime", sec);
+
+  if(sec === 0){
+    timerEnabled = false;
+    timerToggle.checked = false;
+    document.getElementById("gameTimer").style.display = "none";
+    clearInterval(timerInterval);
+  }else{
+    timerEnabled = true;
+    timerToggle.checked = true;
+    document.getElementById("gameTimer").style.display = "block";
+    startTimer();
+  }
+
+  localStorage.setItem("timerEnabled", timerEnabled);
+}
+  timerToggle.addEventListener("change", ()=>{
+  timerEnabled = timerToggle.checked;
+  localStorage.setItem("timerEnabled", timerEnabled);
+
+  if(!timerEnabled){
+    clearInterval(timerInterval);
+    document.getElementById("gameTimer").style.display = "none";
+  }else{
+    document.getElementById("gameTimer").style.display = "block";
+    startTimer();
+  }
+
+  timerOptions.style.display = timerEnabled ? "block" : "none";
+});
+  
+
+const manifestURL = URL.createObjectURL(manifestBlob);
+const link = document.createElement("link");
+link.rel = "manifest";
+link.href = manifestURL;
+document.head.appendChild(link);
+  
+ const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
+  
+ function resizeCanvas(){
+  const maxW = Math.min(window.innerWidth, /*420*/488);
+  const maxH = window.innerHeight - /*160*/110;
+
+  const scale = Math.min(
+    maxW / 380,
+    maxH / 520
+  );
+
+  canvas.style.width  = (380 * scale) + "px";
+  canvas.style.height = (520 * scale) + "px";
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = 380 * dpr;
+  canvas.height = 520 * dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas(); 
+  
+const scoreEl=document.getElementById("score");
+const panel=document.getElementById("gameOverPanel");
+const finalScoreEl=document.getElementById("finalScore");
+const highScoreEl=document.getElementById("highScore");
+const leaderboardList=document.getElementById("leaderboardList");
+  
+const FLOAT_OFFSET_Y = 80; // jarak puzzle di atas jari (px)
+const GRID=10,CELL=30;
+const BOARD_X = (380 - GRID * 34) / 2; // ⬅️ CENTER BOARD
+const BOARD_Y = 75;   // ⬅️ NAIK
+const PREVIEW_Y = BOARD_Y + GRID * 34 + 20;
+const PREVIEW_SCALE=0.85;
+/*const PREVIEW_Y=370;*/
+const BOARD_HEIGHT = GRID * 34;
+/*const PREVIEW_Y = BOARD_Y + BOARD_HEIGHT + 10; // ⬅️ jarak aman*/
+
+/*let score=0,dragging=null,dragOffset={x:0,y:0},gameOver=false;*/
+let score=0,dragging=null,dragOffset={x:0,y:0},gameOver=false;
+let paused = false;  
+let floatingTexts=[],glassParticles=[];
+
+/* ===== HIGH SCORE & LEADERBOARD ===== */
+let leaderboard=JSON.parse(localStorage.getItem("leaderboard")||"[]");
+let highScore=Number(localStorage.getItem("highScore")||0);
+highScoreEl.textContent=highScore;
+
+function saveScore(val){
+ leaderboard.push(val);
+ leaderboard.sort((a,b)=>b-a);
+ leaderboard=leaderboard.slice(0,5);
+ localStorage.setItem("leaderboard",JSON.stringify(leaderboard));
+
+ if(val>highScore){
+  highScore=val;
+  localStorage.setItem("highScore",val);
+ }
+ highScoreEl.textContent=highScore;
+}
+
+function renderLeaderboard(){
+ leaderboardList.innerHTML="";
+ leaderboard.forEach((s,i)=>{
+  const li=document.createElement("li");
+  li.textContent=`${i+1}. ${s}`;
+  leaderboardList.appendChild(li);
+ });
+}
+  function resetLeaderboard(){
+ if(!confirm("Reset semua leaderboard dan high score?")) return;
+
+ leaderboard = [];
+ highScore = 0;
+
+ localStorage.removeItem("leaderboard");
+ localStorage.removeItem("highScore");
+
+ leaderboardList.innerHTML = "";
+ highScoreEl.textContent = "0";
+
+ alert("Leaderboard berhasil direset!");
+}
+   
+/* ===== AUDIO ===== */
+const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+const sound=(f,t="square",d=.25,v=.6)=>{
+ if(audioCtx.state!=="running")audioCtx.resume();
+ const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+ o.type=t;o.frequency.value=f;g.gain.value=v;
+ o.connect(g);g.connect(audioCtx.destination);
+ o.start();o.stop(audioCtx.currentTime+d);
+};
+const dropSound=()=>sound(220);
+const clearSound=()=>sound(140,"sawtooth",.45);
+const gameOverSound=()=>sound(80,"triangle",.8);
+  
+  /* ===== BACKGROUND MUSIC ===== */
+const bgm = new Audio(
+  /*"https://cdn.pixabay.com/download/audio/2022/03/15/audio_8b0f8f38e0.mp3"*/
+  "https://cdn.pixabay.com/audio/2023/03/07/audio_7c45e8c2f6.mp3"
+);
+bgm.loop = true;
+bgm.volume = 0.35;
+
+let bgmStarted = false;
+
+// start music setelah interaksi user (aturan browser)
+function startBGM(){
+  if(!bgmStarted){
+    bgm.play().catch(()=>{});
+    bgmStarted = true;
+  }
+}
+
+/* ===== DATA ===== */
+const board=Array.from({length:GRID},()=>Array(GRID).fill(null));
+const SHAPES=[[[1]],[[1,1]],[[1,1,1]],[[1],[1],[1]],[[1,1],[1,1]],
+ [[1,0],[1,1]],[[1,1],[0,1]],[[1,1,1],[0,1,0]]];
+const COLORS=["#ff4d4d","#4dff88","#4da6ff","#ffd24d","#b366ff"];
+let pieces=[];
+
+/* ===== SPAWN ===== */
+  
+  function spawnPieces(){
+  pieces = [];
+
+  // 🔀 clone & shuffle agar unik
+  const shapePool = [...SHAPES].sort(() => Math.random() - 0.5);
+  const colorPool = [...COLORS].sort(() => Math.random() - 0.5);
+
+  const GAP = 28;
+  const temp = [];
+  let totalWidth = 0;
+
+  // 🎯 Ambil 3 SHAPE & WARNA berbeda
+  for(let i = 0; i < 3; i++){
+    const shape = shapePool[i];
+    const color = colorPool[i];
+
+    const w = shape[0].length * 34 * PREVIEW_SCALE;
+    temp.push({ shape, color, w });
+    totalWidth += w;
+  }
+
+  totalWidth += GAP * (temp.length - 1);
+
+  // 🎯 center horizontal
+  let startX = (380 - totalWidth) / 2;
+
+  temp.forEach(t => {
+    pieces.push({
+      shape: t.shape,
+      color: t.color,
+      scale: PREVIEW_SCALE,
+      x: startX,
+      y: PREVIEW_Y
+    });
+    startX += t.w + GAP;
+  });
+
+  // ❌ jika tidak ada kemungkinan langkah → game over
+  if(!canAnyMove()) endGame();
+}
+
+/* ===== CHECK ===== */
+const canAnyMove=()=>pieces.some(p=>{
+ for(let y=0;y<GRID;y++)
+  for(let x=0;x<GRID;x++)
+   if(canPlace(p.shape,x,y))return true;
+});
+const canPlace=(s,gx,gy)=>s.every((r,dy)=>r.every((v,dx)=>{
+ if(!v)return true;
+ const x=gx+dx,y=gy+dy;
+ return x>=0&&x<GRID&&y>=0&&y<GRID&&board[y][x]==null;
+}));
+
+/* ===== GLASS FX ===== */
+function spawnGlass(x,y,color){
+ for(let i=0;i<6;i++)
+  glassParticles.push({
+    x,y,
+    vx:(Math.random()-.5)*4,
+    vy:(Math.random()-1.2)*4,
+    r:Math.random()*6,
+    vr:(Math.random()-.5)*.3,
+    life:1,color
+  });
+}
+
+/* ===== BLOCK DRAW ===== */
+function drawBlock3D(x,y,s,c){
+ ctx.fillStyle="rgba(0,0,0,.35)";
+ ctx.fillRect(x+3,y+6,s,s);
+ ctx.fillStyle=c;
+ ctx.fillRect(x,y,s,s);
+ const g=ctx.createLinearGradient(x,y,x,y+s);
+ g.addColorStop(0,"rgba(255,255,255,.55)");
+ g.addColorStop(.4,"rgba(255,255,255,.15)");
+ g.addColorStop(.7,"rgba(0,0,0,.15)");
+ g.addColorStop(1,"rgba(0,0,0,.45)");
+ ctx.fillStyle=g;
+ ctx.fillRect(x+5,y+5,s-10,s-10);
+ ctx.strokeStyle="rgba(0,0,0,.6)";
+ ctx.strokeRect(x+.5,y+.5,s-1,s-1);
+}
+  
+/* ===== PLACE / DESTROY (H + V) ===== */
+function place(shape,color,gx,gy){
+ let b=0;
+ shape.forEach((r,dy)=>r.forEach((v,dx)=>{
+  if(v){
+   board[gy+dy][gx+dx]=color;
+   b++;
+   floatingTexts.push({text:"+10",x:BOARD_X+(gx+dx)*34+8,y:BOARD_Y+(gy+dy)*34+14,life:1});
+  }
+ }));
+ score+=b*10;scoreEl.textContent=score;
+ dropSound();clearLines();
+}
+
+function clearLines(){
+ let cleared=0;
+
+ for(let y=GRID-1;y>=0;y--){
+  if(board[y].every(v=>v)){
+   board[y].forEach((c,x)=>spawnGlass(BOARD_X+x*34+15,BOARD_Y+y*34+15,c));
+   board.splice(y,1);
+   board.unshift(Array(GRID).fill(null));
+   cleared++; y++;
+  }
+ }
+
+ for(let x=0;x<GRID;x++){
+  if(board.every(r=>r[x])){
+   for(let y=0;y<GRID;y++){
+    spawnGlass(BOARD_X+x*34+15,BOARD_Y+y*34+15,board[y][x]);
+    board[y][x]=null;
+   }
+   cleared++;
+  }
+ }
+
+ if(cleared){
+  const bonus=cleared*150;
+  score+=bonus;
+  scoreEl.textContent=score;
+  floatingTexts.push({text:`DESTROY +${bonus}`,x:90,y:180,life:1.4});
+  clearSound();
+ }
+}
+
+/* ===== DRAW LOOP ===== */
+/*function draw(){*/
+function draw(){
+ if(paused){
+  requestAnimationFrame(draw);
+  return;
+ }
+
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ /*ctx.clearRect(0,0,canvas.width,canvas.height);*/
+
+ for(let y=0;y<GRID;y++)
+  for(let x=0;x<GRID;x++)
+   board[y][x]
+    ?drawBlock3D(BOARD_X+x*34,BOARD_Y+y*34,CELL,board[y][x])
+    :(ctx.fillStyle="rgba(255,255,255,.08)",
+      ctx.fillRect(BOARD_X+x*34,BOARD_Y+y*34,CELL,CELL));
+
+ /* 👻 GHOST SNAP PREVIEW */
+ if(dragging){
+  const gx=Math.round((dragging.x-BOARD_X)/34);
+  const gy=Math.round((dragging.y-BOARD_Y)/34);
+  const ok=canPlace(dragging.shape,gx,gy);
+  ctx.globalAlpha=.35;
+  dragging.shape.forEach((r,dy)=>r.forEach((v,dx)=>{
+   if(v){
+    drawBlock3D(
+     BOARD_X+(gx+dx)*34,
+     BOARD_Y+(gy+dy)*34,
+     CELL,
+     ok?dragging.color:"#ff4d4d"
+    );
+   }
+  }));
+  ctx.globalAlpha=1;
+ }
+
+ pieces.forEach(p=>p.shape.forEach((r,dy)=>r.forEach((v,dx)=>{
+  if(v)drawBlock3D(p.x+dx*34*p.scale,p.y+dy*34*p.scale,CELL*p.scale,p.color);
+ })));
+
+ glassParticles.forEach(p=>{
+  ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);
+  ctx.globalAlpha=p.life;ctx.fillStyle=p.color;
+  ctx.fillRect(-4,-4,8,8);ctx.restore();
+  p.x+=p.vx;p.y+=p.vy;p.vy+=.08;p.life-=.03;
+ });
+ glassParticles=glassParticles.filter(p=>p.life>0);
+
+ floatingTexts.forEach(t=>{
+  ctx.globalAlpha=t.life;ctx.fillStyle="#fff";
+  ctx.fillText(t.text,t.x,t.y);
+  t.y-=.6;t.life-=.02;
+ });
+ floatingTexts=floatingTexts.filter(t=>t.life>0);
+ ctx.globalAlpha=1;
+
+ requestAnimationFrame(draw);
+}
+
+/* ===== INPUT ===== */
+  function getCanvasPos(e){
+  const r = canvas.getBoundingClientRect();
+  const scaleX = 380 / r.width;
+  const scaleY = 520 / r.height;
+
+  return {
+    x: (e.clientX - r.left) * scaleX,
+    y: (e.clientY - r.top)  * scaleY
+  };
+}
+  canvas.addEventListener("pointerdown", e => {
+  e.preventDefault();      // ⬅️ WAJIB
+  canvas.focus?.();
+ if(paused) return;
+ startBGM();
+ const {x,y}=getCanvasPos(e);
+ canvas.setPointerCapture(e.pointerId);
+ for(const p of pieces){
+  const w=p.shape[0].length*34*p.scale;
+  const h=p.shape.length*34*p.scale;
+  if(x>=p.x&&x<=p.x+w&&y>=p.y&&y<=p.y+h){
+   dragging=p;
+   dragOffset.x=x-p.x;
+   /*dragOffset.y=y-p.y;*/
+   dragOffset.y = y - p.y + FLOAT_OFFSET_Y;
+   p.startX=p.x;p.startY=p.y;
+   break;
+  }
+ }
+});
+/*canvas.addEventListener("pointermove",e=>{*/
+canvas.addEventListener("pointermove",e=>{
+ if(paused) return;
+ if(!dragging)return;
+ const {x,y}=getCanvasPos(e);
+ dragging.x=x-dragOffset.x;
+ dragging.y=y-dragOffset.y;
+});
+canvas.addEventListener("pointerup",e=>{
+ if(paused) return;
+ if(!dragging)return;
+ const gx=Math.round((dragging.x-BOARD_X)/34);
+ const gy=Math.round((dragging.y-BOARD_Y)/34);
+ if(canPlace(dragging.shape,gx,gy)){
+  place(dragging.shape,dragging.color,gx,gy);
+  pieces=pieces.filter(p=>p!==dragging);
+  if(!pieces.length)spawnPieces();
+ }else{
+  dragging.x=dragging.startX;
+  dragging.y=dragging.startY;
+ }
+ dragging=null;
+ canvas.releasePointerCapture(e.pointerId);
+ if(!canAnyMove())endGame();
+});
+  
+  /*function endGame(){*/
+   function endGame(){
+    clearInterval(timerInterval);
+     
+ gameOver=true;
+ paused = true;
+ bgm.pause();   
+ finalScoreEl.textContent=score;
+
+ saveScore(score);        // ⬅️ SIMPAN SCORE
+ renderLeaderboard();     // ⬅️ TAMPILKAN LEADERBOARD
+
+ panel.classList.add("show");
+ gameOverSound();
+}
+  
+  function restart(){
+ paused = false;
+ pauseBtn.textContent = "⏸";
+ bgm.play().catch(()=>{});
+
+ board.forEach(r=>r.fill(null));
+ score = 0;
+ scoreEl.textContent = 0;
+ gameOver = false;
+
+ panel.classList.remove("show");
+
+ clearInterval(timerInterval);
+ startTimer();          // ⬅️ RESET TIMER
+
+ spawnPieces();
+}
+
+/* function exitGame(){
+  if(!confirm("Keluar dari permainan?")) return;
+
+  bgm.pause();
+  clearInterval(timerInterval);
+
+  if(document.fullscreenElement){
+    document.exitFullscreen();
+  }
+
+  // ⬅️ KEMBALI KE PAGE SEBELUMNYA
+  if(history.length > 1){
+    history.back();
+  }else{
+    window.location.href = "/";
+  }
+}*/
+
+ function goDashboard() {
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
+  bgm.pause();
+  clearInterval(timerInterval);
+
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(()=>{});
+  }
+
+  setTimeout(() => {
+    window.location.href =
+      "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 150);
+} 
+
+  const pauseBtn = document.querySelector(".pause-btn");
+
+function togglePause(){
+  if(gameOver) return;
+
+  paused = !paused;
+  pauseBtn.textContent = paused ? "▶️" : "⏸";
+
+  if(paused){
+    bgm.pause();
+  }else{
+    bgm.play().catch(()=>{});
+  }
+}
+
+pauseBtn.addEventListener("click", togglePause);
+  
+  /* ================= CUSTOM BACKGROUND ================= */
+const bgInput = document.getElementById("bgInput");
+const settingsPanel = document.getElementById("settingsPanel");
+
+function openSettings(){
+  settingsPanel.classList.add("show");
+}
+function closeSettings(){
+  settingsPanel.classList.remove("show");
+}
+
+function pickBg(){
+  bgInput.click();
+}
+
+bgInput.addEventListener("change",()=>{
+  const file = bgInput.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    document.documentElement.style.setProperty(
+      "--custom-bg", `url(${e.target.result})`
+    );
+    localStorage.setItem("customBG", e.target.result);
+  };
+  reader.readAsDataURL(file);
+});
+
+function resetBg(){
+  document.documentElement.style.setProperty("--custom-bg","none");
+  localStorage.removeItem("customBG");
+}
+
+/* LOAD SAVED BG */
+const savedBg = localStorage.getItem("customBG");
+if(savedBg){
+  document.documentElement.style.setProperty(
+    "--custom-bg", `url(${savedBg})`
+  );
+}
+   /* LOAD SAVED PRESET */
+/*const savedPreset = localStorage.getItem("presetBG");
+if(savedPreset){
+  setPreset(savedPreset);
+}*/ 
+  /* LOAD SAVED PRESET (DEFAULT DARK) */
+const savedPreset = localStorage.getItem("presetBG");
+if(savedPreset){
+  setPreset(savedPreset);
+}else{
+  setPreset("dark"); // ⬅️ DEFAULT BACKGROUND
+}
+    
+    /* ================= PRESET BACKGROUND ================= */
+function setPreset(type){
+  let bg = "none";
+
+  if(type === "wood"){
+    bg = `
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.03) 0px,
+        rgba(255,255,255,0.03) 2px,
+        rgba(0,0,0,0.04) 4px,
+        rgba(0,0,0,0.04) 6px
+      ),
+      linear-gradient(180deg,#7a4a2e,#4b2a16)
+    `;
+  }
+
+  if(type === "marble"){
+    bg = `
+      radial-gradient(circle at 30% 30%,rgba(255,255,255,.6),transparent 60%),
+      radial-gradient(circle at 70% 60%,rgba(255,255,255,.35),transparent 55%),
+      linear-gradient(180deg,#cfcfcf,#9f9f9f)
+    `;
+  }
+  
+ if(type === "glass"){
+    bg = `
+      linear-gradient(180deg,rgba(255,255,255,.25),rgba(255,255,255,.05)),
+      radial-gradient(circle at top,rgba(255,255,255,.45),transparent 60%)
+    `;
+  }
+  if(type === "dark"){
+  bg = `
+    radial-gradient(circle at top left, rgba(90,110,255,.25), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(255,80,120,.22), transparent 65%),
+    linear-gradient(180deg, #0f1220 0%, #151a2f 45%, #0a0d18 100%)
+  `;
+}
+
+  document.documentElement.style.setProperty("--preset-bg", bg);
+  localStorage.setItem("presetBG", type);
+}
+
+function clearPreset(){
+  document.documentElement.style.setProperty("--preset-bg", "none");
+  localStorage.removeItem("presetBG");
+}
+  
+  /* === SERVICE WORKER === */
+if ("serviceWorker" in navigator) {
+  const swCode = `
+    self.addEventListener("install", e => {
+      e.waitUntil(
+        caches.open("glass-puzzle").then(c => c.addAll(["./"]))
+      );
+    });
+    self.addEventListener("fetch", e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request))
+      );
+    });
+  `;
+  const swBlob = new Blob([swCode], { type: "text/javascript" });
+  navigator.serviceWorker.register(
+    URL.createObjectURL(swBlob)
+  );
+}
+renderLeaderboard();
+spawnPieces();
+ startTimer();
+  draw();
+
+</script>
+</body>
+</html>
