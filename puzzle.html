@@ -12,15 +12,18 @@
 :root{--accent:#22d3ee}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
-body{
+  body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,sans-serif;
   background:radial-gradient(circle at top,#1e293b,#020617);
   color:white;
+  min-height:100vh;
+  overflow:hidden;
+
+  /* ⬇️ TAMBAHKAN INI */
+  padding-top:env(safe-area-inset-top);
   display:flex;
   justify-content:center;
-  align-items:center;
-  height:100vh;
 }
 
 .app{
@@ -44,12 +47,36 @@ body{
   margin-top:10px;
   width:100%;
   aspect-ratio:1/1;
-  background:#020617;
+  background:transparent;     /* ⬅️ HILANGKAN HITAM */
   border-radius:14px;
   position:relative;
-  overflow:hidden;
+  overflow:visible;           /* ⬅️ PENTING */
 }
 
+/* === TRUE FULLSCREEN WIN === */
+.board.win-mode{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  margin:0;
+  border-radius:0;
+  background:transparent !important;
+  z-index:100000;
+} 
+  /* === FULL IMAGE WIN OVERLAY === */
+.win-image{
+  position:fixed;       /* ⬅️ BUKAN absolute */
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  border-radius:0;
+  z-index:100001;
+  opacity:0;
+  transform:scale(1.02);
+  transition:opacity .8s ease, transform 1s ease;
+  pointer-events:none;
+}
 .tile{
   position:absolute;
   border-radius:10px;
@@ -94,16 +121,260 @@ input[type=file]{display:none}
   opacity:.7;
   margin-top:6px;
 }
-</style>
+  
+/* === PLAYSTORE PRO SPLASH === */
+.cinematic-pro{
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-rows:1.1fr auto 1fr;
+  place-items:center;
+  text-align:center;
+  padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  animation:fadeIn 1.2s ease;
+}
+
+/* BRAND GROUP */
+.brand{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  transform:translateY(4vh);   /* ⬅️ turun natural */
+}
+
+/* LOGO */
+.studio-logo{
+  width:84px;
+  height:84px;
+  border-radius:20px;
+  background:linear-gradient(135deg,#22d3ee,#6366f1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:44px;
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.6),
+    0 0 40px rgba(99,102,241,.4);
+  animation:logoFloat 4s ease-in-out infinite;
+}
+
+/* TITLE */
+.game-title{
+  margin:0;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:.5px;
+  background:linear-gradient(90deg,#22d3ee,#a5b4fc);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+/* SUBTITLE */
+.game-tagline{
+  margin:0;
+  font-size:12px;
+  opacity:.75;
+}
+
+/* TAP BUTTON */
+.tap-start{
+  height:44px;
+  padding:0 32px;
+  border-radius:999px;
+  border:none;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:white;
+  background:linear-gradient(135deg,#22d3ee,#6366f1);
+  box-shadow:0 14px 32px rgba(0,0,0,.45);
+  cursor:pointer;
+  animation:pulse 1.8s ease-in-out infinite;
+}
+
+/* ANIMATIONS */
+@keyframes logoFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+
+@keyframes pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:scale(.96)}
+  to{opacity:1;transform:scale(1)}
+}
+  #splashAAA{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:radial-gradient(circle at top,#1e293b,#020617);
+}
+   .app{
+  width:340px;
+  margin-top:clamp(20px, 6vh, 48px);
+  position:relative;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .6s ease;
+}
+  .tile.hidden{
+  opacity:0;
+  pointer-events:none;
+  transform:scale(.95);
+}
+  .app.win-hide{
+  opacity:0;
+  pointer-events:none;
+}
+  .board.win-mode .tile{
+  display:none !important;   /* ⬅️ BUKAN opacity */
+}
+  /* === WIN OVERLAY (HANYA AREA BOARD) === */
+#winOverlay{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  border-radius:14px;
+  opacity:0;
+  pointer-events:none;
+  z-index:50;
+  transform:scale(1.02);
+  transition:opacity .8s ease, transform 1s ease;
+}
+
+#winOverlay.show{
+  opacity:1;
+  transform:scale(1);
+}
+  .app{
+  width:340px;
+  margin:auto;
+  position:relative;
+  top:0;              /* ⬅️ TAMBAHAN */
+}
+  .controls, .header{
+  position:relative;
+  z-index:100;
+}
+  /* === BOARD LOCK === */
+.board.locked{
+  pointer-events:none;
+}
+
+/* === WIN IMAGE OVERLAY === */
+#winOverlay{
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  transform:scale(1.03);
+  transition:.8s ease;
+  z-index:10;
+}
+
+#winOverlay.show{
+  opacity:1;
+  transform:scale(1);
+}
+
+/* === WIN PANEL === */
+#winPanel{
+  position:absolute;
+  inset:0;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  align-items:center;
+  padding:16px;
+  opacity:0;
+  pointer-events:none;
+  z-index:20;
+}
+
+#winPanel.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* TITLE */
+.win-title{
+  font-size:16px;
+  font-weight:900;
+  margin-bottom:10px;
+  background:linear-gradient(90deg,#22d3ee,#a5b4fc);
+  -webkit-background-clip:text;
+  color:transparent;
+  animation:pop .6s ease;
+}
+
+/* ACTION BUTTONS */
+.win-actions{
+  display:flex;
+  gap:10px;
+}
+
+.win-actions button{
+  padding:4px 8px;
+  border-radius:10px;
+  border:none;
+  font-size:8px;
+  font-weight:700;
+  background:linear-gradient(135deg,#22d3ee,#6366f1);
+  color:white;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.4);
+}
+
+/* POP ANIMATION */
+@keyframes pop{
+  from{transform:scale(.8);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+  /* === CONFETTI WIN EFFECT === */
+#confetti{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:200000; /* DI ATAS SEMUA */
+}
+    </style>
 </head>
 
 <body>
+ <div id="splashAAA">
+  <canvas id="particles"></canvas>
 
+  <div class="cinematic-pro">
+    <div class="brand">
+      <div class="studio-logo">🧩</div>
+      <h1 class="game-title">Modern Puzzle Game</h1>
+      <p class="game-tagline">Think Smart • Play Smooth</p>
+    </div>
+
+    <!-- <button class="tap-start" onclick="startGame()"> -->
+    <!-- <button class="tap-start" onclick="playIntroSound(); startGame();">
+      TAP TO START-->
+    <button class="tap-start" onclick="handleStart()">
+  TAP TO START
+    </button>
+  </div>
+</div>
+  
 <div class="app">
   <div class="header">
     <h2>Puzzle</h2>
     <div>Moves: <span id="moves">0</span></div>
   </div>
+  
+  <canvas id="confetti"></canvas>
 
   <div class="controls">
     <select id="level">
@@ -120,12 +391,97 @@ input[type=file]{display:none}
     <button onclick="toggleFullscreen()">⛶</button>
   </div>
 
-  <div class="board" id="board"></div>
+  <div class="board" id="board">
+  <div id="winOverlay"></div>
 
+     <div id="winPanel">
+    <div class="win-title">🎉 PUZZLE SOLVED!</div>
+    <div class="win-actions">
+      <button onclick="replay()">🔁 Replay</button>
+      <!--  <button onclick="shuffle()">➡️ Next</button> -->
+    </div>
+  </div>
+</div> 
+  <!-- 🎵 SPLASH AUDIO -->
+  <audio id="introSound" loop preload="auto">
+  <source src="https://actions.google.com/sounds/v1/ambiences/wind_chimes.ogg" type="audio/ogg">
+</audio>
+<audio id="tapSound" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
+</audio>
+  
   <div class="footer">High Score: <span id="high">-</span></div>
 </div>
-
+  
 <script>
+  
+/* ===== PARTICLE EFFECT ===== */
+const canvas = document.getElementById("particles");
+const ctx = canvas.getContext("2d");
+
+let w,h,particles=[];
+function resize(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+}
+window.addEventListener("resize",resize);
+resize();
+
+for(let i=0;i<60;i++){
+  particles.push({
+    x:Math.random()*w,
+    y:Math.random()*h,
+    r:Math.random()*2+1,
+    vx:(Math.random()-.5)*.3,
+    vy:(Math.random()-.5)*.3,
+    a:Math.random()
+  });
+}
+
+function animate(){
+  ctx.clearRect(0,0,w,h);
+  particles.forEach(p=>{
+    p.x+=p.vx;
+    p.y+=p.vy;
+    if(p.x<0)p.x=w;
+    if(p.y<0)p.y=h;
+    if(p.x>w)p.x=0;
+    if(p.y>h)p.y=0;
+    ctx.fillStyle=`rgba(99,102,241,${p.a})`;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ===== START GAME ===== */
+  function startGame(){
+  const splash = document.getElementById("splashAAA");
+  const app = document.querySelector(".app");
+
+  // 🎬 cinematic transition
+  splash.style.opacity = 0;
+
+  setTimeout(()=>{
+    splash.remove();
+    app.style.opacity = 1;
+    app.style.pointerEvents = "auto";
+
+    // 🎵 FADE INTRO SETELAH SPLASH BENAR-BENAR HILANG
+    const fade = setInterval(()=>{
+      if(introSound.volume > 0.05){
+        introSound.volume -= 0.03;
+      }else{
+        introSound.pause();
+        clearInterval(fade);
+      }
+    },60);
+
+  },800);
+}
+
 /* ================= CORE ================= */
 let SIZE=4, tiles=[], moves=0;
 /*let imageSrc="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600";*/
@@ -172,7 +528,8 @@ function init(){
   SIZE=parseInt(level.value);
   tiles=[...Array(SIZE*SIZE-1).keys()].map(n=>n+1).concat(0);
   moves=0;movesEl.textContent=0;
-  board.innerHTML="";
+  /*board.innerHTML="";*/
+  board.querySelectorAll(".tile").forEach(t => t.remove());
 
   const s=100/SIZE;
 
@@ -230,17 +587,62 @@ function shuffle(){
 }
 
 /* ================= WIN ================= */
-function checkWin(){
+  function checkWin(){
   for(let i=0;i<SIZE*SIZE-1;i++) if(tiles[i]!==i+1) return;
 
   winAudio.play().catch(()=>{});
+
   const k=`high_${SIZE}`;
   const b=localStorage.getItem(k);
   if(!b||moves<b) localStorage.setItem(k,moves);
   updateHigh();
-  setTimeout(()=>alert("🎉 Puzzle Selesai!"),200);
-}
 
+  /*showFullImage(); // ⬅️ TAMBAHAN UTAMA*/
+    showFullImage();
+launchConfetti(); // 🎉 CONFETTI MENANG
+}
+  
+  function showFullImage(){
+  const overlay = document.getElementById("winOverlay");
+  const panel   = document.getElementById("winPanel");
+
+  // kunci board
+  board.classList.add("locked");
+
+  // pasang gambar utuh
+  overlay.style.backgroundImage = `url(${imageSrc})`;
+
+  // sembunyikan tile
+  document.querySelectorAll(".tile").forEach(t=>{
+    t.style.opacity = 0;
+    t.style.pointerEvents = "none";
+  });
+
+  // tampilkan overlay & panel
+  requestAnimationFrame(()=>{
+    overlay.classList.add("show");
+    panel.classList.add("show");
+  });
+
+  navigator.vibrate && navigator.vibrate([80,120,80]);
+}
+  function replay(){
+  const overlay = document.getElementById("winOverlay");
+  const panel   = document.getElementById("winPanel");
+
+  overlay.classList.remove("show");
+  panel.classList.remove("show");
+
+  board.classList.remove("locked");
+
+  document.querySelectorAll(".tile").forEach(t=>{
+    t.style.opacity = 1;
+    t.style.pointerEvents = "auto";
+  });
+
+  shuffle();
+}
+  
 function updateHigh(){
   highEl.textContent=localStorage.getItem(`high_${SIZE}`)||"-";
 }
@@ -273,6 +675,90 @@ if("serviceWorker" in navigator){
     URL.createObjectURL(new Blob([sw],{type:"text/javascript"}))
   );
 }
-</script>
+  /* ================= CONFETTI EFFECT ================= */
+const confettiCanvas = document.getElementById("confetti");
+const confettiCtx = confettiCanvas.getContext("2d");
+
+let cw, ch, confettis = [], confettiActive = false;
+
+function resizeConfetti(){
+  cw = confettiCanvas.width = window.innerWidth;
+  ch = confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeConfetti);
+resizeConfetti();
+
+function launchConfetti(){
+  confettis = [];
+  confettiActive = true;
+
+  for(let i=0;i<120;i++){
+    confettis.push({
+      x:Math.random()*cw,
+      y:Math.random()*-ch,
+      r:Math.random()*6+4,
+      c:`hsl(${Math.random()*360},90%,60%)`,
+      vy:Math.random()*4+3,
+      vx:(Math.random()-.5)*2,
+      rot:Math.random()*360,
+      vr:(Math.random()-.5)*10
+    });
+  }
+
+  animateConfetti();
+}
+
+function animateConfetti(){
+  if(!confettiActive) return;
+
+  confettiCtx.clearRect(0,0,cw,ch);
+
+  confettis.forEach(p=>{
+    p.x+=p.vx;
+    p.y+=p.vy;
+    p.rot+=p.vr;
+
+    confettiCtx.save();
+    confettiCtx.translate(p.x,p.y);
+    confettiCtx.rotate(p.rot*Math.PI/180);
+    confettiCtx.fillStyle=p.c;
+    confettiCtx.fillRect(-p.r/2,-p.r/2,p.r,p.r);
+    confettiCtx.restore();
+  });
+
+  confettis = confettis.filter(p=>p.y < ch+20);
+
+  if(confettis.length){
+    requestAnimationFrame(animateConfetti);
+  }else{
+    confettiActive=false;
+    confettiCtx.clearRect(0,0,cw,ch);
+  }
+}
+  /* ===== SPLASH AUDIO CONTROL ===== */
+const introSound = document.getElementById("introSound");
+const tapSound   = document.getElementById("tapSound");
+
+// aktifkan audio saat interaksi pertama (wajib mobile)
+
+let introStarted = false;
+
+function handleStart(){
+  // 🔊 START INTRO (PASTI BUNYI)
+  if(!introStarted){
+    introStarted = true;
+    introSound.volume = 0.4;
+    introSound.currentTime = 0;
+    introSound.play().catch(()=>{});
+  }
+
+  // 🔊 TAP SOUND
+  tapSound.currentTime = 0;
+  tapSound.play().catch(()=>{});
+
+  // ⏳ TUNGGU SEBENTAR BIAR INTRO TERDENGAR
+  setTimeout(startGame, 1200);
+}  
+  </script>
 </body>
 </html>
