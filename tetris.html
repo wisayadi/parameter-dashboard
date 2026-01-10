@@ -231,6 +231,73 @@ button:active::after{
   position:relative;
   z-index:2;
 }
+  /* ===== SETTINGS OVERLAY ===== */
+#settingsPage{
+  position:absolute;
+  inset:0;
+  background:rgba(2,6,23,.75);
+  backdrop-filter:blur(12px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:998;
+}
+
+.settings-card{
+  width:280px;
+  background:rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:16px;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+  animation:fadeIn .3s ease;
+}
+
+.settings-card h3{
+  margin:4px 0 12px;
+  color:#22d3ee;
+}
+
+.settings-section{
+  margin-bottom:14px;
+}
+
+.settings-section p{
+  font-size:11px;
+  margin-bottom:6px;
+  opacity:.8;
+}
+
+.settings-card button{
+  width:100%;
+  margin:4px 0;
+}
+
+/* EXIT BUTTON */
+.btn-exit{
+  background:linear-gradient(135deg,#ef4444,#b91c1c);
+}
+
+/* CLOSE BUTTON */
+.btn-close{
+  background:linear-gradient(135deg,#64748b,#334155);
+}
+
+/* ===== CARD THEMES ===== */
+.theme-default{
+  background:rgba(255,255,255,.08);
+}
+
+.theme-dark{
+  background:linear-gradient(180deg,#020617,#020617);
+}
+
+.theme-neon{
+  background:linear-gradient(180deg,#2e1065,#020617);
+}
+  #settingsPage{
+  z-index:2000;
+}
 </style>
 </head>
 
@@ -253,13 +320,35 @@ button:active::after{
   <audio id="introSound" preload="auto">
   <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_9c1d79c68a.mp3" type="audio/mpeg">
 </audio>
+  
+  <!-- ===== SETTINGS PAGE ===== -->
+<div id="settingsPage">
+  <div class="settings-card">
+    <h3>⚙️ Settings</h3>
+
+    <div class="settings-section">
+      <p>🎨 Card Background</p>
+      <button onclick="setTheme('default')">Default</button>
+      <button onclick="setTheme('dark')">Dark Blue</button>
+      <button onclick="setTheme('neon')">Purple Neon</button>
+    </div>
+
+    <div class="settings-section">
+      <button class="btn-exit" onclick="exitGame()">EXIT GAME</button>
+    </div>
+
+    <button class="btn-close" onclick="closeSettings()">Close</button>
+  </div>
+</div>
 
   <!-- HEADER -->
-  <div class="header">
-    <h2>TETRIS</h2>
+<div class="header">
+  <h2>TETRIS</h2>
+  <div style="display:flex;gap:6px">
+    <button onclick="openSettings()">⚙️</button>
     <button onclick="toggleFullscreen()">⛶</button>
   </div>
-
+</div> 
   <!-- STATS -->
   <div class="stats">
     <div>Score: <span id="score">0</span></div>
@@ -281,16 +370,7 @@ button:active::after{
         <canvas id="next" width="80" height="80"></canvas>
       </div>
 
-      <!-- <div class="box">
-        🔊 Sound
-        <button onclick="toggleSound()">ON / OFF</button>
-      </div>
-
        <div class="box">
-        🎵 Music
-        <button onclick="toggleMusic()">ON / OFF</button>
-      </div> -->
-      <div class="box">
   🔊 Sound
   <button id="btnSound">ON</button>
 </div>
@@ -300,16 +380,6 @@ button:active::after{
   <button id="btnMusic">ON</button>
 </div>
       
-      <audio id="btnBeep" preload="auto">
-  <source src="https://actions.google.com/sounds/v1/ui/click.ogg" type="audio/ogg">
-</audio>
-
-      <!-- ▶ START / PAUSE / RESET PINDAH KE SINI -->
-      <!-- <div class="controls">
-         <button onclick="startGame()">▶ Start</button>
-        <button onclick="pauseGame()">⏸ Pause</button>
-        <button onclick="resetGame()">⟲ Reset</button>   
-     </div> -->
       <div class="controls">
   <button id="btnStartPause">▶ Start</button>
   <button onclick="resetGame()">⟲ Reset</button>
@@ -330,6 +400,38 @@ button:active::after{
 
 <!-- ===== SCRIPT ASLI KAMU (TIDAK DIUBAH) ===== -->
 <script>
+  /* ===== UI BEEP (AAA SAFE) ===== */
+let audioCtx;
+let uiUnlocked = false;
+
+function unlockAudio(){
+  if(uiUnlocked) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  audioCtx.resume();
+  uiUnlocked = true;
+}
+
+function uiBeep(){
+  if(!uiUnlocked) return;
+
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+
+  o.type = "square";
+  o.frequency.value = 850;
+
+  g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.07);
+
+  o.connect(g);
+  g.connect(audioCtx.destination);
+
+  o.start();
+  o.stop(audioCtx.currentTime + 0.07);
+}
+
+document.addEventListener("pointerdown", unlockAudio, { once:true });  
+  
 /* FULL JS TETAP PERSIS PUNYAMU */
     /* ===== FULLSCREEN ===== */
 function toggleFullscreen(){
@@ -351,20 +453,11 @@ const sOver=new Audio("https://actions.google.com/sounds/v1/cartoon/descending_w
 /**const music=new Audio("356-8-bit-chiptune-game-music-357518.mp3");**/
 const music = new Audio("https://orangefreesounds.com/wp-content/uploads/2025/04/8-bit-chiptune-music.mp3");
 music.loop = true;
-music.volume = 0.9;   
-const beep = document.getElementById("btnBeep");
-
-/* unlock audio (mobile fix) */
-document.addEventListener("touchstart",()=>{
-  beep.play().then(()=>beep.pause()).catch(()=>{});
-},{once:true});
-
-/* pasang beep ke semua tombol */
-document.querySelectorAll("button").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    beep.currentTime=0;
-    beep.play().catch(()=>{});
-  });
+music.volume = 0.9; 
+  
+  document.querySelectorAll(".header button, .settings-card button")
+.forEach(btn=>{
+  btn.addEventListener("pointerdown", uiBeep);
 });
   
 function play(s){if(soundOn){s.currentTime=0;s.play().catch(()=>{})}}
@@ -451,13 +544,7 @@ function drawNext(){
   next.shape.forEach((r,y)=>r.forEach((v,x)=>{
     if(v){nextCtx.fillStyle=colors[next.color];nextCtx.fillRect(x*20,y*20,18,18)}
   }));
-  /*nextCtx.clearRect(0,0,80,80);
-next.shape.forEach((r,y)=>r.forEach((v,x)=>{
-  if(v){
-    nextCtx.fillStyle = colors[next.color];
-    nextCtx.fillRect(x*20, y*20, 16, 16);
-  }
-}));*/
+ 
 }
 
 function update(t=0){
@@ -581,20 +668,6 @@ document.addEventListener("touchstart",()=>{
   }).catch(()=>{});
 },{once:true});
   
-/* ===== SPLASH CONTROLLER ===== */
-/**const splash = document.getElementById("splash");
-
-/* Disable game interaction during splash */
-/**paused = true;
-
-setTimeout(()=>{
-  splash.style.animation = "fadeOut .8s ease forwards";
-},5500);
-
-setTimeout(()=>{
-  splash.remove();
-  paused = true; // tetap pause, user tekan Start
-},6300);**/
   
   /* ===== SPLASH CONTROLLER ===== */
 const splash = document.getElementById("splash");
@@ -728,6 +801,44 @@ function drawFX(){
 }
 
 drawFX();
+  
+ /* ===== SETTINGS LOGIC ===== */
+const settingsPage = document.getElementById("settingsPage");
+const appCard = document.querySelector(".app");
+
+  function openSettings(){
+  uiBeep();
+  settingsPage.style.display = "flex";
+  paused = true;
+}
+
+  function closeSettings(){
+  uiBeep();
+  settingsPage.style.display = "none";
+}
+
+  function setTheme(mode, silent=false){
+  if(!silent) uiBeep();
+
+  appCard.classList.remove("theme-default","theme-dark","theme-neon");
+
+  if(mode==="default") appCard.classList.add("theme-default");
+  if(mode==="dark") appCard.classList.add("theme-dark");
+  if(mode==="neon") appCard.classList.add("theme-neon");
+
+  localStorage.setItem("tetris_theme",mode);
+}
+
+  const savedTheme = localStorage.getItem("tetris_theme") || "default";
+setTheme(savedTheme, true); // ⬅️ silent
+
+  function exitGame(){
+  uiBeep();
+  setTimeout(()=>{
+    window.location.href =
+      "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  },120);
+}
 
 </script>
 </body>
