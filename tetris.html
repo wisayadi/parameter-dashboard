@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>Modern Tetris Pro</title>
+
+<link rel="manifest" id="manifest">
+<meta name="theme-color" content="#020617">
+
+<style>
+:root{--accent:#22d3ee}
+*{box-sizing:border-box;font-family:system-ui}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#1e293b,#020617);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.app{
+  width:360px;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);
+  border-radius:20px;
+  padding:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.6);
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.header h2{margin:0;color:var(--accent)}
+
+.stats{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  margin:6px 0;
+}
+
+.game{
+  display:flex;
+  gap:10px;
+}
+
+canvas{
+  background:#020617;
+  border-radius:9px;
+}
+
+.side{
+  width:100px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.box{
+  background:rgba(255,255,255,.1);
+  border-radius:8px;
+  padding:6px;
+  font-size:11px;
+  text-align:center;
+}
+
+.side button{
+  width:100%;
+  margin-top:4px;
+}
+
+.controls{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.touch{
+  display:flex;
+  gap:6px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+
+.touch button{flex:1}
+
+button{
+  border:none;
+  border-radius:12px;
+  padding:8px;
+  background:linear-gradient(135deg,#22d3ee,#6366f1);
+  color:white;
+  font-size:10px;
+}
+  /* ===== PRO BUTTON UX ===== */
+button{
+  cursor:pointer;
+  transition:all .18s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Hover */
+button:hover{
+  transform:translateY(-1px) scale(1.03);
+  box-shadow:0 6px 18px rgba(34,211,238,.45);
+  filter:brightness(1.1);
+}
+
+/* Active / Tap */
+button:active{
+  transform:scale(.96);
+  box-shadow:0 3px 8px rgba(0,0,0,.5) inset;
+}
+
+/* Ripple effect */
+button::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at center,
+    rgba(255,255,255,.35),
+    transparent 60%);
+  opacity:0;
+  transition:.3s;
+}
+
+button:active::after{
+  opacity:1;
+}
+
+/* Touch feel */
+@media (hover:none){
+  button:hover{transform:none}
+}
+  /* ===== STATE COLORS ===== */
+.btn-start {background:linear-gradient(135deg,#22c55e,#16a34a)} /* hijau */
+.btn-pause {background:linear-gradient(135deg,#ef4444,#b91c1c)} /* merah */
+
+.btn-sound-on {background:linear-gradient(135deg,#22c55e,#16a34a)}
+.btn-sound-off {background:linear-gradient(135deg,#fb923c,#f97316)}
+
+.btn-music-on {background:linear-gradient(135deg,#3b82f6,#2563eb)}
+.btn-music-off {background:linear-gradient(135deg,#fde047,#facc15); color:#000}
+  
+/* ===== SPLASH SCREEN ===== */
+#splash{
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at top,#0f172a,#020617);
+  z-index:999;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  animation:fadeIn .6s ease;
+}
+
+.splash-content{
+  text-align:center;
+}
+
+.logo{
+  font-size:25px;
+  font-weight:900;
+  letter-spacing:4px;
+  color:#22d3ee;
+  text-shadow:
+    0 0 20px rgba(34,211,238,.6),
+    0 0 40px rgba(99,102,241,.4);
+  animation:float 2.2s ease-in-out infinite;
+}
+
+.tagline{
+  font-size:10px;
+  opacity:.75;
+  margin-top:6px;
+}
+
+.loader{
+  width:180px;
+  height:6px;
+  background:rgba(255,255,255,.15);
+  border-radius:10px;
+  overflow:hidden;
+  margin:26px auto 12px;
+}
+
+.loader .bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#22d3ee,#6366f1);
+  animation:load 6s linear forwards;
+}
+
+.hint{
+  font-size:11px;
+  opacity:.6;
+}
+
+/* Animations */
+@keyframes load{
+  to{width:100%}
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+
+@keyframes fadeOut{
+  to{opacity:0;visibility:hidden}
+}
+
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}  
+  #fx{
+  position:absolute;
+  inset:0;
+  z-index:0;
+}
+
+.splash-content{
+  position:relative;
+  z-index:2;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <!-- ===== SPLASH SCREEN ===== -->
+<div id="splash">
+  <canvas id="fx"></canvas>
+  <div class="splash-content">
+    <div class="logo">TETRIS</div>
+    <div class="tagline">Modern • Pro • Arcade</div>
+
+    <div class="loader">
+      <div class="bar"></div>
+    </div>
+
+    <div class="hint">Preparing Game Engine...</div>
+  </div>
+</div>
+  <audio id="introSound" preload="auto">
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_9c1d79c68a.mp3" type="audio/mpeg">
+</audio>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h2>TETRIS</h2>
+    <button onclick="toggleFullscreen()">⛶</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div>Score: <span id="score">0</span></div>
+    <div>Level: <span id="level">1</span></div>
+    <div>Lines: <span id="lines">0</span></div>
+  </div>
+
+  <div class="stats">
+    <div>🏆 High: <span id="high">0</span></div>
+  </div>
+
+  <!-- GAME AREA -->
+  <div class="game">
+    <canvas id="board" width="200" height="400"></canvas>
+
+    <div class="side">
+      <div class="box">
+        NEXT
+        <canvas id="next" width="80" height="80"></canvas>
+      </div>
+
+      <!-- <div class="box">
+        🔊 Sound
+        <button onclick="toggleSound()">ON / OFF</button>
+      </div>
+
+       <div class="box">
+        🎵 Music
+        <button onclick="toggleMusic()">ON / OFF</button>
+      </div> -->
+      <div class="box">
+  🔊 Sound
+  <button id="btnSound">ON</button>
+</div>
+
+<div class="box">
+  🎵 Music
+  <button id="btnMusic">ON</button>
+</div>
+      
+      <audio id="btnBeep" preload="auto">
+  <source src="https://actions.google.com/sounds/v1/ui/click.ogg" type="audio/ogg">
+</audio>
+
+      <!-- ▶ START / PAUSE / RESET PINDAH KE SINI -->
+      <!-- <div class="controls">
+         <button onclick="startGame()">▶ Start</button>
+        <button onclick="pauseGame()">⏸ Pause</button>
+        <button onclick="resetGame()">⟲ Reset</button>   
+     </div> -->
+      <div class="controls">
+  <button id="btnStartPause">▶ Start</button>
+  <button onclick="resetGame()">⟲ Reset</button>
+</div>
+    </div>
+  </div>
+
+  <!-- TOUCH CONTROLS (TETAP DI BAWAH GAME) -->
+  <div class="touch">
+    <button onclick="move(-1)">⬅</button>
+    <button onclick="rotate()">⟳</button>
+    <button onclick="move(1)">➡</button>
+    <button onclick="drop()">⬇</button>
+    <button onclick="hardDrop()">⏬</button>
+  </div>
+
+</div>
+
+<!-- ===== SCRIPT ASLI KAMU (TIDAK DIUBAH) ===== -->
+<script>
+/* FULL JS TETAP PERSIS PUNYAMU */
+    /* ===== FULLSCREEN ===== */
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen();
+  }else{
+    document.exitFullscreen();
+  }
+}
+
+/* ===== SOUND ===== */
+let soundOn=true, musicOn=true;
+const sMove=new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
+const sRotate=new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+const sClear=new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
+const sOver=new Audio("https://actions.google.com/sounds/v1/cartoon/descending_whistle_2.ogg");
+/*const music=new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_9c1d79c68a.mp3");*/
+/*const music=new Audio("https://cdn.pixabay.com/audio/2022/03/15/audio_9c1d79c68a.mp3");*/
+/**const music=new Audio("356-8-bit-chiptune-game-music-357518.mp3");**/
+const music = new Audio("https://orangefreesounds.com/wp-content/uploads/2025/04/8-bit-chiptune-music.mp3");
+music.loop = true;
+music.volume = 0.9;   
+const beep = document.getElementById("btnBeep");
+
+/* unlock audio (mobile fix) */
+document.addEventListener("touchstart",()=>{
+  beep.play().then(()=>beep.pause()).catch(()=>{});
+},{once:true});
+
+/* pasang beep ke semua tombol */
+document.querySelectorAll("button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    beep.currentTime=0;
+    beep.play().catch(()=>{});
+  });
+});
+  
+function play(s){if(soundOn){s.currentTime=0;s.play().catch(()=>{})}}
+function toggleSound(){soundOn=!soundOn}
+function toggleMusic(){musicOn=!musicOn; musicOn?music.play():music.pause()}
+  
+/* ===== CORE ===== */
+const COLS=10,ROWS=20,BLOCK=20;
+const canvas=document.getElementById("board");
+const ctx=canvas.getContext("2d");
+const nextCtx=document.getElementById("next").getContext("2d");
+
+let board=[],current,next;
+let score=0,lines=0,level=1;
+let high=localStorage.getItem("tetris_high")||0;
+document.getElementById("high").textContent=high;
+
+let dropInterval=800,last=0,paused=true;
+
+const colors=[null,"#22d3ee","#f97316","#a855f7","#22c55e","#eab308","#ef4444","#3b82f6"];
+const shapes=[[],[[1,1,1,1]],[[2,0,0],[2,2,2]],[[0,0,3],[3,3,3]],[[4,4],[4,4]],[[0,5,5],[5,5,0]],[[6,6,0],[0,6,6]],[[0,7,0],[7,7,7]]];
+
+function newPiece(){
+  const id=1+Math.random()*7|0;
+  return{shape:shapes[id],color:id,x:COLS/2|0,y:0};
+}
+
+function createBoard(){
+  board=Array.from({length:ROWS},()=>Array(COLS).fill(0));
+}
+
+function draw(){
+  ctx.clearRect(0,0,200,400);
+  board.forEach((r,y)=>r.forEach((v,x)=>{
+    if(v){ctx.fillStyle=colors[v];ctx.fillRect(x*BLOCK,y*BLOCK,BLOCK-1,BLOCK-1)}
+  }));
+  drawPiece(current,ctx,BLOCK);
+}
+
+function drawPiece(p,c,s){
+  p.shape.forEach((r,y)=>r.forEach((v,x)=>{
+    if(v){c.fillStyle=colors[p.color];c.fillRect((p.x+x)*s,(p.y+y)*s,s-1,s-1)}
+  }));
+}
+
+function collide(p){
+  return p.shape.some((r,y)=>r.some((v,x)=>{
+    if(v){
+      const nx=p.x+x, ny=p.y+y;
+      return nx<0||nx>=COLS||ny>=ROWS||board[ny]?.[nx];
+    }
+  }));
+}
+
+function merge(){
+  current.shape.forEach((r,y)=>r.forEach((v,x)=>{
+    if(v) board[current.y+y][current.x+x]=current.color;
+  }));
+}
+
+function clearLines(){
+  let c=0;
+  outer:for(let y=ROWS-1;y>=0;y--){
+    for(let x=0;x<COLS;x++) if(!board[y][x]) continue outer;
+    board.splice(y,1); board.unshift(Array(COLS).fill(0));
+    c++;y++;
+  }
+  if(c){
+    play(sClear);
+    lines+=c;
+    score+=c*100*level;
+    level=1+(lines/10|0);
+    dropInterval=Math.max(100,800-(level-1)*70);
+  }
+}
+
+function rotate(){const p=current.shape;current.shape=p[0].map((_,i)=>p.map(r=>r[i]).reverse());if(collide(current))current.shape=p;play(sRotate)}
+function move(d){current.x+=d;if(collide(current))current.x-=d;else play(sMove)}
+function drop(){current.y++;if(collide(current)){current.y--;merge();clearLines();current=next;next=newPiece();drawNext();if(collide(current))gameOver()}}
+function hardDrop(){while(!collide(current))current.y++;current.y--;drop()}
+
+function drawNext(){
+  nextCtx.clearRect(0,0,80,80);
+  next.shape.forEach((r,y)=>r.forEach((v,x)=>{
+    if(v){nextCtx.fillStyle=colors[next.color];nextCtx.fillRect(x*20,y*20,18,18)}
+  }));
+  /*nextCtx.clearRect(0,0,80,80);
+next.shape.forEach((r,y)=>r.forEach((v,x)=>{
+  if(v){
+    nextCtx.fillStyle = colors[next.color];
+    nextCtx.fillRect(x*20, y*20, 16, 16);
+  }
+}));*/
+}
+
+function update(t=0){
+  if(paused) return;
+  if(t-last>dropInterval){drop();last=t}
+  draw();
+  scoreEl.textContent=score;
+  levelEl.textContent=level;
+  linesEl.textContent=lines;
+  requestAnimationFrame(update);
+}
+
+function startGame(){
+  if(!current){
+    createBoard();
+    current=newPiece();
+    next=newPiece();
+    drawNext();
+  }
+  paused=false;
+  if(musicOn) music.play();
+  update();
+}
+  
+function pauseGame(){paused=!paused;paused?music.pause():music.play();if(!paused)update()}    
+function resetGame(){score=lines=0;level=1;dropInterval=800;createBoard();current=newPiece();next=newPiece();drawNext();paused=false;update()}
+
+function gameOver(){
+  play(sOver);
+  paused=true; music.pause();
+  if(score>high){
+    high=score;
+    localStorage.setItem("tetris_high",high);
+    document.getElementById("high").textContent=high;
+  }
+  alert("GAME OVER");
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.key=="ArrowLeft")move(-1);
+  if(e.key=="ArrowRight")move(1);
+  if(e.key=="ArrowUp")rotate();
+  if(e.key=="ArrowDown")drop();
+  if(e.key==" ")hardDrop();
+});
+
+const scoreEl=document.getElementById("score");
+const levelEl=document.getElementById("level");
+const linesEl=document.getElementById("lines");
+  
+/* ===== UI STATE CONTROLLER ===== */
+const btnStartPause = document.getElementById("btnStartPause");
+const btnSound = document.getElementById("btnSound");
+const btnMusic = document.getElementById("btnMusic");
+
+/* INIT STATE */
+updateStartPause();
+updateSoundBtn();
+updateMusicBtn();
+
+/* START / PAUSE TOGGLE */
+btnStartPause.addEventListener("click", ()=>{
+  if(paused){
+    startGame();
+  }else{
+    pauseGame();
+  }
+  updateStartPause();
+});
+
+function updateStartPause(){
+  if(paused){
+    btnStartPause.textContent = "▶ Start";
+    btnStartPause.className = "btn-start";
+  }else{
+    btnStartPause.textContent = "⏸ Pause";
+    btnStartPause.className = "btn-pause";
+  }
+}
+
+/* SOUND TOGGLE */
+btnSound.addEventListener("click", ()=>{
+  toggleSound();
+  updateSoundBtn();
+});
+
+function updateSoundBtn(){
+  if(soundOn){
+    btnSound.textContent = "ON";
+    btnSound.className = "btn-sound-on";
+  }else{
+    btnSound.textContent = "OFF";
+    btnSound.className = "btn-sound-off";
+  }
+}
+
+/* MUSIC TOGGLE */
+btnMusic.addEventListener("click", ()=>{
+  toggleMusic();
+  updateMusicBtn();
+});
+
+function updateMusicBtn(){
+  if(musicOn){
+    btnMusic.textContent = "ON";
+    btnMusic.className = "btn-music-on";
+  }else{
+    btnMusic.textContent = "OFF";
+    btnMusic.className = "btn-music-off";
+  }
+}
+  /* ===== INTRO SOUND (MOBILE SAFE) ===== */
+const introSound = document.getElementById("introSound");
+introSound.volume = 0.7;
+
+/* unlock audio once */
+document.addEventListener("touchstart",()=>{
+  introSound.play().then(()=>{
+    introSound.pause();
+    introSound.currentTime = 0;
+  }).catch(()=>{});
+},{once:true});
+  
+/* ===== SPLASH CONTROLLER ===== */
+/**const splash = document.getElementById("splash");
+
+/* Disable game interaction during splash */
+/**paused = true;
+
+setTimeout(()=>{
+  splash.style.animation = "fadeOut .8s ease forwards";
+},5500);
+
+setTimeout(()=>{
+  splash.remove();
+  paused = true; // tetap pause, user tekan Start
+},6300);**/
+  
+  /* ===== SPLASH CONTROLLER ===== */
+const splash = document.getElementById("splash");
+
+/* Disable game interaction during splash */
+paused = true;
+
+/* play intro sound */
+setTimeout(()=>{
+  introSound.play().catch(()=>{});
+},300);
+
+/* fade out splash */
+setTimeout(()=>{
+  splash.style.animation = "fadeOut .8s ease forwards";
+  introSound.volume = 0.2;
+},5500);
+
+/* cleanup */
+setTimeout(()=>{
+  introSound.pause();
+  introSound.currentTime = 0;
+  splash.remove();
+  paused = true;
+},6300);
+  
+  /* ===== TETRIS BLOCK PARTICLE FX ===== */
+const fx = document.getElementById("fx");
+const fctx = fx.getContext("2d");
+
+function resizeFX(){
+  fx.width = splash.offsetWidth;
+  fx.height = splash.offsetHeight;
+}
+resizeFX();
+window.addEventListener("resize", resizeFX);
+
+/* mini tetromino shapes */
+const miniShapes = [
+  [[1,1,1,1]],                // I
+  [[1,1],[1,1]],              // O
+  [[0,1,0],[1,1,1]],          // T
+  [[1,0,0],[1,1,1]],          // L
+  [[0,1,1],[1,1,0]]           // Z
+];
+
+const miniColors = [
+  "#22d3ee",
+  "#f97316",
+  "#a855f7",
+  "#22c55e",
+  "#eab308",
+  "#ef4444",
+  "#3b82f6"
+];
+
+/* create block particles */
+const blockParticles = Array.from({length:22},()=>({
+  x: Math.random()*fx.width,
+  y: Math.random()*fx.height,
+  size: 6 + Math.random()*2,
+  speed: 0.25 + Math.random()*0.4,
+  rot: Math.random()*Math.PI,
+  rotSpeed: (Math.random()-.5)*0.01,
+  shape: miniShapes[Math.random()*miniShapes.length|0],
+  color: miniColors[Math.random()*miniColors.length|0],
+  alpha: 0.15 + Math.random()*0.25
+}));
+
+let gridOffset = 0;
+
+function drawMiniShape(p){
+  fctx.save();
+  fctx.translate(p.x, p.y);
+  fctx.rotate(p.rot);
+  fctx.globalAlpha = p.alpha;
+  fctx.fillStyle = p.color;
+
+  p.shape.forEach((row,y)=>{
+    row.forEach((v,x)=>{
+      if(v){
+        fctx.fillRect(
+          x*p.size,
+          y*p.size,
+          p.size-1,
+          p.size-1
+        );
+      }
+    });
+  });
+
+  fctx.restore();
+}
+
+function drawFX(){
+  fctx.clearRect(0,0,fx.width,fx.height);
+
+  /* GRID BACKGROUND */
+  fctx.strokeStyle="rgba(34,211,238,.06)";
+  fctx.lineWidth=1;
+  gridOffset+=0.25;
+
+  for(let x=0;x<fx.width;x+=40){
+    fctx.beginPath();
+    fctx.moveTo(x+(gridOffset%40),0);
+    fctx.lineTo(x+(gridOffset%40),fx.height);
+    fctx.stroke();
+  }
+
+  for(let y=0;y<fx.height;y+=40){
+    fctx.beginPath();
+    fctx.moveTo(0,y+(gridOffset%40));
+    fctx.lineTo(fx.width,y+(gridOffset%40));
+    fctx.stroke();
+  }
+
+  /* TETRIS BLOCK PARTICLES */
+  blockParticles.forEach(p=>{
+    p.y += p.speed;
+    p.rot += p.rotSpeed;
+
+    if(p.y > fx.height + 40){
+      p.y = -40;
+      p.x = Math.random()*fx.width;
+    }
+
+    drawMiniShape(p);
+  });
+
+  requestAnimationFrame(drawFX);
+}
+
+drawFX();
+
+</script>
+</body>
+</html>
