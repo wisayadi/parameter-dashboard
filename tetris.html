@@ -255,7 +255,7 @@ button:active::after{
 
 .settings-card h3{
   margin:4px 0 12px;
-  color:#22d3ee;
+  color:/*#22d3ee*/gold;
 }
 
 .settings-section{
@@ -289,11 +289,20 @@ button:active::after{
 }
 
 .theme-dark{
-  background:linear-gradient(180deg,#020617,#020617);
+  /*background:linear-gradient(180deg,#020617,#020617);*/
+  /*background: linear-gradient(180deg, #a7f3d0, #ecfeff);*/
+  /*background: linear-gradient(180deg, #e0f2fe, #f8fafc);*/
+  /*background: linear-gradient(180deg, #fbcfe8, #e9d5ff);*/
+  /**background: linear-gradient(135deg, #22d3ee, #a78bfa, #f472b6);**/    /*aurora pro*/
+  background:
+  radial-gradient(circle at top, rgba(255,255,255,.6), transparent 60%),
+  linear-gradient(180deg, #38bdf8, #f0f9ff);   /*glass glow */
+  
 }
 
 .theme-neon{
-  background:linear-gradient(180deg,#2e1065,#020617);
+  /*background:linear-gradient(180deg,#2e1065,#020617);*/
+  background: linear-gradient(135deg, #22d3ee, #a78bfa, #f472b6);      /*aurora pro*/
 }
   #settingsPage{
   z-index:2000;
@@ -302,6 +311,10 @@ button:active::after{
 </head>
 
 <body>
+  <audio id="beepClick" preload="auto">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+</audio>
+
 <div class="app">
   <!-- ===== SPLASH SCREEN ===== -->
 <div id="splash">
@@ -329,13 +342,17 @@ button:active::after{
     <div class="settings-section">
       <p>🎨 Card Background</p>
       <button onclick="setTheme('default')">Default</button>
-      <button onclick="setTheme('dark')">Dark Blue</button>
-      <button onclick="setTheme('neon')">Purple Neon</button>
+      <button onclick="setTheme('dark')">Glass Glow</button>   
+      <button onclick="setTheme('neon')">Purple Aurora</button>
     </div>
 
     <div class="settings-section">
-      <button class="btn-exit" onclick="exitGame()">EXIT GAME</button>
-    </div>
+      <!-- <button class="btn-exit" onclick="exitGame()">EXIT GAME</button>
+    </div>-->
+      <button class="btn-exit" onclick="exitGame(); goDashboard()">
+    EXIT GAME
+  </button> 
+ </div>
 
     <button class="btn-close" onclick="closeSettings()">Close</button>
   </div>
@@ -435,6 +452,9 @@ document.addEventListener("pointerdown", unlockAudio, { once:true });
 /* FULL JS TETAP PERSIS PUNYAMU */
     /* ===== FULLSCREEN ===== */
 function toggleFullscreen(){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen();
   }else{
@@ -807,18 +827,40 @@ const settingsPage = document.getElementById("settingsPage");
 const appCard = document.querySelector(".app");
 
   function openSettings(){
-  uiBeep();
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   settingsPage.style.display = "flex";
   paused = true;
 }
 
-  function closeSettings(){
-  uiBeep();
+  function closeSettings(){ 
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+  
   settingsPage.style.display = "none";
 }
+  
+  function goDashboard() {
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
 
-  function setTheme(mode, silent=false){
-  if(!silent) uiBeep();
+  bgm.pause();
+  clearInterval(timerInterval);
+
+  if (document.fullscreenElement) {
+    document.exitFullscreen().catch(()=>{});
+  }
+
+  setTimeout(() => {
+    window.location.href =
+      "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 150);
+} 
+  
+  function setTheme(mode, silent=true){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
 
   appCard.classList.remove("theme-default","theme-dark","theme-neon");
 
