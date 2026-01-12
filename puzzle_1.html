@@ -453,7 +453,144 @@ input[type=file]{display:none}
   cursor:pointer;
   transition:.25s ease;
 }
-  
+  /* =====================================================
+   PRO INTERACTIVE BUTTON EFFECT (GLOBAL)
+===================================================== */
+
+/* Base interactive */
+button, label, select {
+  position: relative;
+  overflow: hidden;
+  transition:
+    background .25s ease,
+    transform .12s ease,
+    box-shadow .25s ease,
+    filter .25s ease;
+}
+
+/* HOVER (desktop) */
+@media (hover:hover){
+  button:hover,
+  label:hover,
+  select:hover{
+    filter:brightness(1.15) saturate(1.2);
+    box-shadow:
+      0 8px 22px rgba(34,211,238,.45),
+      0 0 16px rgba(99,102,241,.35);
+    transform:translateY(-1px) scale(1.03);
+  }
+}
+
+/* ACTIVE / TAP */
+button:active,
+label:active,
+select:active{
+  transform:scale(.96);
+  filter:brightness(.9) saturate(1.1);
+  box-shadow:
+    0 4px 12px rgba(0,0,0,.6) inset,
+    0 2px 6px rgba(0,0,0,.4);
+}
+
+/* RIPPLE LIGHT EFFECT */
+button::after,
+label::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:radial-gradient(circle at center,
+    rgba(255,255,255,.35),
+    transparent 65%);
+  opacity:0;
+  transition:.35s ease;
+  pointer-events:none;
+}
+
+button:active::after,
+label:active::after{
+  opacity:1;
+}
+
+/* DISABLE HOVER JITTER ON MOBILE */
+@media (hover:none){
+  button:hover,
+  label:hover,
+  select:hover{
+    transform:none;
+    box-shadow:none;
+    filter:none;
+  }
+}
+  .controls button:active{
+  background:linear-gradient(135deg,#0ea5e9,#6366f1);
+}
+  .tap-start:active{
+  background:linear-gradient(135deg,#38bdf8,#818cf8);
+  box-shadow:
+    0 6px 18px rgba(0,0,0,.6) inset,
+    0 0 22px rgba(56,189,248,.6);
+}
+  /* =====================================================
+   TRUE HOVER + ACTIVE COLOR CHANGE (PRO FIX)
+===================================================== */
+
+/* HOVER */
+@media (hover:hover){
+  button:hover,
+  label:hover,
+  select:hover{
+    background:
+      linear-gradient(135deg,#38bdf8,#818cf8) !important;
+    box-shadow:
+      0 10px 26px rgba(56,189,248,.6),
+      0 0 18px rgba(129,140,248,.45);
+    transform:translateY(-1px) scale(1.04);
+  }
+}
+
+/* ACTIVE (TAP / CLICK) */
+button:active,
+label:active,
+select:active{
+  background:
+    linear-gradient(135deg,#0ea5e9,#4f46e5) !important;
+  box-shadow:
+    0 6px 14px rgba(0,0,0,.6) inset,
+    0 0 20px rgba(79,70,229,.6);
+  transform:scale(.94);
+}
+
+/* HOVER + ACTIVE BERSAMAAN (INI YANG HILANG SEBELUMNYA) */
+@media (hover:hover){
+  button:hover:active,
+  label:hover:active,
+  select:hover:active{
+    background:
+      linear-gradient(135deg,#0284c7,#4338ca) !important;
+    filter:brightness(1.15);
+    box-shadow:
+      0 4px 10px rgba(0,0,0,.7) inset,
+      0 0 24px rgba(67,56,202,.75);
+  }
+}
+  .tap-start:active{
+  background:
+    linear-gradient(135deg,#22d3ee,#6366f1) !important;
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.6) inset,
+    0 0 32px rgba(34,211,238,.8);
+  transform:scale(.92);
+}
+  /* ================= CLICK FLASH YELLOW (GLOBAL) ================= */
+.flash-yellow{
+  background:linear-gradient(135deg,#fde047,#facc15) !important;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,.25) inset,
+    0 0 18px rgba(250,204,21,.9),
+    0 8px 18px rgba(0,0,0,.5);
+  filter:brightness(1.15) saturate(1.2);
+  transform:scale(.96);
+}
     </style>
 </head>
 
@@ -635,6 +772,8 @@ function vibrate(){navigator.vibrate&&navigator.vibrate(15);}
 
 /* ================= FULLSCREEN ================= */
 function toggleFullscreen(){
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen();
   }else{
@@ -643,7 +782,9 @@ function toggleFullscreen(){
 }
 
 /* ================= TOGGLE ANGKA ================= */
-function toggleNumber(){
+function toggleNumber(){  
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
   numberOn=!numberOn;
   document.querySelectorAll(".tile").forEach(t=>{
     t.textContent = numberOn ? t.dataset.id : "";
@@ -661,6 +802,9 @@ imgInput.onchange=e=>{
 
 /* ================= INIT ================= */
 function init(){
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
+
   SIZE=parseInt(level.value);
   tiles=[...Array(SIZE*SIZE-1).keys()].map(n=>n+1).concat(0);
   moves=0;movesEl.textContent=0;
@@ -709,19 +853,43 @@ function move(i){
 }
 
 /* ================= SHUFFLE ================= */
-function shuffle(){
-  numberOn=false; // otomatis sembunyikan angka
-  document.querySelectorAll(".tile").forEach(t=>t.textContent="");
+  function shuffle(){
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
+  numberOn = false;
+  document.querySelectorAll(".tile").forEach(t => t.textContent = "");
 
-  for(let i=0;i<300;i++){
-    const e=tiles.indexOf(0);
-    const n=[e-1,e+1,e-SIZE,e+SIZE].filter(x=>x>=0&&x<SIZE*SIZE);
-    const p=n[Math.random()*n.length|0];
-    [tiles[e],tiles[p]]=[tiles[p],tiles[e]];
+  // RESET ke posisi solved
+  tiles = [...Array(SIZE * SIZE - 1).keys()].map(n => n + 1).concat(0);
+
+  let empty = tiles.length - 1;
+  let last = -1;
+
+  // lakukan gerakan valid acak
+  for(let i = 0; i < SIZE * SIZE * 20; i++){
+    const x = empty % SIZE;
+    const y = Math.floor(empty / SIZE);
+
+    const moves = [];
+    if(x > 0) moves.push(empty - 1);
+    if(x < SIZE - 1) moves.push(empty + 1);
+    if(y > 0) moves.push(empty - SIZE);
+    if(y < SIZE - 1) moves.push(empty + SIZE);
+
+    // hindari bolak-balik
+    const valid = moves.filter(m => m !== last);
+    const next = valid[Math.random() * valid.length | 0];
+
+    last = empty;
+    [tiles[empty], tiles[next]] = [tiles[next], tiles[empty]];
+    empty = next;
   }
-  moves=0;movesEl.textContent=0;render();
-}
 
+  moves = 0;
+  movesEl.textContent = 0;
+  render();
+}
+  
 /* ================= WIN ================= */
   function checkWin(){
   for(let i=0;i<SIZE*SIZE-1;i++) if(tiles[i]!==i+1) return;
@@ -922,10 +1090,14 @@ const defaultImages=[
 ];
 
 function openSettings(){
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
   document.getElementById("settingsPage").classList.add("show");
 }
 
 function closeSettings(){
+  const beepClick = document.getElementById("beepClick");
+  beepClick.play();
   document.getElementById("settingsPage").classList.remove("show");
 }
 
@@ -934,6 +1106,19 @@ function setDefaultImage(i){
   closeSettings();
   init();
 }
+  
+/* ========= GLOBAL YELLOW CLICK EFFECT ========= */
+document.addEventListener("click", e=>{
+  const el = e.target.closest("button, label, select");
+  if(!el) return;
+
+  el.classList.add("flash-yellow");
+
+  setTimeout(()=>{
+    el.classList.remove("flash-yellow");
+  },500); // ⬅️ durasi kilat (bisa 80–150)
+});
+
   </script>
 </body>
 </html>
