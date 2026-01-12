@@ -681,6 +681,9 @@ setTimeout(()=>{
 const fsBtn = document.getElementById("fsBtn");
 
 fsBtn.addEventListener("click", () => {
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
   } else {
@@ -755,6 +758,9 @@ const manifestBlob = new Blob(
   },1000);
 }*/
   function startTimer(){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   clearInterval(timerInterval);
 
   if(!timerEnabled || GAME_TIME === 0){
@@ -805,6 +811,9 @@ document.getElementById("gameTimer").style.display =
   timerEnabled && GAME_TIME > 0 ? "block" : "none";
   
   function setGameTime(sec){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   GAME_TIME = sec;
   localStorage.setItem("gameTime", sec);
 
@@ -916,6 +925,9 @@ function renderLeaderboard(){
  });
 }
   function resetLeaderboard(){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
  if(!confirm("Reset semua leaderboard dan high score?")) return;
 
  leaderboard = [];
@@ -1267,6 +1279,7 @@ canvas.addEventListener("pointerup",e=>{
   }
 }*/
 
+
  function goDashboard() {
   const beepClick = document.getElementById("beepClick");
   if (beepClick) beepClick.play().catch(()=>{});
@@ -1287,6 +1300,9 @@ canvas.addEventListener("pointerup",e=>{
   const pauseBtn = document.querySelector(".pause-btn");
 
 function togglePause(){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   if(gameOver) return;
 
   paused = !paused;
@@ -1306,13 +1322,22 @@ const bgInput = document.getElementById("bgInput");
 const settingsPanel = document.getElementById("settingsPanel");
 
 function openSettings(){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   settingsPanel.classList.add("show");
 }
 function closeSettings(){
+   const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   settingsPanel.classList.remove("show");
 }
 
 function pickBg(){
+    const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   bgInput.click();
 }
 
@@ -1331,6 +1356,9 @@ bgInput.addEventListener("change",()=>{
 });
 
 function resetBg(){
+   const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   document.documentElement.style.setProperty("--custom-bg","none");
   localStorage.removeItem("customBG");
 }
@@ -1357,6 +1385,9 @@ if(savedPreset){
     
     /* ================= PRESET BACKGROUND ================= */
 function setPreset(type){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   let bg = "none";
 
   if(type === "wood"){
@@ -1399,6 +1430,9 @@ function setPreset(type){
 }
 
 function clearPreset(){
+  const beepClick = document.getElementById("beepClick");
+  if (beepClick) beepClick.play().catch(()=>{});
+
   document.documentElement.style.setProperty("--preset-bg", "none");
   localStorage.removeItem("presetBG");
 }
