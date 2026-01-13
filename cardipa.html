@@ -719,6 +719,318 @@ header p{margin:2px 0 0;font-size:9px;opacity:.85}
 .nav-item:active{
   transform: scale(0.92);
 }
+ 
+/* ================= GAME OVERLAY (FIX CENTER) ================= */
+#gameOverlay{
+  position: fixed;
+  inset: 0;
+  display: none;               /* ⬅️ default BENAR */
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
+
+#gameOverlay.show{
+  display: flex;
+}
+/* Background blur */
+.game-overlay-bg{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(14px);
+}
+
+/* PANEL */
+.game-panel{
+  position: relative;
+  width: 88%;
+  max-width: 360px;
+
+  background: linear-gradient(180deg,#f9fafb,#e5e7eb);
+  border-radius: 22px;
+  padding: 18px;
+
+  box-shadow: 0 30px 80px rgba(0,0,0,.45);
+
+  /* anim */
+  transform: scale(.92);
+  animation: gamePanelIn .45s cubic-bezier(.22,1.2,.32,1);
+}
+
+/* Anim masuk */
+@keyframes gamePanelIn{
+  from{
+    opacity:0;
+    transform: scale(.85);
+  }
+  to{
+    opacity:1;
+    transform: scale(1);
+  }
+}
+   
+.game-title{
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  color: #111827;
+}
+
+/* GRID */
+.game-grid{
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap: 14px;
+}
+
+/* CARD */
+.game-card{
+  border-radius: 16px;
+  padding: 18px 10px;
+  text-align: center;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 12px 26px rgba(0,0,0,.25);
+  transition: all .25s ease;
+}
+
+.game-card:hover{
+  transform: translateY(-4px) scale(1.05);
+}
+
+.game-icon{
+  font-size: 32px;
+  margin-bottom: 6px;
+}
+
+.game-name{
+  font-size: 12px;
+  text-shadow: 0 2px 4px rgba(0,0,0,.35);
+}
+
+/* THEME PER GAME */
+.blockblast{
+  background: linear-gradient(135deg,#22c55e,#4ade80);
+}
+.puzzle{
+  background: linear-gradient(135deg,#3b82f6,#60a5fa);
+}
+.tetris{
+  background: linear-gradient(135deg,#f97316,#fb923c);
+}
+
+/* CLOSE BUTTON */
+.close-game{
+  margin-top: 14px;
+  width: 100%;
+  border: none;
+  border-radius: 14px;
+  padding: 8px;
+  font-size: 11px;
+  background: linear-gradient(135deg,#ef4444,#f87171);
+  color: white;
+  cursor: pointer;
+}
+   .game-panel{
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+   /* ===== GOLD HOVER & CLICK EFFECT (BOTTOM NAV) ===== */
+.nav-item:hover .nav-icon-card{
+  background: linear-gradient(135deg,#d4af37,#ffd700);
+  box-shadow:
+    0 0 18px rgba(212,175,55,.85),
+    0 6px 20px rgba(0,0,0,.45);
+}
+
+.nav-item:hover .nav-label{
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255,215,0,.8);
+}
+
+/* Saat ditekan (klik/tap) */
+.nav-item:active .nav-icon-card{
+  transform: scale(0.88);
+  background: linear-gradient(135deg,#b8860b,#ffcc00);
+  box-shadow:
+    0 0 25px rgba(255,215,0,.95),
+    0 8px 26px rgba(0,0,0,.55);
+}
+   /* ===== GOLD EFFECT – CLOSE GAME BUTTON ===== */
+.close-game{
+  background: linear-gradient(135deg,#ef4444,#f87171);
+  transition: all .25s ease;
+}
+
+/* Hover */
+.close-game:hover{
+  background: linear-gradient(135deg,#d4af37,#ffd700);
+  color: #3a2a00;
+  box-shadow:
+    0 0 20px rgba(255,215,0,.85),
+    0 10px 30px rgba(0,0,0,.45);
+  transform: translateY(-2px) scale(1.03);
+}
+
+/* Click / Press */
+.close-game:active{
+  transform: scale(0.9);
+  background: linear-gradient(135deg,#b8860b,#ffcc00);
+  box-shadow:
+    0 0 28px rgba(255,215,0,1),
+    0 12px 34px rgba(0,0,0,.6);
+}
+   /* GOLD LOCK STATE (VISIBLE DI HP) */
+.nav-item.gold-lock .nav-icon-card{
+  background: linear-gradient(135deg,#d4af37,#ffd700);
+  box-shadow:
+    0 0 28px rgba(255,215,0,1),
+    0 10px 30px rgba(0,0,0,.55);
+  transition: all .3s ease;
+}
+
+.nav-item.gold-lock .nav-label{
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255,215,0,.9);
+}
+   .close-game.gold-lock{
+  background: linear-gradient(135deg,#d4af37,#ffd700) !important;
+  color: #3a2a00;
+  box-shadow:
+    0 0 30px rgba(255,215,0,1),
+    0 12px 34px rgba(0,0,0,.6);
+}
+   /* ================= FLOATING GAME CARDS (CARDIPA STYLE) ================= */
+
+.game-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+/* CARD DASAR */
+.game-card{
+  position:relative;
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(14px);
+  border-radius:18px;
+  padding:14px 10px;
+  text-align:center;
+  cursor:pointer;
+
+  box-shadow:
+    0 10px 28px rgba(0,0,0,.45),
+    inset 0 0 0 1px rgba(255,255,255,.06);
+
+  animation: cardFloat 5.4s ease-in-out infinite;
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease;
+}
+
+/* ICON */
+.game-icon{
+  font-size:34px;
+  margin-bottom:6px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* NAMA GAME */
+.game-name{
+  font-size:11px;
+  font-weight:700;
+  opacity:.85;
+  color:brown;
+}
+
+/* ================= FLOAT ANIMATION ================= */
+@keyframes cardFloat{
+  0%,100%{
+    transform:translateY(0);
+  }
+  50%{
+    transform:translateY(-8px);
+  }
+}
+
+/* ================= VARIASI DELAY (BIAR HIDUP) ================= */
+.game-card:nth-child(1){animation-delay:0s}
+.game-card:nth-child(2){animation-delay:.6s}
+.game-card:nth-child(3){animation-delay:1.2s}
+.game-card:nth-child(4){animation-delay:1.8s}
+.game-card:nth-child(5){animation-delay:2.4s}
+.game-card:nth-child(6){animation-delay:3s}
+
+/* ================= HOVER / TAP EFFECT ================= */
+.game-card:hover{
+  transform:translateY(-14px) scale(1.05);
+  box-shadow:
+    0 18px 40px rgba(0,0,0,.6),
+    0 0 24px rgba(99,102,241,.45);
+}
+
+/* MOBILE TAP */
+.game-card:active{
+  transform:scale(.96);
+}
+   /* ================= UNIQUE GAME CARD COLORS ================= */
+
+/* 🧱 Block Blast – Emerald Neon */
+.blockblast{
+  background: linear-gradient(
+    135deg,
+    #10b981,
+    #34d399
+  );
+  box-shadow:
+    0 0 18px rgba(16,185,129,.55),
+    0 12px 28px rgba(0,0,0,.35);
+}
+
+/* 🧩 Puzzle – Royal Purple */
+.puzzle{
+  background: linear-gradient(
+    135deg,
+    #7c3aed,
+    #a78bfa
+  );
+  box-shadow:
+    0 0 18px rgba(124,58,237,.55),
+    0 12px 28px rgba(0,0,0,.35);
+}
+
+/* ⬛ Tetris – Sunset Orange */
+.tetris{
+  /*background: linear-gradient(
+    135deg,
+    #f97316,
+    #fb7185
+  );*/
+   background: linear-gradient(135deg,
+  #22d3ee,
+  #818cf8
+);
+  box-shadow:
+    0 0 18px rgba(249,115,22,.55),
+    0 12px 28px rgba(0,0,0,.35);
+}
+     /* === TETRIS ICON (BLOCKS COLORFUL) === */
+.tetris-icon{
+  width:48px;
+  height:48px;
+  background-image:url("https://cdn-icons-png.flaticon.com/512/888/888879.png");
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center;
+  filter:
+    /*drop-shadow(0 6px 14px rgba(0,0,0,.45))*/
+    drop-shadow(0 0 12px rgba(255,255,255,1.25));
+}
    </style>
 </head>
 
@@ -754,7 +1066,6 @@ function goDashboard() {
 }
 
 </script>
-
 
    <body>
    <div id="watermark"></div>
@@ -840,34 +1151,51 @@ function goDashboard() {
   </div>
   <span class="nav-label" id="soundLabel">Suara</span>
 </div>
-
-   <!-- <div class="nav-item" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/drop_puzzle_1.html')"> -->
-   <div class="nav-item game-btn" onclick="activateGame(this,'https://wisayadi.github.io/parameter-dashboard/drop_puzzle_1.html')">
-  <div class="nav-icon-card">
-    <span class="nav-icon">🎮</span>
-  </div>
-  <span class="nav-label">Block-Blast</span>
-</div>
    
-   <!-- <div class="nav-item" onclick="cardClick('https://wisayadi.github.io/parameter-dashboard/puzzle_1.html')"> -->
-   <div class="nav-item game-btn" onclick="activateGame(this,'https://wisayadi.github.io/parameter-dashboard/puzzle_1.html')">  
+
+<div class="nav-item" onclick="openGameOverlay()">
   <div class="nav-icon-card">
     <span class="nav-icon">🎮</span>
   </div>
-  <span class="nav-label">Puzzle</span>
-</div>
-   <!--</nav> -->        
-         <div class="nav-item game-btn" onclick="activateGame(this,'https://wisayadi.github.io/parameter-dashboard/tetris.html')">  
-  <div class="nav-icon-card">
-    <span class="nav-icon">🎮</span>
+  <span class="nav-label">Game</span>
+</div>  
+   </nav>
+   
+   <!-- ================= GAME OVERLAY ================= -->
+    <div id="gameOverlay">
+  <div class="game-overlay-bg" onclick="closeGameOverlay()"></div>
+
+  <div class="game-panel">
+    <h2 class="game-title">🎮 Game Center</h2>
+
+    <div class="game-grid">
+      <div class="game-card blockblast"
+           onclick="openGame('https://wisayadi.github.io/parameter-dashboard/drop_puzzle_1.html')">
+        <div class="game-icon">🧱</div>
+        <div class="game-name">Block Blast</div>
+      </div>
+
+      <div class="game-card puzzle"
+           onclick="openGame('https://wisayadi.github.io/parameter-dashboard/puzzle_1.html')">
+        <div class="game-icon">🧩</div>
+        <div class="game-name">Puzzle</div>
+      </div>
+
+      <div class="game-card tetris"
+           onclick="openGame('https://wisayadi.github.io/parameter-dashboard/tetris.html')">
+         <!-- <div class="game-icon">⬛</div> -->
+          <div class="game-icon tetris-icon"></div>
+        <div class="game-name">Tetris</div>
+      </div>
+    </div> 
+
+    <button class="close-game" onclick="closeGameOverlay()">Tutup</button>
   </div>
-  <span class="nav-label">Tetris</span>
-</div>
-</nav>   
+</div> 
 
       <!-- <button id="soundBtn" onclick="toggleSound()">🔊 Aktifkan Suara</button> -->
   <footer>© 2025 Dashboard Cardipa</footer>
-      
+            
 <script>
 let audioBeep = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
 let soundEnabled = localStorage.getItem("soundEnabled") === "true";
@@ -993,6 +1321,57 @@ window.addEventListener("online", hidePopup);**/
   pingTest();
 
 });
+      
+  /*function openGameOverlay(){
+  if(soundEnabled) audioBeep.play().catch(()=>{});
+  document.getElementById("gameOverlay").classList.add("show");
+  document.body.style.overflow = "hidden"; // lock scroll
+}*/
+   function openGameOverlay(){
+  if(soundEnabled) audioBeep.play().catch(()=>{});
+
+  const gameBtn = document.querySelector(".nav-item:nth-child(2)");
+
+  // 🔒 LOCK GOLD
+  gameBtn.classList.add("gold-lock");
+
+  // ⏳ TUNGGU BIAR GOLD TERLIHAT
+  setTimeout(()=>{
+    gameBtn.classList.remove("gold-lock");
+
+    document.getElementById("gameOverlay").classList.add("show");
+    document.body.style.overflow = "hidden";
+  }, 450); // ⬅️ DURASI IDEAL (300–500 ms)
+}   
+
+/*function closeGameOverlay(){
+   if(soundEnabled) audioBeep.play().catch(()=>{});
+  document.getElementById("gameOverlay").classList.remove("show");
+  document.body.style.overflow = "auto";
+}*/
+  function closeGameOverlay(){
+  if(soundEnabled) audioBeep.play().catch(()=>{});
+
+  const closeBtn = document.querySelector(".close-game");
+
+  // 🔒 GOLD LOCK
+  closeBtn.classList.add("gold-lock");
+
+  // ⏳ DELAY VISUAL
+  setTimeout(()=>{
+    closeBtn.classList.remove("gold-lock");
+
+    document.getElementById("gameOverlay").classList.remove("show");
+    document.body.style.overflow = "auto";
+  }, 450);
+}
+
+function openGame(url){
+  if(soundEnabled) audioBeep.play().catch(()=>{});
+  document.body.style.opacity = 0;
+  setTimeout(()=>window.location.href = url,400);
+}
+
      
 
 function updateClockLocal() {
