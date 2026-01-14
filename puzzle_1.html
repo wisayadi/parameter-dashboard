@@ -346,113 +346,162 @@ input[type=file]{display:none}
   z-index:200000; /* DI ATAS SEMUA */
 }
   /* ================= SETTINGS OVERLAY ================= */
+/* ================= AAA SETTINGS OVERLAY ================= */
+
 #settingsPage{
-  position:absolute;
+  position:fixed;
   inset:0;
-  background:rgba(2,6,23,.96);
-  backdrop-filter:blur(16px);
-  z-index:1000;
+  z-index:2000;
+
   display:none;
-  flex-direction:column;
-  padding:16px;
-  border-radius:18px;
+  justify-content:center;
+  align-items:center;
+
+  background:
+    radial-gradient(circle at top,
+      rgba(34,211,238,.12),
+      rgba(2,6,23,.96)
+    );
+
+  backdrop-filter:blur(22px) saturate(130%);
 }
 
 #settingsPage.show{
   display:flex;
 }
 
-.settings-title{
-  font-size:16px;
-  font-weight:900;
-  margin-bottom:12px;
+/* === CARD === */
+.settings-card{
+  width:92%;
+  max-width:420px;
+
+  padding:22px;
+  border-radius:26px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.14),
+      rgba(255,255,255,.05)
+    );
+
+  box-shadow:
+    0 30px 80px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.2);
+
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+
+  animation:settingsIn .6s cubic-bezier(.22,1,.36,1);
+}
+
+@keyframes settingsIn{
+  from{
+    opacity:0;
+    transform:scale(.88) translateY(40px);
+  }
+  to{
+    opacity:1;
+    transform:none;
+  }
+}
+
+/* === HEADER === */
+.settings-header{
   text-align:center;
-  background:linear-gradient(90deg,#22d3ee,#a5b4fc);
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:.6px;
+
+  background:linear-gradient(
+    90deg,
+    #22d3ee,
+    #a78bfa,
+    #fb7185
+  );
+
   -webkit-background-clip:text;
   color:transparent;
+}
+
+/* === CONTENT === */
+.settings-content{
+  display:flex;
+  justify-content:center;
 }
 
 .settings-images{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-bottom:auto;
+  gap:14px;
 }
-
-.settings-images button{
+  .settings-images button{
+  width:100%;
   aspect-ratio:1/1;
-  border-radius:12px;
+
+  min-width:96px;        /* ⬅️ TAMBAH */
+  min-height:96px;       /* ⬅️ TAMBAH */
+
+  border-radius:22px;    /* lebih premium */
   background-size:cover;
   background-position:center;
-  border:2px solid transparent;
+
+  border:2px solid rgba(255,255,255,.18);
+
+  box-shadow:
+    0 14px 36px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.25);
+
+  transition:
+    transform .25s cubic-bezier(.4,0,.2,1),
+    box-shadow .25s ease;
+}
+  .settings-images button.active{
+  transform:scale(1.08);
+  box-shadow:
+    0 20px 50px rgba(34,211,238,.6),
+    0 0 24px rgba(99,102,241,.55);
+  border-color:#22d3ee;
 }
 
 .settings-images button:hover{
-  border-color:var(--accent);
+  transform:translateY(-4px) scale(1.05);
+  box-shadow:0 20px 40px rgba(0,0,0,.65);
 }
 
-.settings-footer button{
-  width:100%;
-  padding:10px;
-  border-radius:12px;
-  font-weight:700;
+/* === ACTIONS === */
+.settings-actions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
 }
+
+/* EXIT */
+.settings-exit{
+  width:70%;
+  height:46px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:800;
+
+  background:linear-gradient(135deg,#ef4444,#f97316);
+  box-shadow:0 12px 26px rgba(0,0,0,.45);
+}
+
+/* BACK */
+.settings-back{
+  width:100%;
+  height:44px;
+  border-radius:14px;
+  font-size:13px;
+  font-weight:700;
+
+  background:linear-gradient(135deg,#22d3ee,#6366f1);
+}  
   
   /* === SETTINGS EXIT BUTTON (PROPORTIONAL) === */
-.settings-exit{
-  width:66%;                 /* ⬅️ 2/3 dari tombol Back */
-  height:46px;               /* ⬅️ tinggi normal */
-  margin:18px auto 8px;      /* ⬅️ center horizontal */
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:14px;
-  border:none;
-  font-size:13px;
-  font-weight:700;
-  letter-spacing:.6px;
-  color:white;
-
-  background:linear-gradient(135deg,#ef4444,#f97316);
-  box-shadow:
-    0 12px 26px rgba(0,0,0,.45),
-    0 0 18px rgba(239,68,68,.35);
-
-  cursor:pointer;
-  transition:.25s ease;
-}
-
-.settings-exit:active{
-  transform:scale(.96);
-  box-shadow:0 8px 18px rgba(0,0,0,.4);
-}
-  .settings-exit{
-  flex:0 0 auto !important;   /* 🔥 KUNCI UTAMA */
-  align-self:center;          /* center horizontal */
-  width:66%;
-  height:46px;
-  margin:14px 0 10px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:999px;
-  border:none;
-  font-size:13px;
-  font-weight:700;
-  letter-spacing:.6px;
-  color:white;
-
-  background:linear-gradient(135deg,#ef4444,#f97316);
-  box-shadow:
-    0 10px 24px rgba(0,0,0,.4),
-    0 0 16px rgba(239,68,68,.35);
-
-  cursor:pointer;
-  transition:.25s ease;
-}
   /* =====================================================
    PRO INTERACTIVE BUTTON EFFECT (GLOBAL)
 ===================================================== */
@@ -591,6 +640,35 @@ select:active{
   filter:brightness(1.15) saturate(1.2);
   transform:scale(.96);
 }
+  .settings-actions{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+}
+
+/* EXIT */
+.settings-exit{
+  width:70%;
+  height:46px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:800;
+
+  background:linear-gradient(135deg,#ef4444,#f97316);
+  box-shadow:0 12px 26px rgba(0,0,0,.45);
+}
+
+/* BACK */
+.settings-back{
+  width:100%;
+  height:44px;
+  border-radius:14px;
+  font-size:13px;
+  font-weight:700;
+
+  background:linear-gradient(135deg,#22d3ee,#6366f1);
+}
     </style>
 </head>
 
@@ -664,27 +742,37 @@ select:active{
   <div class="footer">High Score: <span id="high">-</span></div>
 </div>
   <!-- ================= SETTINGS PAGE ================= -->
+<!-- ================= AAA SETTINGS PAGE ================= -->
 <div id="settingsPage">
-  <div class="settings-title">⚙️ Settings</div>
 
-  <div class="settings-images">
-    <button style="background-image:url('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800')" onclick="setDefaultImage(0)"></button>
+  <div class="settings-card">
 
-    <button style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800')" onclick="setDefaultImage(1)"></button>
+    <div class="settings-header">⚙️ Settings</div>
 
-    <button style="background-image:url('https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?w=800')" onclick="setDefaultImage(2)"></button>
+    <div class="settings-content">
+      <div class="settings-images">
+        <button style="background-image:url('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800')"
+                onclick="setDefaultImage(0)"></button>
+
+        <button style="background-image:url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=800')"
+                onclick="setDefaultImage(1)"></button>
+
+        <button style="background-image:url('https://images.unsplash.com/photo-1523413651479-597eb2da0ad6?w=800')"
+                onclick="setDefaultImage(2)"></button>
+      </div>
+    </div>
+
+    <div class="settings-actions">
+      <button class="settings-exit" onclick="goDashboard()">Exit</button>
+      <button class="settings-back" onclick="closeSettings()">⬅️ Back</button>
+    </div>
+
   </div>
-  
+</div>  
   <audio id="beepClick">
   <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
 </audio>
-
-  <button class="settings-exit" onclick="goDashboard()">Exit</button>
-
-  <div class="settings-footer">
-    <button onclick="closeSettings()">⬅️ Back</button>
-  </div>
-</div>
+  
   
 <script>
   
@@ -1101,8 +1189,17 @@ function closeSettings(){
   document.getElementById("settingsPage").classList.remove("show");
 }
 
-function setDefaultImage(i){
+  function setDefaultImage(i){
   imageSrc = defaultImages[i];
+
+  document
+    .querySelectorAll(".settings-images button")
+    .forEach(b=>b.classList.remove("active"));
+
+  document
+    .querySelectorAll(".settings-images button")[i]
+    .classList.add("active");
+
   closeSettings();
   init();
 }
