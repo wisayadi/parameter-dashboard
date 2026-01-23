@@ -387,8 +387,8 @@ button:active{transform:scale(.92);}
 }
   .tube{
   background:linear-gradient(180deg,#c6ff5c,#6aa800);
-  border-radius:20px;
-  border:4px solid #555;
+  border-radius:5px;
+  border:0px solid #555;
   position:absolute; 
  /* position:relative;*/
 }
@@ -480,17 +480,6 @@ button:active{transform:scale(.92);}
 .tube-line.left{ left:6px; }
 .tube-line.right{ right:6px; }
 
-/* Zona tengah (rata) */
-.tube.vertical::after{
-  content:"";
-  position:absolute;
-  top:50%;
-  left:4px;
-  right:4px;
-  height:2px;
-  background:#9aff00;
-  opacity:.8;
-}
   .tube.vertical.flat{
   box-shadow:
     inset 0 0 14px rgba(150,255,0,.6),
@@ -520,9 +509,31 @@ button:active{transform:scale(.92);}
   right:0;
   top:0;  
 }
+  /* ===== END CAP TABUNG VERTIKAL (FLAT) ===== */
+.tube.vertical::before,
+.tube.vertical::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  height:12px;             /* lebih tipis */
+  background:#4b5563;      /* warna solid flat */
+  z-index:2;
+}
+
+/* atas */
+.tube.vertical::before{
+  top:0;
+}
+
+/* bawah */
+.tube.vertical::after{
+  bottom:0;
+}
+
   /* ===== ACTION BUTTON ROW (PRO+) ===== */
   .action-row{
-   margin-top:14px;
+   margin-top:18px;
   display: flex;   
   justify-content: center;
   gap: 12px;
@@ -554,9 +565,9 @@ button:active{transform:scale(.92);}
   gap:6px;        /* jarak skala ↔ tabung */
 }
   /* ===== TABUNG HORIZONTAL ===== */
-.tube-wrap-h{
+/*.tube-wrap-h{
   position:relative;
-  margin:18px auto 0;
+  margin:38px auto 0;
   width:260px;
   height:60px;
   display:flex;
@@ -564,18 +575,50 @@ button:active{transform:scale(.92);}
   align-items:center;
   
   margin-bottom: 12px;
+}*/
+  .tube-wrap-h{
+  position:relative;
+  margin:38px auto 0;      /* layout tetap */
+  width:260px;
+  height:60px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  transform:translateY(20px);  /* ⬅️ geser tabung SAJA */
 }
 
 .tube.horizontal{
   width:260px;
   height:26px;
-  border-radius:20px;
+  border-radius:5px;
   background:linear-gradient(90deg,#c6ff5c,#6aa800);
-  border:4px solid #555;
+  border:0px solid #555;
   position:relative;
   overflow:hidden;
 }
+  /* ===== END CAP TABUNG HORIZONTAL (FLAT) ===== */
+.tube.horizontal::before,
+.tube.horizontal::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:12px;              /* lebih tipis */
+  background:#4b5563;      /* warna solid flat */
+  z-index:2;
+}
 
+/* kiri */
+.tube.horizontal::before{
+  left:0;
+}
+
+/* kanan */
+.tube.horizontal::after{
+  right:0;
+}
+   
 /* garis pembatas */
 .tube-line.top{
   position:absolute;
@@ -592,18 +635,6 @@ button:active{transform:scale(.92);}
   bottom:6px;
   height:2px;
   background:rgba(0,0,0,.45);
-}
-
-/* garis tengah (rata) */
-.tube.horizontal::after{
-  content:"";
-  position:absolute;
-  left:50%;
-  top:4px;
-  bottom:4px;
-  width:2px;
-  background:#9aff00;
-  opacity:.85;
 }
 
 /* glow saat rata */
@@ -637,6 +668,31 @@ button:active{transform:scale(.92);}
   right:0;
   bottom:-3px;
 }
+  /* GARIS TENGAH HORIZONTAL (RATA) */
+.tube-center{
+  position:absolute;
+  left:50%;
+  top:4px;
+  bottom:4px;
+  width:2px;
+  background:#9aff00;
+  opacity:.85;
+  transform:translateX(-50%);
+  z-index:1;
+}
+  /* GARIS TENGAH TABUNG VERTIKAL */
+.tube-center-v{
+  position:absolute;
+  top:50%;
+  left:4px;
+  right:4px;
+  height:2px;
+  background:#9aff00;
+  opacity:.85;
+  transform:translateY(-50%);
+  z-index:1;
+}
+  
 </style>
 </head>
 
@@ -663,7 +719,7 @@ button:active{transform:scale(.92);}
 <div class="settings-btn" onclick="openSettings()">⚙️</div>
 
 <div class="settings-overlay" id="settings">
-  <button onclick="toggleFullscreen()">🖥 Fullscreen / PWA</button>
+  <button onclick="toggleFullscreen()">🖥 Fullscreen</button>
   <button id="themeBtn" onclick="toggleTheme()">🌞 Mode Terang</button>
   <button onclick="closeSettings()">⬅️ Back</button>
   <button onclick="exitApp()" class="lock">Exit</button>
@@ -683,14 +739,16 @@ button:active{transform:scale(.92);}
   <div class="center-ring" id="centerRing"></div>  
   <div class="dot" id="dot"></div>
 </div>
+  
   <!-- ===== TABUNG HORIZONTAL ===== -->
 <div class="tube-wrap-h">
-  <!-- TABUNG -->
   <div class="tube horizontal">
-    <div class="tube-line top"></div>
-    <div class="tube-line bottom"></div>
-    <div class="bubble" id="bubbleH"></div>
-  </div>
+  <div class="tube-line top"></div>
+  <div class="tube-line bottom"></div>
+
+  <div class="tube-center"></div> <!-- ⬅️ BARU -->
+  <div class="bubble" id="bubbleH"></div>
+</div>
 
   <!-- SKALA -->
   <div class="scale-h left">-1°</div>
@@ -698,41 +756,25 @@ button:active{transform:scale(.92);}
   <div class="scale-h right">+1°</div>
 </div>
   
-  <!-- <div class="tube-wrap">
-  <div class="tube vertical">
-    <div class="tube-line left"></div>
-    <div class="tube-line right"></div>
-    <div class="bubble" id="bubbleV"></div>
-  </div>
-
-    <div class="scale top">+1°</div>
-  <div class="scale mid">0°</div>
-  <div class="scale bot">-1°</div>
-</div> -->
    <div class="tube-wrap">
   <!-- SKALA KIRI -->
   <div class="scale top">+1°</div>
   <div class="scale mid">0°</div>
   <div class="scale bot">-1°</div>
 
-  <!-- TABUNG -->
-  <div class="tube vertical">
-    <div class="tube-line left"></div>
-    <div class="tube-line right"></div>
-    <div class="bubble" id="bubbleV"></div>
-  </div>
+     <div class="tube vertical">
+  <div class="tube-line left"></div>
+  <div class="tube-line right"></div>
+
+  <div class="tube-center-v"></div> <!-- ⬅️ GARIS TENGAH -->
+  <div class="bubble" id="bubbleV"></div>
 </div>
+  </div>
   
-  <!-- <button id="btnCal" onclick="calibrate()">🎯 Kalibrasi (Zero)</button>
-<button id="btnLock" class="lock" onclick="lockAngle()">🔒 Lock Sudut</button>
-</div> -->
    <div class="action-row">
   <button id="btnCal" class="btn-small" onclick="calibrate()">
     🎯 Kalibrasi
   </button>
-     <!-- <button id="btnCal" class="btn-small">
-  🎯 Kalibrasi
-</button> -->
 
   <button id="btnLock" class="lock btn-small" onclick="lockAngle()">
     🔒 lock
