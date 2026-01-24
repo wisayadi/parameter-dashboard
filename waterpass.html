@@ -37,7 +37,7 @@ body.light{
   border-radius:20px;
   padding:25px;
   width:84%;
-  height:90vh;
+  height:110vh;
   max-width:400px;
   box-shadow:0 0 25px rgba(0,255,255,.3);
   text-align:center;
@@ -60,17 +60,39 @@ body.light h1{color:#334155;}
   color:#00ffcc;
 }
 
-.axis{font-size:10px;color:yellow;}
+/*.axis{font-size:10px;color:yellow;}
   
   .axis div{
   border:1.5px solid var(--neon);
  /* padding:6px 18px;*/
-  border-radius:10px;
+  /*border-radius:10px;
   width:50%;
   height:16px;
   margin-left:70px;
   background:silver;
-  color:/*var(--neon)*/purple;
+  color:/*var(--neon)*//*purple;
+ /* font-weight:bold;
+}*/
+  .axis{
+  margin:18px auto 12px;     /* ⬅️ jarak dari atas card */
+  display:flex;
+  justify-content:center;
+}
+
+.axis div{
+  width:50%;               /* proporsional */
+  max-width:260px;
+  height:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1.5px solid var(--neon);
+  border-radius:12px;
+
+  background:rgba(255,255,255,.85);
+  color:purple;
+  font-size:9px;
   font-weight:bold;
 }
 
@@ -554,6 +576,85 @@ button:active{transform:scale(.92);}
     0 0 12px rgba(255,215,0,.9),
     inset 0 0 6px rgba(255,255,255,.4);
 }
+  
+  /* ===== KOMENTAR PENGUKURAN ===== */
+.comment-wrap{
+  margin-top:14px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.comment-card{
+  width:65%;
+  padding:5px 7px;
+  border-radius:14px;
+  background:/*rgba(0,0,0,.55)*/silver;
+  box-shadow:inset 0 0 10px rgba(0,255,200,.25),
+             0 0 12px rgba(0,255,200,.2);
+  font-size:10px;
+  font-weight:bold;
+  text-align:left;
+  color:/*#e5faff*/brown;
+  margin-left:45px;
+}
+
+body.light .comment-card{
+  background:#f1f5f9;
+  color:#0f172a;
+}
+
+.comment-card span{
+  float:right;
+  color:#9aff00;
+}
+
+.comment-card.miring span{
+  color:#ff5252;
+}
+  /* ===== KOMENTAR GABUNGAN (PRO++) ===== */
+/*.comment-box{
+  margin-top:14px;
+  width:100%;
+  padding:12px 14px;
+  border-radius:16px;
+
+  background:rgba(0,0,0,.55);
+  box-shadow:
+    inset 0 0 12px rgba(0,255,200,.25),
+    0 0 14px rgba(0,255,200,.25);
+
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+
+  font-size:12px;
+  font-weight:bold;
+  color:#e5faff;
+}
+
+body.light .comment-box{
+  background:#f1f5f9;
+  color:#0f172a;
+}
+
+/* Baris komentar */
+/*.comment-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* Status */
+/*.comment-row span{
+  color:#9aff00;
+}
+
+/* Saat miring */
+/*.comment-row.miring span{
+  color:#ff5252;
+}*/
+  
   .tube-wrap{
   position:absolute;
   right:3px;
@@ -780,6 +881,24 @@ button:active{transform:scale(.92);}
     🔒 lock
   </button>
 </div>
+  <!-- ===== KOMENTAR PENGUKURAN ===== -->
+   <div class="comment-wrap">
+  <div class="comment-card" id="commentH">
+    📏 Horizontal: <span>Rata</span>
+  </div>
+  <div class="comment-card" id="commentV">
+    📐 Vertikal: <span>Rata</span>
+  </div>
+</div> 
+  <!-- ===== KOMENTAR PENGUKURAN (GABUNGAN) ===== -->
+  <!-- <div class="comment-box" id="commentBox">
+  <div class="comment-row" id="commentH">
+    📏 Horizontal <span>Rata</span>
+  </div>
+  <div class="comment-row" id="commentV">
+    📐 Vertikal <span>Rata</span>
+  </div>
+</div> -->
 
 <audio id="beep">
 <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
@@ -797,6 +916,8 @@ const TOL=0.3;
 
 const dot=document.getElementById("dot");
 const beep=document.getElementById("beep");
+const commentH = document.getElementById("commentH");
+const commentV = document.getElementById("commentV");
 
 window.addEventListener("deviceorientation",e=>{
  if(locked||!audioReady) return;
@@ -885,6 +1006,18 @@ if(Math.abs(x) < TUBE_TOL){
 }else{
   tube.classList.remove("flat");
 }
+  /* ===== KOMENTAR VERTIKAL ===== */
+if(Math.abs(x) < TUBE_TOL){
+  commentV.innerHTML = "📐 Vertikal: <span>Rata</span>";
+  commentV.classList.remove("miring");
+}else if(x > 0){
+  commentV.innerHTML = "📐 Vertikal: <span>Miring ke bawah</span>";
+  commentV.classList.add("miring");
+}else{
+  commentV.innerHTML = "📐 Vertikal: <span>Miring ke atas</span>";
+  commentV.classList.add("miring");
+}
+  
   /* ===== TABUNG HORIZONTAL ===== */
 const bubbleH = document.getElementById("bubbleH");
 const tubeH   = document.querySelector(".tube.horizontal");
@@ -908,6 +1041,17 @@ if(Math.abs(y) < H_TOL){
   bubbleH.classList.add("red");
   bubbleH.classList.remove("green");
   tubeH.classList.remove("flat");
+}
+ /* ===== KOMENTAR HORIZONTAL ===== */
+  if(Math.abs(y) < H_TOL){
+  commentH.innerHTML = "📏 Horizontal: <span>Rata</span>";
+  commentH.classList.remove("miring");
+}else if(y > 0){
+  commentH.innerHTML = "📏 Horizontal: <span>Miring ke kanan</span>";
+  commentH.classList.add("miring");
+}else{
+  commentH.innerHTML = "📏 Horizontal: <span>Miring ke kiri</span>";
+  commentH.classList.add("miring");
 }
   
     /* ===== DOT LINGKARAN PROFESIONAL ===== */
