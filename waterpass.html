@@ -14,7 +14,7 @@
 
 }
 
-body{
+/*body{
   margin:0;
   font-family:'Segoe UI',sans-serif;
   background:var(--bg-dark);
@@ -25,15 +25,28 @@ body{
   justify-content:center;
   height:100vh;
   transition:.3s;
+}*/
+  body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(180deg,#0a1209,#020402);
+  color:white;
+
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;   /* ⬅️ PENTING */
+  min-height:100vh;
+
+  padding-top: env(safe-area-inset-top);
 }
 
 body.light{
   background:var(--bg-light);
   color:#0f172a;
 }
-  .container{
+  /*.container{
   position:relative; /* ⬅️ WAJIB */
-  background:rgba(0,0,0,.45);
+  /*background:rgba(0,0,0,.45);
   border-radius:20px;
   padding:25px;
   width:84%;
@@ -44,13 +57,36 @@ body.light{
     
   padding-bottom: 25px;
 
+}*/
+  .container{
+  position:relative;
+  background:rgba(0,0,0,.45);
+  border-radius:20px;
+  padding:25px;
+  width:84%;
+  max-width:400px;
+
+  min-height:calc(100vh - 20px); /* ⬅️ GANTI */
+  height:auto;                  /* ⬅️ HAPUS 110vh */
+
+  margin-top:10px;              /* ⬅️ beri nafas */
+  box-shadow:0 0 25px rgba(0,255,255,.3);
+  text-align:center;
 }
 
 body.light .container{
   background:white;
 }
 
-h1{font-size:18px;color:silver;}
+/*h1{font-size:18px;color:silver;}*/
+  h1{
+  font-size:16px;
+  letter-spacing:1.2px;
+  margin-top:4px;
+  margin-bottom:6px;
+  color:#cbd5e1;
+  text-shadow:0 0 6px rgba(154,255,0,.4);
+}
 body.light h1{color:#334155;}
 
 .angle{
@@ -793,6 +829,15 @@ body.light .comment-box{
   transform:translateY(-50%);
   z-index:1;
 }
+  .app-title{
+  font-size:14px;
+  font-weight:bold;
+  letter-spacing:1.4px;
+  margin-bottom:6px;
+  margin-top:16px;
+  color:#e5faff;
+  opacity:.85;
+}
   
 </style>
 </head>
@@ -811,7 +856,10 @@ body.light .comment-box{
 <div class="tool t-level">🧰</div>
   </div>
   
-  <div class="splash-title">WATERPASS DIGITAL PRO</div>
+  <!-- <div class="splash-title">WATERPASS DIGITAL PRO</div> -->
+  <div class="app-title">
+  🧭 WATERPASS DIGITAL PRO
+</div>
   <div class="splash-sub">Precision Level Measurement</div>
   <div class="loader"><span></span></div>
 </div>
