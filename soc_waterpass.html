@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Waterpass Digital PRO</title>
+
+<style>
+:root{
+  --bg-dark:radial-gradient(circle,#0f2027,#203a43,#2c5364);
+  --bg-light:linear-gradient(180deg,#f8fafc,#e2e8f0);
+  --neon:#9aff00;
+  --bg:linear-gradient(180deg,#0a1209,#020402);
+
+}
+
+/*body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:var(--bg-dark);
+  background:linear-gradient(180deg,#0a1209,#020402);
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+  transition:.3s;
+}*/
+  body{
+  margin:0;
+  font-family:'Segoe UI',sans-serif;
+  background:linear-gradient(180deg,#0a1209,#020402);
+  color:white;
+
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;   /* ⬅️ PENTING */
+  min-height:100vh;
+
+  padding-top: env(safe-area-inset-top);
+}
+
+body.light{
+  background:var(--bg-light);
+  color:#0f172a;
+}
+  /*.container{
+  position:relative; /* ⬅️ WAJIB */
+  /*background:rgba(0,0,0,.45);
+  border-radius:20px;
+  padding:25px;
+  width:84%;
+  height:110vh;
+  max-width:400px;
+  box-shadow:0 0 25px rgba(0,255,255,.3);
+  text-align:center;
+    
+  padding-bottom: 25px;
+
+}*/
+  .container{
+  position:relative;
+  background:rgba(0,0,0,.45);
+  border-radius:20px;
+  padding:25px;
+  width:84%;
+  max-width:400px;
+
+  min-height:calc(100vh - 20px); /* ⬅️ GANTI */
+  height:auto;                  /* ⬅️ HAPUS 110vh */
+
+  margin-top:10px;              /* ⬅️ beri nafas */
+  box-shadow:0 0 25px rgba(0,255,255,.3);
+  text-align:center;
+}
+
+body.light .container{
+  background:white;
+}
+
+/*h1{font-size:18px;color:silver;}*/
+  h1{
+  font-size:16px;
+  letter-spacing:1.2px;
+  margin-top:4px;
+  margin-bottom:6px;
+  color:#cbd5e1;
+  text-shadow:0 0 6px rgba(154,255,0,.4);
+}
+body.light h1{color:#334155;}
+
+.angle{
+  font-size:26px;
+  font-weight:bold;
+  margin:10px 0;
+  color:#00ffcc;
+}
+
+/*.axis{font-size:10px;color:yellow;}
+  
+  .axis div{
+  border:1.5px solid var(--neon);
+ /* padding:6px 18px;*/
+  /*border-radius:10px;
+  width:50%;
+  height:16px;
+  margin-left:70px;
+  background:silver;
+  color:/*var(--neon)*//*purple;
+ /* font-weight:bold;
+}*/
+  .axis{
+  margin:18px auto 12px;     /* ⬅️ jarak dari atas card */
+  display:flex;
+  justify-content:center;
+}
+
+.axis div{
+  width:50%;               /* proporsional */
+  max-width:260px;
+  height:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1.5px solid var(--neon);
+  border-radius:12px;
+
+  background:rgba(255,255,255,.85);
+  color:purple;
+  font-size:9px;
+  font-weight:bold;
+}
+
+.level-box{
+  margin:15px auto;
+  width:220px;
+  height:220px;
+  /*border:3px solid #00ffcc;*/
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#c6ff5c,#6aa800);
+  border:8px solid #444;
+  box-shadow:inset 0 0 30px rgba(0,0,0,.6),
+             0 0 25px rgba(154,255,0,.6);
+  position:relative;
+}
+
+.cross-h,.cross-v{position:absolute;background:#00ffcc;}
+.cross-h{top:50%;width:100%;height:2px;}
+.cross-v{left:50%;height:100%;width:2px;}
+  
+/* ===== REALISTIC BUBBLE (AIR TERPERANGKAP) ===== */
+.dot{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  transition:
+    background .25s ease,
+    box-shadow .25s ease;
+
+  /* lapisan dalam + kedalaman */
+  box-shadow:
+    inset -3px -4px 6px rgba(0,0,0,.35),
+    inset 3px 3px 6px rgba(255,255,255,.35),
+    0 0 10px rgba(0,0,0,.4);
+}
+
+/* 🔵 HIGHLIGHT cahaya (gelembung air) */
+.dot::before{
+  content:"";
+  position:absolute;
+  top:4px;
+  left:6px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:rgba(255,255,255,.75);
+  filter:blur(.4px);
+}
+
+/* 🔘 ring tipis transparan */
+.dot::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.25);
+}
+  /* 🟢 GELEMBUNG AMAN (HIJAU AIR) */
+.dot.green{
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #f4ffd2 0%,
+      #c8ff7a 35%,
+      #6ecb00 70%,
+      #3f7f00 100%
+    );
+  box-shadow:
+    inset -3px -4px 6px rgba(0,0,0,.35),
+    inset 3px 3px 6px rgba(255,255,255,.4),
+    0 0 14px rgba(120,255,0,.9);
+}
+
+/* 🔴 GELEMBUNG MIRING (MERAH CAIR) */
+.dot.red{
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      #ffe3e3 0%,
+      #ff9b9b 35%,
+      #ff3b3b 70%,
+      #7a0000 100%
+    );
+  box-shadow:
+    inset -3px -4px 6px rgba(0,0,0,.45),
+    inset 3px 3px 6px rgba(255,255,255,.35),
+    0 0 14px rgba(255,80,80,.9);
+}
+
+button{
+  width:70%;
+  padding:10px;
+  margin-top:8px;
+  border:none;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:bold;
+  cursor:pointer;
+  background:linear-gradient(90deg,#00ffcc,#00bfa5);
+  /*transition:.15s;*/
+  transition:transform .15s ease,background .25s ease;
+}
+
+button:hover{transform:scale(.96);}
+button:active{transform:scale(.92);}
+
+.active-gold{
+  background:linear-gradient(90deg,#ffd700,#ffb703)!important;
+  color:#4a2c00;
+  box-shadow:0 0 12px rgba(255,215,0,.8);
+}
+  
+.lock{background:linear-gradient(90deg,#ff9800,#ff5722);}
+
+/* ⚙️ SETTINGS BUTTON */
+.settings-btn{
+  position:fixed;
+  top:12px;
+  right:12px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#38bdf8,#22c55e);
+  color:white;
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  z-index:20;
+  box-shadow:0 0 15px rgba(0,255,255,.6);
+}
+
+/* OVERLAY */
+.settings-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.9);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  z-index:30;
+}
+
+.settings-overlay button{
+  width:220px;
+  font-size:14px;
+}
+  /* ===== SPLASH SCREEN ===== */
+#splash-screen{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(circle,#0f2027,#203a43,#2c5364);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+.splash-ring{
+  width:180px;
+  height:180px;
+  border:4px solid #00ffcc;
+  border-radius:50%;
+  position:relative;
+  box-shadow:0 0 25px rgba(0,255,204,.6);
+  animation:spin 6s linear infinite;
+}
+
+.splash-cross-h,
+.splash-cross-v{
+  position:absolute;
+  background:#00ffcc;
+}
+
+.splash-cross-h{
+  top:50%;
+  width:100%;
+  height:2px;
+}
+
+.splash-cross-v{
+  left:50%;
+  height:100%;
+  width:2px;
+}
+
+.splash-dot{
+  width:16px;
+  height:16px;
+  background:#00ffcc;
+  border-radius:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+}
+
+.splash-title{
+  margin-top:25px;
+  font-size:20px;
+  font-weight:bold;
+  letter-spacing:2px;
+}
+
+.splash-sub{
+  font-size:12px;
+  color:silver;
+  margin-top:6px;
+}
+  
+  /* Progress bar */
+.loader{
+  width:220px;
+  height:6px;
+  background:rgba(255,255,255,.2);
+  border-radius:10px;
+  overflow:hidden;
+  margin-top:25px;
+}
+
+.loader span{
+  display:block;
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#00ffcc,#00bfa5);
+  animation:load 7s linear forwards;
+}
+
+@keyframes load{
+  to{width:100%;}
+}
+
+@keyframes spin{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+  
+  /* ===== TOOL ICONS INSIDE CIRCLE ===== */
+.tool{
+  position:absolute;
+  width:34px;
+  height:34px;
+  font-size:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,255,204,.18);
+  border-radius:50%;
+  box-shadow:0 0 10px rgba(0,255,204,.6);
+  left:50%;
+  top:50%;
+  transform:translate(-50%, -50%);
+  user-select:none;
+}
+
+/* Jarak dari pusat */
+:root{
+  --r:45px;
+}
+
+/* Kuadran dalam lingkaran */
+.t-siku{
+  transform:
+    translate(-50%, -50%)
+    translate(var(--r), calc(-1 * var(--r)));
+}
+
+.t-meter{
+  transform:
+    translate(-50%, -50%)
+    translate(var(--r), var(--r));
+}
+
+.t-saw{
+  transform:
+    translate(-50%, -50%)
+    translate(calc(-1 * var(--r)), var(--r));
+}
+
+.t-level{
+  transform:
+    translate(-50%, -50%)
+    translate(calc(-1 * var(--r)), calc(-1 * var(--r)));
+}
+  /* 🎯 CENTER TARGET RING */
+.center-ring{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:2px dashed rgba(255,255,255,.6);
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  opacity:0;
+  pointer-events:none;
+  box-shadow:0 0 10px rgba(154,255,0,.6);
+  transition:opacity .2s ease, box-shadow .2s ease;
+}
+
+/* Aktif saat benar-benar rata */
+.center-ring.active{
+  opacity:1;
+  border-color:/*#9aff00*/grey;
+  box-shadow:0 0 16px rgba(154,255,0,.9);
+}
+  .tube{
+  background:linear-gradient(180deg,#c6ff5c,#6aa800);
+  border-radius:5px;
+  border:0px solid #555;
+  position:absolute; 
+ /* position:relative;*/
+}
+
+.horizontal{
+  width:260px;
+  height:36px;
+  /*top:140px;*/
+}
+  .vertical{
+  width:28px;
+  height:260px;
+  right:3px;     /* JANGAN negatif */
+  top:120px;
+}
+
+  /* ===== REALISTIC BUBBLE TABUNG (SAMA DENGAN DOT) ===== */
+.bubble{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  transition:
+    background .25s ease,
+    box-shadow .25s ease;
+
+  box-shadow:
+    inset -3px -4px 6px rgba(0,0,0,.35),
+    inset 3px 3px 6px rgba(255,255,255,.35),
+    0 0 10px rgba(0,0,0,.4);
+}
+
+/* highlight cahaya */
+.bubble::before{
+  content:"";
+  position:absolute;
+  top:4px;
+  left:6px;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:rgba(255,255,255,.75);
+  filter:blur(.4px);
+}
+
+/* ring transparan */
+.bubble::after{
+  content:"";
+  position:absolute;
+  inset:2px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.25);
+}
+
+/* 🟢 RATA */
+.bubble.green{
+  background:
+    radial-gradient(circle at 35% 30%,
+      #f4ffd2 0%,
+      #c8ff7a 35%,
+      #6ecb00 70%,
+      #3f7f00 100%);
+  box-shadow:
+    inset -3px -4px 6px rgba(0,0,0,.35),
+    inset 3px 3px 6px rgba(255,255,255,.4),
+    0 0 14px rgba(120,255,0,.9);
+}
+
+/* 🔴 MIRING */
+.bubble.red{
+  background:
+    radial-gradient(circle at 35% 30%,
+      #ffe3e3 0%,
+      #ff9b9b 35%,
+      #ff3b3b 70%,
+      #7a0000 100%);
+  box-shadow:
+    inset -3px -4px 6px rgba(0,0,0,.45),
+    inset 3px 3px 6px rgba(255,255,255,.35),
+    0 0 14px rgba(255,80,80,.9);
+}
+  .tube.vertical{
+  overflow: hidden;
+}
+
+.tube-line.left{ left:6px; }
+.tube-line.right{ right:6px; }
+
+  .tube.vertical.flat{
+  box-shadow:
+    inset 0 0 14px rgba(150,255,0,.6),
+    0 0 18px rgba(150,255,0,.7);
+}
+ .scale{
+  position:absolute;
+  left:0;
+  font-size:10px;
+  font-weight:bold;
+  opacity:.65;
+  color:cyan;
+  text-align:left;
+}
+.scale.top{ top:6%; }
+.scale.mid{ top:50%; transform:translateY(-50%); font-weight:bold; }
+.scale.bot{ bottom:6%; } 
+  
+  .tube-wrap{
+  position:absolute;
+  right:3px;
+  top:120px;
+  width:60px;     /* ruang skala */
+  height:260px;
+}
+.tube.vertical{
+  right:0;
+  top:0;  
+}
+  /* ===== END CAP TABUNG VERTIKAL (FLAT) ===== */
+.tube.vertical::before,
+.tube.vertical::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  height:12px;             /* lebih tipis */
+  background:#4b5563;      /* warna solid flat */
+  z-index:2;
+}
+
+/* atas */
+.tube.vertical::before{
+  top:0;
+}
+
+/* bawah */
+.tube.vertical::after{
+  bottom:0;
+}
+
+  /* ===== ACTION BUTTON ROW (PRO+) ===== */
+  .action-row{
+   margin-top:18px;
+  display: flex;   
+  justify-content: center;
+  gap: 12px;
+}
+/* tombol versi kecil */
+/*.btn-small{
+  width:35%;
+  padding:8px 0;
+  font-size:10px;
+  color:white;
+  border-radius:9px;
+}*/
+  .btn-small{
+  width:120px;     /* FIXED = STABIL */
+  padding:8px 0;
+  font-size:10px;
+  border-radius:9px;
+}
+  /* LOCK ON */
+.lock-on{
+  background:linear-gradient(90deg,#ffd700,#ffb703)!important;
+  color:#4a2c00;
+  box-shadow:
+    0 0 12px rgba(255,215,0,.9),
+    inset 0 0 6px rgba(255,255,255,.4);
+}
+  
+  /* ===== KOMENTAR PENGUKURAN ===== */
+.comment-wrap{
+  margin-top:14px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.comment-card{
+  width:100%;
+  padding:5px 7px;
+  border-radius:14px;
+  background:/*rgba(0,0,0,.55)*/silver;
+  box-shadow:inset 0 0 10px rgba(0,255,200,.25),
+             0 0 12px rgba(0,255,200,.2);
+  font-size:10px;
+  font-weight:bold;
+  text-align:left;
+  color:/*#e5faff*/brown;
+  /*margin-left:45px;*/
+}
+
+body.light .comment-card{
+  background:#f1f5f9;
+  color:#0f172a;
+}
+
+.comment-card span{
+  float:right;
+  color:#9aff00;
+}
+
+.comment-card.miring span{
+  color:#ff5252;
+}
+  /* ===== KOMENTAR GABUNGAN (PRO++) ===== */
+/*.comment-box{
+  margin-top:14px;
+  width:100%;
+  padding:12px 14px;
+  border-radius:16px;
+
+  background:rgba(0,0,0,.55);
+  box-shadow:
+    inset 0 0 12px rgba(0,255,200,.25),
+    0 0 14px rgba(0,255,200,.25);
+
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+
+  font-size:12px;
+  font-weight:bold;
+  color:#e5faff;
+}
+
+body.light .comment-box{
+  background:#f1f5f9;
+  color:#0f172a;
+}
+
+/* Baris komentar */
+/*.comment-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+/* Status */
+/*.comment-row span{
+  color:#9aff00;
+}
+
+/* Saat miring */
+/*.comment-row.miring span{
+  color:#ff5252;
+}*/
+  
+  .tube-wrap{
+  position:absolute;
+  right:3px;
+  top:138px;
+  height:260px;
+
+  display:flex;
+  align-items:center;
+  gap:6px;        /* jarak skala ↔ tabung */
+}
+  /* ===== TABUNG HORIZONTAL ===== */
+/*.tube-wrap-h{
+  position:relative;
+  margin:38px auto 0;
+  width:260px;
+  height:60px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  
+  margin-bottom: 12px;
+}*/
+  .tube-wrap-h{
+  position:relative;
+  margin:38px auto 0;      /* layout tetap */
+  width:260px;
+  height:60px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  /*transform:translateY(20px);*/  /* ⬅️ geser tabung SAJA */
+  margin-top:20px;   /* AMAN & ikut flow */
+}
+
+.tube.horizontal{
+  width:260px;
+  height:27px;
+  border-radius:5px;
+  background:linear-gradient(90deg,#c6ff5c,#6aa800);
+  border:0px solid #555;
+  position:relative;
+  overflow:hidden;
+}
+  /* ===== END CAP TABUNG HORIZONTAL (FLAT) ===== */
+.tube.horizontal::before,
+.tube.horizontal::after{
+  content:"";
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:12px;              /* lebih tipis */
+  background:#4b5563;      /* warna solid flat */
+  z-index:2;
+}
+
+/* kiri */
+.tube.horizontal::before{
+  left:0;
+}
+
+/* kanan */
+.tube.horizontal::after{
+  right:0;
+}
+   
+/* garis pembatas */
+.tube-line.top{
+  position:absolute;
+ /* left:6px;
+  right:6px;*/
+  top:6px;
+  height:2px;
+  background:rgba(0,0,0,.45);
+}
+.tube-line.bottom{
+  position:absolute;
+  /*left:6px;
+  right:6px;*/
+  bottom:6px;
+  height:2px;
+  background:rgba(0,0,0,.45);
+}
+
+/* glow saat rata */
+.tube.horizontal.flat{
+  box-shadow:
+    inset 0 0 14px rgba(150,255,0,.6),
+    0 0 18px rgba(150,255,0,.7);
+}
+
+/* ===== SKALA HORIZONTAL ===== */
+.scale-h{
+  font-size:10px;
+  font-weight:bold;
+  color:cyan;
+  opacity:.7;
+}
+
+.scale-h.left{
+  position:absolute;
+  left:0;
+  bottom:-3px;
+}
+.scale-h.mid{
+  position:absolute;
+  left:50%;
+  bottom:-3px;
+  transform:translateX(-50%);
+}
+.scale-h.right{
+  position:absolute;
+  right:0;
+  bottom:-3px;
+}
+  /* GARIS TENGAH HORIZONTAL (RATA) */
+.tube-center{
+  position:absolute;
+  left:50%;
+  top:4px;
+  bottom:4px;
+  width:2px;
+  background:#9aff00;
+  opacity:.85;
+  transform:translateX(-50%);
+  z-index:1;
+}
+  /* GARIS TENGAH TABUNG VERTIKAL */
+.tube-center-v{
+  position:absolute;
+  top:50%;
+  left:4px;
+  right:4px;
+  height:2px;
+  background:#9aff00;
+  opacity:.85;
+  transform:translateY(-50%);
+  z-index:1;
+}
+  .app-title{
+  font-size:14px;
+  font-weight:bold;
+  letter-spacing:1.4px;
+  margin-bottom:6px;
+  margin-top:16px;
+  color:#e5faff;
+  opacity:.85;
+}
+  /* ===== GROUP BAWAH TERKONTROL ===== */
+.bottom-group{
+  margin-top: 90px;     /* ⬅️ INI YANG MENGGESER SEMUA */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;            /* jarak konsisten antar elemen */
+}
+  /* ===== LABEL TABUNG ===== */
+.tube-label{
+  font-size:8px;
+  font-weight:bold;
+  letter-spacing:1px;
+  color:/*#9aff00*/tomato;
+  opacity:.85;
+  text-shadow:0 0 6px rgba(154,255,0,.6);
+  user-select:none;
+}
+
+/* Label Horizontal (di atas tabung) */
+.tube-label.horizontal{
+  margin-bottom:6px;
+}
+
+/* Label Vertikal (tulisan ke bawah) */
+.tube-label.vertical{
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  letter-spacing:2px;
+  margin-right:4px;
+}
+  /*.scale-h{
+  position:absolute;
+  bottom:-10px;   /* sedikit lebih turun */
+  /*z-index:5;      /* ⬅️ KUNCI UTAMA */
+  /*pointer-events:none;
+}*/
+  
+</style>
+</head>
+
+<body>
+  <!-- SPLASH SCREEN -->
+<div id="splash-screen">
+  <div class="splash-ring">
+    <div class="splash-cross-h"></div>
+    <div class="splash-cross-v"></div>
+    <div class="splash-dot"></div>
+    
+    <div class="tool t-siku">📐</div>
+    <div class="tool t-meter">🔨</div>
+<div class="tool t-saw">🪚</div>
+<div class="tool t-level">🧰</div>
+  </div>
+  
+  <!-- <div class="splash-title">WATERPASS DIGITAL PRO</div> -->
+  <div class="app-title">
+  🧭 WATERPASS DIGITAL PRO
+</div>
+  <div class="splash-sub">Precision Level Measurement</div>
+  <div class="loader"><span></span></div>
+</div>
+
+<!-- ⚙️ SETTINGS -->
+<div class="settings-btn" onclick="openSettings()">⚙️</div>
+
+<div class="settings-overlay" id="settings">
+  <button onclick="toggleFullscreen()">🖥 Fullscreen</button>
+  <button id="themeBtn" onclick="toggleTheme()">🌞 Mode Terang</button>
+  <button onclick="closeSettings()">⬅️ Back</button>
+  <!-- <button onclick="exitApp()" class="lock">Exit</button> -->
+</div>
+
+<div class="container">
+<h1>🧭 WATERPASS DIGITAL PRO</h1>
+
+<div class="angle" id="angle">0.00°</div>
+   <div class="axis">
+    <div id="axis">X: 0.00° | Y: 0.00°</div>
+  </div>
+  
+<div class="level-box">
+  <div class="cross-h"></div>
+  <div class="cross-v"></div> 
+  <div class="center-ring" id="centerRing"></div>  
+  <div class="dot" id="dot"></div>
+</div>
+  <!-- ===== GROUP BAWAH (TABUNG + TOMBOL + KOMENTAR) ===== -->
+<div class="bottom-group">
+
+  <!-- TABUNG HORIZONTAL -->
+  <!-- <div class="tube-wrap-h">
+    <div class="tube horizontal"> -->
+  <div class="tube-wrap-h">
+    <!-- <div class="tube-label horizontal">Horizontal</div> -->
+  <div class="tube horizontal">
+      <div class="tube-line top"></div>
+      <div class="tube-line bottom"></div>
+      <div class="tube-center"></div>
+      <div class="bubble" id="bubbleH"></div>
+    </div>
+    <!-- <div class="tube-label horizontal">Horizontal</div> -->
+    <div class="scale-h left">-1°</div>
+    <div class="scale-h mid">0°</div>
+    <div class="scale-h right">+1°</div>
+  </div>
+  <div class="tube-label horizontal">Horizontal</div>
+
+  <!-- TOMBOL -->
+  <div class="action-row">
+    <button id="btnCal" class="btn-small" onclick="calibrate()">🎯 Kalibrasi</button>
+    <button id="btnLock" class="lock btn-small" onclick="lockAngle()">🔒 lock</button>
+  </div>
+
+  <!-- KOMENTAR -->
+  <div class="comment-wrap">
+    <div class="comment-card" id="commentH">
+      📏 Horizontal: <span>Rata</span>
+    </div>
+    <div class="comment-card" id="commentV">
+      📐 Vertikal: <span>Rata</span>
+    </div>
+  </div>
+
+</div>
+  
+  <!-- ===== TABUNG HORIZONTAL ===== -->
+  <!--<div class="tube-wrap-h">
+  <div class="tube horizontal">
+  <div class="tube-line top"></div>
+  <div class="tube-line bottom"></div> 
+
+  <div class="tube-center"></div> <!-- ⬅️ BARU -->
+  <!-- <div class="bubble" id="bubbleH"></div>
+</div>
+
+  <!-- SKALA -->
+  <!-- <div class="scale-h left">-1°</div>
+  <div class="scale-h mid">0°</div>
+  <div class="scale-h right">+1°</div>
+</div> -->
+  
+  <div class="tube-wrap">
+  <div class="tube-label vertical">Vertikal</div>
+  <!-- SKALA KIRI -->
+  <div class="scale top">+1°</div>
+  <!-- <div class="tube-wrap"> -->
+  <!-- SKALA KIRI -->
+     <!-- <div class="scale top">+1°</div>-->
+  <div class="scale mid">0°</div>
+  <div class="scale bot">-1°</div>
+
+     <div class="tube vertical">
+  <div class="tube-line left"></div>
+  <div class="tube-line right"></div>
+
+  <div class="tube-center-v"></div> <!-- ⬅️ GARIS TENGAH -->
+  <div class="bubble" id="bubbleV"></div>
+</div>
+  </div>
+  
+<!-- <div class="action-row">
+  <button id="btnCal" class="btn-small" onclick="calibrate()">
+    🎯 Kalibrasi
+  </button> 
+
+  <button id="btnLock" class="lock btn-small" onclick="lockAngle()">
+    🔒 lock
+  </button>
+</div> -->
+
+  <!-- ===== KOMENTAR PENGUKURAN ===== -->
+<!-- <div class="comment-wrap">
+  <div class="comment-card" id="commentH">
+    📏 Horizontal: <span>Rata</span>
+  </div>
+  <div class="comment-card" id="commentV">
+    📐 Vertikal: <span>Rata</span>
+  </div>
+</div> --> 
+
+  <!-- ===== KOMENTAR PENGUKURAN (GABUNGAN) ===== -->
+  <!-- <div class="comment-box" id="commentBox">
+  <div class="comment-row" id="commentH">
+    📏 Horizontal <span>Rata</span>
+  </div>
+  <div class="comment-row" id="commentV">
+    📐 Vertikal <span>Rata</span>
+  </div>
+</div> -->
+
+<audio id="beep">
+<source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+</audio>
+
+<script>
+let lastFlat = false;
+let lastX = 0;
+let lastY = 0;
+let offsetX=0,offsetY=0;
+let locked=false;
+let pulse=null;
+let audioReady=false;
+const TOL=0.3;
+
+const dot=document.getElementById("dot");
+const beep=document.getElementById("beep");
+const commentH = document.getElementById("commentH");
+const commentV = document.getElementById("commentV");
+
+window.addEventListener("deviceorientation",e=>{
+ if(locked||!audioReady) return;
+ let x=e.beta-offsetX;
+ let y=e.gamma-offsetY;
+ let angle=Math.sqrt(x*x+y*y);
+
+ angleEl.innerText=angle.toFixed(2)+"°";
+ axisEl.innerText=`X: ${x.toFixed(2)}° | Y: ${y.toFixed(2)}°`;
+
+ dot.style.left=50+y+"%";
+ dot.style.top =50+x+"%";
+  
+  const centerRing = document.getElementById("centerRing");
+const CENTER_TOL = 0.6; // sensitivitas pusat (semakin kecil makin presisi)
+  
+  const dist = Math.sqrt(x*x + y*y);
+
+if(dist < CENTER_TOL){
+  centerRing.classList.add("active");
+
+  angleEl.style.color="#9aff00";
+  dot.style.background="radial-gradient(circle at 30% 30%,#eaffb0,#4caf00)";
+
+  if(!pulse){
+    pulse=setInterval(()=>{
+      beep.currentTime=0;
+      beep.play();
+      navigator.vibrate(30);
+    },200);
+  }
+}else{
+  centerRing.classList.remove("active");
+
+  angleEl.style.color="#ff5252";
+  dot.style.background="radial-gradient(circle at 35% 35%,#ffd6d6,#ff5252 45%,#b71c1c 100%)";
+
+  clearInterval(pulse);
+  pulse=null;
+}
+  
+  /* ===== BEEP KHUSUS SAAT RATA ===== */
+const FLAT_TOL = 0.6;
+
+let isFlat = Math.abs(x) < FLAT_TOL && Math.abs(y) < FLAT_TOL;
+
+if(isFlat && !lastFlat){
+  playBeep();
+  navigator.vibrate(60);
+}
+
+lastFlat = isFlat;
+});
+  
+  const bubbleV = document.getElementById("bubbleV");
+  window.addEventListener("deviceorientation", e => {
+  if(locked || !audioReady) return;
+
+  let x = e.beta - offsetX;
+  let y = e.gamma - offsetY;
+
+  lastX = x;
+  lastY = y;
+
+  /* ===== TABUNG VERTIKAL ===== */
+  const bubbleV = document.getElementById("bubbleV");
+  const TUBE_LIMIT = 110;
+  const TUBE_GAIN  = 2.2;
+  const TUBE_TOL   = 0.6;
+
+  let vPos = x * TUBE_GAIN;
+  vPos = Math.max(-TUBE_LIMIT, Math.min(TUBE_LIMIT, vPos));
+  bubbleV.style.top = `calc(50% + ${vPos}px)`;
+
+    if(Math.abs(x) < TUBE_TOL){
+  bubbleV.classList.add("green");
+  bubbleV.classList.remove("red");
+}else{
+  bubbleV.classList.add("red");
+  bubbleV.classList.remove("green");
+}      
+    const tube = document.querySelector(".tube.vertical");
+
+if(Math.abs(x) < TUBE_TOL){
+  tube.classList.add("flat");
+}else{
+  tube.classList.remove("flat");
+}
+  /* ===== KOMENTAR VERTIKAL ===== */
+if(Math.abs(x) < TUBE_TOL){
+  commentV.innerHTML = "📐 Vertikal: <span>Rata</span>";
+  commentV.classList.remove("miring");
+}else if(x > 0){
+  commentV.innerHTML = "📐 Vertikal: <span>Miring ke bawah</span>";
+  commentV.classList.add("miring");
+}else{
+  commentV.innerHTML = "📐 Vertikal: <span>Miring ke atas</span>";
+  commentV.classList.add("miring");
+}
+  
+  /* ===== TABUNG HORIZONTAL ===== */
+const bubbleH = document.getElementById("bubbleH");
+const tubeH   = document.querySelector(".tube.horizontal");
+
+const H_LIMIT = 110;
+const H_GAIN  = 2.2;
+const H_TOL   = 0.6;
+
+/* pakai Y (gamma) */
+let hPos = y * H_GAIN;
+hPos = Math.max(-H_LIMIT, Math.min(H_LIMIT, hPos));
+
+bubbleH.style.left = `calc(50% + ${hPos}px)`;
+
+/* warna bubble */
+if(Math.abs(y) < H_TOL){
+  bubbleH.classList.add("green");
+  bubbleH.classList.remove("red");
+  tubeH.classList.add("flat");
+}else{
+  bubbleH.classList.add("red");
+  bubbleH.classList.remove("green");
+  tubeH.classList.remove("flat");
+}
+ /* ===== KOMENTAR HORIZONTAL ===== */
+  if(Math.abs(y) < H_TOL){
+  commentH.innerHTML = "📏 Horizontal: <span>Rata</span>";
+  commentH.classList.remove("miring");
+}else if(y > 0){
+  commentH.innerHTML = "📏 Horizontal: <span>Miring ke kanan</span>";
+  commentH.classList.add("miring");
+}else{
+  commentH.innerHTML = "📏 Horizontal: <span>Miring ke kiri</span>";
+  commentH.classList.add("miring");
+}
+  
+    /* ===== DOT LINGKARAN PROFESIONAL ===== */
+const MAX_RADIUS = 90;   // pixel (aman di dalam lingkaran)
+const GAIN = 2.2;        // sensitivitas gerak
+
+let dx = y * GAIN;
+let dy = x * GAIN;
+
+const distance = Math.sqrt(dx*dx + dy*dy);
+
+if(distance > MAX_RADIUS){
+  const scale = MAX_RADIUS / distance;
+  dx *= scale;
+  dy *= scale;
+}
+
+dot.style.left = `calc(50% + ${dx}px)`;
+dot.style.top  = `calc(50% + ${dy}px)`;
+    
+  const dist = Math.sqrt(x*x + y*y);
+  if(dist < CENTER_TOL){
+  centerRing.classList.add("active");
+  dot.classList.add("green");
+  dot.classList.remove("red");
+}else{
+  centerRing.classList.remove("active");
+  dot.classList.add("red");
+  dot.classList.remove("green");
+  }
+});
+  
+function playBeep(){beep.currentTime=0;beep.play();}
+
+  function calibrate(){
+  audioReady = true;
+  playBeep();
+  navigator.vibrate(80);
+
+  offsetX = lastX;
+  offsetY = lastY;
+}
+  /*let calTimer = null;
+
+btnCal.addEventListener("touchstart", startCalibrate);
+btnCal.addEventListener("mousedown", startCalibrate);
+
+btnCal.addEventListener("touchend", cancelCalibrate);
+btnCal.addEventListener("mouseup", cancelCalibrate);
+btnCal.addEventListener("mouseleave", cancelCalibrate);
+
+function startCalibrate(){
+  btnCal.classList.add("cal-hold");
+  navigator.vibrate(30);
+
+  calTimer = setTimeout(()=>{
+    calibrate();
+    btnCal.classList.remove("cal-hold");
+  },700); // tahan 0.7 detik
+}
+
+function cancelCalibrate(){
+  clearTimeout(calTimer);
+  btnCal.classList.remove("cal-hold");
+}*/
+
+/*function lockAngle(){
+ locked=!locked;
+ playBeep();
+
+ btnLock.classList.add("active-gold");
+ setTimeout(()=>btnLock.classList.remove("active-gold"),400);
+}*/
+  function lockAngle(){
+  locked = !locked;
+  playBeep();
+  navigator.vibrate(60);
+
+  if(locked){
+    btnLock.classList.add("lock-on");
+    btnLock.innerHTML = "🔒 Lock";
+  }else{
+    btnLock.classList.remove("lock-on");
+    btnLock.innerHTML = "🔓 Unlock";
+  }
+}
+
+/* SETTINGS */
+function openSettings(){playBeep();settings.style.display="flex";}
+function closeSettings(){playBeep();settings.style.display="none";}
+
+const themeBtn = document.getElementById("themeBtn");
+function toggleTheme(){
+  playBeep();
+
+  const isLight = document.body.classList.toggle("light");
+
+  if(isLight){
+    themeBtn.innerText = "🌙 Mode Gelap";
+  }else{
+    themeBtn.innerText = "🌞 Mode Terang";
+  }
+}
+
+/* OPTIONAL: sinkron awal (jika mau default light) */
+// window.addEventListener("load",()=>{
+//   if(document.body.classList.contains("light")){
+//     themeBtn.innerText="🌙 Mode Gelap";
+//   }
+// });
+
+function toggleFullscreen(){
+ playBeep();
+ if(!document.fullscreenElement){
+  document.documentElement.requestFullscreen();
+ }else{
+  document.exitFullscreen();
+ }
+}
+
+function exitApp(){
+ playBeep();
+ /*window.close();
+}*/
+  setTimeout(() => {
+    window.location.href =
+      "https://wisayadi.github.io/parameter-dashboard/cardipa.html";
+  }, 150);
+} 
+
+/* MATIKAN SPLASH TOTAL SETELAH 8 DETIK */
+setTimeout(()=>{
+  const splash = document.getElementById("splash-screen");
+  splash.style.pointerEvents = "none";
+  splash.style.display = "none";
+},8000);
+
+const angleEl=document.getElementById("angle");
+const axisEl=document.getElementById("axis");
+const settings=document.getElementById("settings");
+</script>
+
+</body>
+</html>
