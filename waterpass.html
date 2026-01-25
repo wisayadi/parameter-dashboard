@@ -597,11 +597,17 @@ button:active{transform:scale(.92);}
   gap: 12px;
 }
 /* tombol versi kecil */
-.btn-small{
+/*.btn-small{
   width:35%;
   padding:8px 0;
   font-size:10px;
   color:white;
+  border-radius:9px;
+}*/
+  .btn-small{
+  width:120px;     /* FIXED = STABIL */
+  padding:8px 0;
+  font-size:10px;
   border-radius:9px;
 }
   /* LOCK ON */
@@ -622,7 +628,7 @@ button:active{transform:scale(.92);}
 }
 
 .comment-card{
-  width:65%;
+  width:100%;
   padding:5px 7px;
   border-radius:14px;
   background:/*rgba(0,0,0,.55)*/silver;
@@ -632,7 +638,7 @@ button:active{transform:scale(.92);}
   font-weight:bold;
   text-align:left;
   color:/*#e5faff*/brown;
-  margin-left:45px;
+  /*margin-left:45px;*/
 }
 
 body.light .comment-card{
@@ -722,12 +728,13 @@ body.light .comment-box{
   flex-direction:column;
   align-items:center;
 
-  transform:translateY(20px);  /* ⬅️ geser tabung SAJA */
+  /*transform:translateY(20px);*/  /* ⬅️ geser tabung SAJA */
+  margin-top:20px;   /* AMAN & ikut flow */
 }
 
 .tube.horizontal{
   width:260px;
-  height:26px;
+  height:27px;
   border-radius:5px;
   background:linear-gradient(90deg,#c6ff5c,#6aa800);
   border:0px solid #555;
@@ -838,6 +845,43 @@ body.light .comment-box{
   color:#e5faff;
   opacity:.85;
 }
+  /* ===== GROUP BAWAH TERKONTROL ===== */
+.bottom-group{
+  margin-top: 90px;     /* ⬅️ INI YANG MENGGESER SEMUA */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;            /* jarak konsisten antar elemen */
+}
+  /* ===== LABEL TABUNG ===== */
+.tube-label{
+  font-size:8px;
+  font-weight:bold;
+  letter-spacing:1px;
+  color:/*#9aff00*/tomato;
+  opacity:.85;
+  text-shadow:0 0 6px rgba(154,255,0,.6);
+  user-select:none;
+}
+
+/* Label Horizontal (di atas tabung) */
+.tube-label.horizontal{
+  margin-bottom:6px;
+}
+
+/* Label Vertikal (tulisan ke bawah) */
+.tube-label.vertical{
+  writing-mode:vertical-rl;
+  text-orientation:upright;
+  letter-spacing:2px;
+  margin-right:4px;
+}
+  /*.scale-h{
+  position:absolute;
+  bottom:-10px;   /* sedikit lebih turun */
+  /*z-index:5;      /* ⬅️ KUNCI UTAMA */
+  /*pointer-events:none;
+}*/
   
 </style>
 </head>
@@ -888,26 +932,68 @@ body.light .comment-box{
   <div class="center-ring" id="centerRing"></div>  
   <div class="dot" id="dot"></div>
 </div>
+  <!-- ===== GROUP BAWAH (TABUNG + TOMBOL + KOMENTAR) ===== -->
+<div class="bottom-group">
+
+  <!-- TABUNG HORIZONTAL -->
+  <!-- <div class="tube-wrap-h">
+    <div class="tube horizontal"> -->
+  <div class="tube-wrap-h">
+    <!-- <div class="tube-label horizontal">Horizontal</div> -->
+  <div class="tube horizontal">
+      <div class="tube-line top"></div>
+      <div class="tube-line bottom"></div>
+      <div class="tube-center"></div>
+      <div class="bubble" id="bubbleH"></div>
+    </div>
+    <!-- <div class="tube-label horizontal">Horizontal</div> -->
+    <div class="scale-h left">-1°</div>
+    <div class="scale-h mid">0°</div>
+    <div class="scale-h right">+1°</div>
+  </div>
+  <div class="tube-label horizontal">Horizontal</div>
+
+  <!-- TOMBOL -->
+  <div class="action-row">
+    <button id="btnCal" class="btn-small" onclick="calibrate()">🎯 Kalibrasi</button>
+    <button id="btnLock" class="lock btn-small" onclick="lockAngle()">🔒 lock</button>
+  </div>
+
+  <!-- KOMENTAR -->
+  <div class="comment-wrap">
+    <div class="comment-card" id="commentH">
+      📏 Horizontal: <span>Rata</span>
+    </div>
+    <div class="comment-card" id="commentV">
+      📐 Vertikal: <span>Rata</span>
+    </div>
+  </div>
+
+</div>
   
   <!-- ===== TABUNG HORIZONTAL ===== -->
-<div class="tube-wrap-h">
+  <!--<div class="tube-wrap-h">
   <div class="tube horizontal">
   <div class="tube-line top"></div>
-  <div class="tube-line bottom"></div>
+  <div class="tube-line bottom"></div> 
 
   <div class="tube-center"></div> <!-- ⬅️ BARU -->
-  <div class="bubble" id="bubbleH"></div>
+  <!-- <div class="bubble" id="bubbleH"></div>
 </div>
 
   <!-- SKALA -->
-  <div class="scale-h left">-1°</div>
+  <!-- <div class="scale-h left">-1°</div>
   <div class="scale-h mid">0°</div>
   <div class="scale-h right">+1°</div>
-</div>
+</div> -->
   
-   <div class="tube-wrap">
+  <div class="tube-wrap">
+  <div class="tube-label vertical">Vertikal</div>
   <!-- SKALA KIRI -->
   <div class="scale top">+1°</div>
+  <!-- <div class="tube-wrap"> -->
+  <!-- SKALA KIRI -->
+     <!-- <div class="scale top">+1°</div>-->
   <div class="scale mid">0°</div>
   <div class="scale bot">-1°</div>
 
@@ -920,24 +1006,26 @@ body.light .comment-box{
 </div>
   </div>
   
-   <div class="action-row">
+<!-- <div class="action-row">
   <button id="btnCal" class="btn-small" onclick="calibrate()">
     🎯 Kalibrasi
-  </button>
+  </button> 
 
   <button id="btnLock" class="lock btn-small" onclick="lockAngle()">
     🔒 lock
   </button>
-</div>
+</div> -->
+
   <!-- ===== KOMENTAR PENGUKURAN ===== -->
-   <div class="comment-wrap">
+<!-- <div class="comment-wrap">
   <div class="comment-card" id="commentH">
     📏 Horizontal: <span>Rata</span>
   </div>
   <div class="comment-card" id="commentV">
     📐 Vertikal: <span>Rata</span>
   </div>
-</div> 
+</div> --> 
+
   <!-- ===== KOMENTAR PENGUKURAN (GABUNGAN) ===== -->
   <!-- <div class="comment-box" id="commentBox">
   <div class="comment-row" id="commentH">
