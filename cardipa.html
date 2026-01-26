@@ -1152,7 +1152,18 @@ function goDashboard() {
   <span class="nav-label" id="soundLabel">Suara</span>
 </div>
    
-
+      <div class="nav-item" onclick="openUtilitas()">
+  <div class="nav-icon-card">
+    <!-- SVG ICON WATERPASS -->
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="6" width="20" height="12" rx="3" fill="#22d3ee"/>
+      <circle cx="12" cy="12" r="3" fill="white"/>
+      <circle cx="12" cy="12" r="1.3" fill="#22d3ee"/>
+    </svg>
+  </div>
+  <div class="nav-label">Utilitas</div>
+</div>
+   
 <div class="nav-item" onclick="openGameOverlay()">
   <div class="nav-icon-card">
     <span class="nav-icon">🎮</span>
@@ -1338,7 +1349,7 @@ window.addEventListener("online", hidePopup);**/
   // ⏳ TUNGGU BIAR GOLD TERLIHAT
   setTimeout(()=>{
     gameBtn.classList.remove("gold-lock");
-
+   
     document.getElementById("gameOverlay").classList.add("show");
     document.body.style.overflow = "hidden";
   }, 450); // ⬅️ DURASI IDEAL (300–500 ms)
@@ -1372,7 +1383,12 @@ function openGame(url){
   setTimeout(()=>window.location.href = url,400);
 }
 
-     
+  function openUtilitas(){
+  if(soundEnabled) audioBeep.play().catch(()=>{});
+  window.location.href =
+  "https://wisayadi.github.io/parameter-dashboard/waterpass.html";
+}
+   
 
 function updateClockLocal() {
   const t = new Date();
