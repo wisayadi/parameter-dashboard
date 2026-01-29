@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resistor Color Band Scanner</title>
+
+<!-- OpenCV -->
+<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+
+<style>
+body{
+  margin:0;
+  font-family:Segoe UI,sans-serif;
+  background:#020617;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+.app{
+  width:94%;
+  max-width:400px;
+  background:#0f172a;
+  border-radius:18px;
+  padding:12px;
+}
+h1{
+  font-size:15px;
+  text-align:center;
+  color:#38bdf8;
+}
+video,canvas{
+  width:100%;
+  border-radius:14px;
+  border:2px solid #00ffcc;
+}
+.result{
+  margin-top:10px;
+  padding:10px;
+  background:#020617;
+  border-radius:14px;
+  text-align:center;
+}
+.value{
+  font-size:26px;
+  color:#9aff00;
+  font-weight:bold;
+}
+button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:linear-gradient(90deg,#00ffcc,#00bfa5);
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+<h1>📷 Resistor Color Band Scanner</h1>
+
+<!-- FIX: playsinline + muted -->
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas" hidden></canvas>
+
+<div class="result">
+  <div>Detected Value</div>
+  <div class="value" id="value">—</div>
+</div>
+
+<button onclick="scan()">SCAN RESISTOR</button>
+</div>
+
+<script>
+let video   = document.getElementById("video");
+let canvas  = document.getElementById("canvas");
+let valueEl = document.getElementById("value");
+
+let cvReady = false;
+
+/* ===============================
+   INIT CAMERA (HP FRIENDLY)
+================================ */
+async function initCamera(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ ideal:"environment" } }
+    });
+    video.srcObject = stream;
+    video.onloadedmetadata = () => video.play();
+  }catch(e){
+    alert("❌ Kamera tidak bisa diakses");
+  }
+}
+
+/* ===============================
+   OPENCV READY CALLBACK
+================================ */
+function onOpenCvReady(){
+  cvReady = true;
+  console.log("✅ OpenCV siap");
+}
+
+/* OpenCV runtime hook */
+if(typeof cv !== "undefined"){
+  cv['onRuntimeInitialized'] = onOpenCvReady;
+}
+
+/* Start camera */
+initCamera();
+
+/* ===============================
+   SCAN FUNCTION
+================================ */
+function scan(){
+  if(!cvReady){
+    alert("⏳ OpenCV belum siap");
+    return;
+  }
+  if(video.videoWidth === 0){
+    alert("📷 Kamera belum aktif");
+    return;
+  }
+
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  let ctx = canvas.getContext("2d");
+  ctx.drawImage(video,0,0);
+
+  let src = cv.imread(canvas);
+  let hsv = new cv.Mat();
+  cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
+  cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);
+
+  let bands = [];
+
+  const colors = [
+    {digit:1, low:[10,80,40],  high:[20,255,200]},  // brown
+    {digit:2, low:[0,120,70],  high:[10,255,255]},  // red
+    {digit:3, low:[11,120,120],high:[20,255,255]},  // orange
+    {digit:4, low:[21,100,100],high:[35,255,255]},  // yellow
+    {digit:5, low:[36,50,50],  high:[85,255,255]},  // green
+    {digit:6, low:[86,50,50],  high:[125,255,255]}, // blue
+    {digit:7, low:[126,50,50], high:[150,255,255]}  // violet
+  ];
+
+  colors.forEach(c=>{
+    let mask = new cv.Mat();
+    cv.inRange(
+      hsv,
+      new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.low),
+      new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.high),
+      mask
+    );
+
+    let contours = new cv.MatVector();
+    let hierarchy = new cv.Mat();
+    cv.findContours(mask,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+
+    for(let i=0;i<contours.size();i++){
+      let rect = cv.boundingRect(contours.get(i));
+      if(rect.height > rect.width * 2){
+        bands.push({ x: rect.x, digit: c.digit });
+      }
+    }
+    mask.delete(); contours.delete(); hierarchy.delete();
+  });
+
+  src.delete(); hsv.delete();
+
+  if(bands.length < 3){
+    valueEl.innerText = "❌ Band tidak terbaca";
+    return;
+  }
+
+  bands.sort((a,b)=>a.x - b.x);
+
+  let R = bands[0].digit * 10 + bands[1].digit;
+  let multiplier = Math.pow(10, bands[2].digit);
+  let ohm = R * multiplier;
+
+  valueEl.innerText =
+    ohm >= 1000 ? (ohm/1000)+" kΩ" : ohm+" Ω";
+}
+</script>
+
+</body>
+</html>
