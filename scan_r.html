@@ -73,12 +73,13 @@ button{
   <div>Detected Value</div>
   <div class="value" id="value">—</div>
 </div>
-
+  
+<button id="scanBtn" disabled>⏳ Loading OpenCV...</button>
 <button onclick="scan()">SCAN RESISTOR</button>
 </div>
 
 <script>
-let video   = document.getElementById("video");
+/*let video   = document.getElementById("video");
 let canvas  = document.getElementById("canvas");
 let valueEl = document.getElementById("value");
 
@@ -87,7 +88,7 @@ let cvReady = false;
 /* ===============================
    INIT CAMERA (HP FRIENDLY)
 ================================ */
-async function initCamera(){
+/*async function initCamera(){
   try{
     const stream = await navigator.mediaDevices.getUserMedia({
       video:{ facingMode:{ ideal:"environment" } }
@@ -102,18 +103,56 @@ async function initCamera(){
 /* ===============================
    OPENCV READY CALLBACK
 ================================ */
-function onOpenCvReady(){
+/*function onOpenCvReady(){
   cvReady = true;
   console.log("✅ OpenCV siap");
 }
 
 /* OpenCV runtime hook */
-if(typeof cv !== "undefined"){
+/*if(typeof cv !== "undefined"){
   cv['onRuntimeInitialized'] = onOpenCvReady;
 }
 
 /* Start camera */
+/*initCamera();*/
+ 
+let video   = document.getElementById("video");
+let canvas  = document.getElementById("canvas");
+let valueEl = document.getElementById("value");
+let scanBtn = document.getElementById("scanBtn");
+
+let cvReady = false;
+
+/* Kamera */
+async function initCamera(){
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video:{ facingMode:{ ideal:"environment" } }
+    });
+    video.srcObject = stream;
+    video.onloadedmetadata = () => video.play();
+  }catch(e){
+    alert("❌ Kamera tidak bisa diakses");
+  }
+}
+
+/* OpenCV READY */
+function onOpenCvReady(){
+  cvReady = true;
+  scanBtn.disabled = false;
+  scanBtn.innerText = "SCAN RESISTOR";
+  console.log("✅ OpenCV siap");
+}
+
+/* WAJIB: tunggu runtime */
+window.Module = {
+  onRuntimeInitialized() {
+    onOpenCvReady();
+  }
+};
+
 initCamera();
+
 
 /* ===============================
    SCAN FUNCTION
