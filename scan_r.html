@@ -2,233 +2,140 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+<title>Auto Crop Resistor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resistor Color Band Scanner</title>
-
-<!-- OpenCV -->
-<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 
 <style>
 body{
   margin:0;
-  font-family:Segoe UI,sans-serif;
-  background:#020617;
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-.app{
-  width:94%;
-  max-width:400px;
   background:#0f172a;
-  border-radius:18px;
-  padding:12px;
-}
-h1{
-  font-size:15px;
+  color:white;
+  font-family:system-ui;
   text-align:center;
-  color:#38bdf8;
 }
-video,canvas{
-  width:100%;
-  border-radius:14px;
-  border:2px solid #00ffcc;
-}
-.result{
+
+h2{ margin:10px }
+
+video, canvas{
+  width:95%;
+  max-width:420px;
+  border-radius:16px;
   margin-top:10px;
-  padding:10px;
-  background:#020617;
-  border-radius:14px;
-  text-align:center;
 }
-.value{
-  font-size:26px;
-  color:#9aff00;
-  font-weight:bold;
-}
+
 button{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
+  margin:15px;
+  padding:14px 30px;
+  font-size:18px;
   border:none;
-  border-radius:12px;
-  background:linear-gradient(90deg,#00ffcc,#00bfa5);
-  font-weight:bold;
+  border-radius:50px;
+  background:linear-gradient(135deg,#22c55e,#16a34a);
+  color:white;
+  cursor:pointer;
+}
+
+#result{
+  margin-top:10px;
+  font-size:18px;
 }
 </style>
 </head>
 
 <body>
+<h2>📷 Auto Crop Resistor</h2>
 
-<div class="app">
-<h1>📷 Resistor Color Band Scanner</h1>
-
-<!-- FIX: playsinline + muted -->
-<video id="video" autoplay playsinline muted></video>
+<video id="video" autoplay playsinline></video>
 <canvas id="canvas" hidden></canvas>
+<canvas id="crop"></canvas>
 
-<div class="result">
-  <div>Detected Value</div>
-  <div class="value" id="value">—</div>
-</div>
-  
 <button id="scanBtn" disabled>⏳ Loading OpenCV...</button>
-<button onclick="scan()">SCAN RESISTOR</button>
-</div>
+<div id="result"></div>
 
-<script>
-/*let video   = document.getElementById("video");
-let canvas  = document.getElementById("canvas");
-let valueEl = document.getElementById("value");
-
-let cvReady = false;
-
-/* ===============================
-   INIT CAMERA (HP FRIENDLY)
-================================ */
-/*async function initCamera(){
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:{ ideal:"environment" } }
-    });
-    video.srcObject = stream;
-    video.onloadedmetadata = () => video.play();
-  }catch(e){
-    alert("❌ Kamera tidak bisa diakses");
-  }
-}
-
-/* ===============================
-   OPENCV READY CALLBACK
-================================ */
-/*function onOpenCvReady(){
-  cvReady = true;
-  console.log("✅ OpenCV siap");
-}
-
-/* OpenCV runtime hook */
-/*if(typeof cv !== "undefined"){
-  cv['onRuntimeInitialized'] = onOpenCvReady;
-}
-
-/* Start camera */
-/*initCamera();*/
- 
-let video   = document.getElementById("video");
-let canvas  = document.getElementById("canvas");
-let valueEl = document.getElementById("value");
+<script src="https://docs.opencv.org/4.x/opencv.js"></script>
+  
+  <script>
+let video = document.getElementById("video");
+let canvas = document.getElementById("canvas");
+let cropCanvas = document.getElementById("crop");
 let scanBtn = document.getElementById("scanBtn");
+let result = document.getElementById("result");
 
 let cvReady = false;
 
 /* Kamera */
 async function initCamera(){
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:{ ideal:"environment" } }
-    });
-    video.srcObject = stream;
-    video.onloadedmetadata = () => video.play();
-  }catch(e){
-    alert("❌ Kamera tidak bisa diakses");
-  }
+  const stream = await navigator.mediaDevices.getUserMedia({
+    video:{ facingMode:{ ideal:"environment" } }
+  });
+  video.srcObject = stream;
 }
 
-/* OpenCV READY */
-function onOpenCvReady(){
-  cvReady = true;
-  scanBtn.disabled = false;
-  scanBtn.innerText = "SCAN RESISTOR";
-  console.log("✅ OpenCV siap");
-}
-
-/* WAJIB: tunggu runtime */
+/* OpenCV siap */
 window.Module = {
-  onRuntimeInitialized() {
-    onOpenCvReady();
+  onRuntimeInitialized(){
+    cvReady = true;
+    scanBtn.disabled = false;
+    scanBtn.innerText = "SCAN & AUTO CROP";
   }
 };
 
-initCamera();
+scanBtn.onclick = autoCropResistor;
 
+function autoCropResistor(){
+  if(!cvReady) return;
 
-/* ===============================
-   SCAN FUNCTION
-================================ */
-function scan(){
-  if(!cvReady){
-    alert("⏳ OpenCV belum siap");
-    return;
-  }
-  if(video.videoWidth === 0){
-    alert("📷 Kamera belum aktif");
-    return;
-  }
-
-  canvas.width  = video.videoWidth;
+  canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
+  cropCanvas.width = canvas.width;
+  cropCanvas.height = canvas.height;
 
   let ctx = canvas.getContext("2d");
   ctx.drawImage(video,0,0);
 
   let src = cv.imread(canvas);
-  let hsv = new cv.Mat();
-  cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
-  cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);
+  let gray = new cv.Mat();
+  let blur = new cv.Mat();
+  let edges = new cv.Mat();
 
-  let bands = [];
+  cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+  cv.GaussianBlur(gray, blur, new cv.Size(5,5),0);
+  cv.Canny(blur, edges, 80, 150);
 
-  const colors = [
-    {digit:1, low:[10,80,40],  high:[20,255,200]},  // brown
-    {digit:2, low:[0,120,70],  high:[10,255,255]},  // red
-    {digit:3, low:[11,120,120],high:[20,255,255]},  // orange
-    {digit:4, low:[21,100,100],high:[35,255,255]},  // yellow
-    {digit:5, low:[36,50,50],  high:[85,255,255]},  // green
-    {digit:6, low:[86,50,50],  high:[125,255,255]}, // blue
-    {digit:7, low:[126,50,50], high:[150,255,255]}  // violet
-  ];
+  let contours = new cv.MatVector();
+  let hierarchy = new cv.Mat();
+  cv.findContours(edges, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
-  colors.forEach(c=>{
-    let mask = new cv.Mat();
-    cv.inRange(
-      hsv,
-      new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.low),
-      new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.high),
-      mask
-    );
+  let bestRect = null;
+  let maxArea = 0;
 
-    let contours = new cv.MatVector();
-    let hierarchy = new cv.Mat();
-    cv.findContours(mask,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+  for(let i=0;i<contours.size();i++){
+    let cnt = contours.get(i);
+    let rect = cv.boundingRect(cnt);
 
-    for(let i=0;i<contours.size();i++){
-      let rect = cv.boundingRect(contours.get(i));
-      if(rect.height > rect.width * 2){
-        bands.push({ x: rect.x, digit: c.digit });
+    let ratio = rect.width / rect.height;
+    let area = rect.width * rect.height;
+
+    /* Filter khas resistor */
+    if(ratio > 2.5 && ratio < 8 && area > 5000){
+      if(area > maxArea){
+        maxArea = area;
+        bestRect = rect;
       }
     }
-    mask.delete(); contours.delete(); hierarchy.delete();
-  });
-
-  src.delete(); hsv.delete();
-
-  if(bands.length < 3){
-    valueEl.innerText = "❌ Band tidak terbaca";
-    return;
   }
 
-  bands.sort((a,b)=>a.x - b.x);
+  if(bestRect){
+    let roi = src.roi(bestRect);
+    cv.imshow("crop", roi);
+    result.innerHTML = "✅ Resistor terdeteksi & dicrop";
+    roi.delete();
+  }else{
+    result.innerHTML = "❌ Resistor tidak terdeteksi";
+  }
 
-  let R = bands[0].digit * 10 + bands[1].digit;
-  let multiplier = Math.pow(10, bands[2].digit);
-  let ohm = R * multiplier;
-
-  valueEl.innerText =
-    ohm >= 1000 ? (ohm/1000)+" kΩ" : ohm+" Ω";
+  src.delete(); gray.delete(); blur.delete();
+  edges.delete(); contours.delete(); hierarchy.delete();
 }
 </script>
-
 </body>
 </html>
