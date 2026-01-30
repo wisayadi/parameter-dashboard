@@ -68,34 +68,47 @@ navigator.mediaDevices.getUserMedia({
   video:{ facingMode:"environment" }
 }).then(s => video.srcObject = s);
 
-// === DATABASE WARNA RESISTOR ===
+// === DATABASE WARNA (DISENGAJA DIPISAH JAUH) ===
 const bands = [
-  {name:"Hitam", rgb:[0,0,0], value:0},
-  {name:"Coklat", rgb:[120,70,20], value:1},
-  {name:"Merah", rgb:[200,40,40], value:2},
-  {name:"Oranye", rgb:[255,130,0], value:3},
-  {name:"Kuning", rgb:[255,220,0], value:4},
-  {name:"Hijau", rgb:[0,160,80], value:5},
-  {name:"Biru", rgb:[40,80,200], value:6},
-  {name:"Ungu", rgb:[140,60,160], value:7}
+  {name:"Hitam", rgb:[20,20,20], value:0},
+  {name:"Coklat", rgb:[120,70,30], value:1},
+  {name:"Merah", rgb:[200,50,50], value:2},
+  {name:"Oranye", rgb:[240,130,30], value:3},
+  {name:"Kuning", rgb:[240,220,50], value:4},
+  {name:"Hijau", rgb:[50,160,80], value:5},
+  {name:"Biru", rgb:[60,90,200], value:6},
+  {name:"Ungu", rgb:[140,80,180], value:7}
 ];
 
 function dist(a,b){
-  return Math.sqrt(
-    (a[0]-b[0])**2 +
-    (a[1]-b[1])**2 +
-    (a[2]-b[2])**2
-  );
+  return Math.hypot(a[0]-b[0], a[1]-b[1], a[2]-b[2]);
 }
 
-function detectColor(r,g,b){
-  let min = 999999;
-  let sel = bands[0];
+function detectColor(rgb){
+  let best = bands[0], min = 1e9;
   for(let c of bands){
-    let d = dist([r,g,b], c.rgb);
-    if(d < min){ min = d; sel = c; }
+    let d = dist(rgb, c.rgb);
+    if(d < min){ min = d; best = c; }
   }
-  return sel;
+  return best;
+}
+
+function getAvgRGB(img, x0, y0, w, h){
+  let r=0,g=0,b=0,c=0;
+  for(let y=y0; y<y0+h; y+=2){
+    for(let x=x0; x<x0+w; x+=2){
+      let i = (y*img.width + x)*4;
+      let rr = img.data[i];
+      let gg = img.data[i+1];
+      let bb = img.data[i+2];
+
+      // buang terlalu gelap / terang (background)
+      if(rr+gg+bb < 80 || rr+gg+bb > 700) continue;
+
+      r+=rr; g+=gg; b+=bb; c++;
+    }
+  }
+  return c ? [r/c,g/c,b/c] : [0,0,0];
 }
 
 scanBtn.onclick = ()=>{
@@ -104,34 +117,28 @@ scanBtn.onclick = ()=>{
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video,0,0);
 
-  // strip tengah
-  const y = canvas.height * 0.45;
-  const h = canvas.height * 0.12;
-  const x = canvas.width * 0.2;
-  const w = canvas.width * 0.6;
+  const img = ctx.getImageData(0,0,canvas.width,canvas.height);
 
-  const img = ctx.getImageData(x,y,w,h);
-  const bandW = w/3;
+  // AREA RESISTOR (AMAN)
+  const rx = canvas.width * 0.25;
+  const ry = canvas.height * 0.45;
+  const rw = canvas.width * 0.5;
+  const rh = canvas.height * 0.12;
+
   let digits = [];
 
   for(let i=0;i<3;i++){
-    let r=0,g=0,b=0,cnt=0;
-    for(let px=i*bandW; px<(i+1)*bandW; px+=4){
-      let idx = (Math.floor(px) * 4);
-      r += img.data[idx];
-      g += img.data[idx+1];
-      b += img.data[idx+2];
-      cnt++;
-    }
-    r/=cnt; g/=cnt; b/=cnt;
-    let c = detectColor(r,g,b);
-    digits.push(c.value);
+    let bx = rx + i*(rw/3);
+    let rgb = getAvgRGB(img, bx, ry, rw/3, rh);
+    let band = detectColor(rgb);
+    digits.push(band.value);
   }
 
-  const val = (digits[0]*10 + digits[1]) * Math.pow(10,digits[2]);
+  const val = (digits[0]*10 + digits[1]) * Math.pow(10, digits[2]);
+
   valueEl.innerText =
-    val>=1e6 ? val/1e6+" MΩ" :
-    val>=1e3 ? val/1e3+" kΩ" :
+    val>=1e6 ? (val/1e6).toFixed(1)+" MΩ" :
+    val>=1e3 ? (val/1e3).toFixed(1)+" kΩ" :
     val+" Ω";
 };
   </script>
