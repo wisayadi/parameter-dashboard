@@ -6,7 +6,7 @@
 <title>Resistor Color Band Scanner</title>
 
 <!-- OpenCV -->
-<script async src="https://docs.opencv.org/4.x/opencv.js"></script>
+<script src="https://docs.opencv.org/4.x/opencv.js"></script>
 
 <style>
 body{
@@ -74,8 +74,9 @@ button{
   <div class="value" id="value">—</div>
 </div>
 
-<button onclick="scan()">SCAN RESISTOR</button>
-</div>
+  <!-- <button onclick="scan()">SCAN RESISTOR</button>
+</div> -->
+  <button id="scanBtn" onclick="scan()" disabled>⏳ Loading OpenCV...</button>
 
 <script>
 let video   = document.getElementById("video");
@@ -98,19 +99,34 @@ async function initCamera(){
     alert("❌ Kamera tidak bisa diakses");
   }
 }
+  Module.onRuntimeInitialized = () => {
+  cvReady = true;
+  document.getElementById("scanBtn").disabled = false;
+  document.getElementById("scanBtn").innerText = "SCAN RESISTOR";
+};
 
 /* ===============================
    OPENCV READY CALLBACK
 ================================ */
-function onOpenCvReady(){
+/*function onOpenCvReady(){
   cvReady = true;
   console.log("✅ OpenCV siap");
 }
 
 /* OpenCV runtime hook */
-if(typeof cv !== "undefined"){
+/*if(typeof cv !== "undefined"){
   cv['onRuntimeInitialized'] = onOpenCvReady;
-}
+}*/
+  
+let cvReady = false;
+
+var Module = {
+  onRuntimeInitialized() {
+    cvReady = true;
+    console.log("✅ OpenCV siap digunakan");
+    document.querySelector("button").innerText = "SCAN RESISTOR";
+  }
+};
 
 /* Start camera */
 initCamera();
