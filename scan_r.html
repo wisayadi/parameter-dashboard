@@ -3,51 +3,43 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resistor Color Band Scanner PRO</title>
+<title>Resistor Color Band Scanner PRO AI</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.14.0"></script>
 
 <style>
 body{
   margin:0;
-  font-family:Segoe UI,sans-serif;
   background:#020617;
-  color:white;
+  font-family:Segoe UI,sans-serif;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
+  color:white;
 }
 .app{
   width:94%;
   max-width:420px;
   background:#0f172a;
+  padding:14px;
   border-radius:18px;
-  padding:12px;
-}
-h1{
-  font-size:15px;
-  text-align:center;
-  color:#38bdf8;
 }
 video{
   width:100%;
   border-radius:14px;
   border:2px solid #00ffcc;
 }
-.result{
-  margin-top:10px;
-  padding:10px;
-  background:#020617;
-  border-radius:14px;
-  text-align:center;
-}
 .value{
+  margin-top:12px;
   font-size:26px;
   color:#9aff00;
+  text-align:center;
   font-weight:bold;
 }
 button{
   width:100%;
-  margin-top:10px;
+  margin-top:12px;
   padding:12px;
   border:none;
   border-radius:12px;
@@ -55,123 +47,81 @@ button{
   font-weight:bold;
 }
 </style>
-
-<script>
-let cvReady=false;
-var Module={
-  onRuntimeInitialized(){
-    cvReady=true;
-    scanBtn.disabled=false;
-    scanBtn.innerText="SCAN RESISTOR";
-  }
-}
-</script>
-<script src="https://docs.opencv.org/4.x/opencv.js"></script>
 </head>
 
 <body>
 <div class="app">
-<h1>📷 Resistor Color Band Scanner</h1>
-
-<video id="video" autoplay playsinline muted></video>
-<canvas id="canvas" hidden></canvas>
-
-<div class="result">
-  <div>Detected Value</div>
+  <h3 style="text-align:center;color:#38bdf8">📷 Resistor Scanner AI</h3>
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas" hidden></canvas>
   <div class="value" id="value">—</div>
-</div>
-
-<button id="scanBtn" disabled>⏳ Loading OpenCV...</button>
+  <button id="scanBtn">SCAN RESISTOR</button>
 </div>
 
 <script>
-const video=document.getElementById("video");
-const canvas=document.getElementById("canvas");
-const valueEl=document.getElementById("value");
-const scanBtn=document.getElementById("scanBtn");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const valueEl = document.getElementById("value");
+const scanBtn = document.getElementById("scanBtn");
 
+let model;
+
+// Kamera
 navigator.mediaDevices.getUserMedia({
   video:{facingMode:"environment"}
 }).then(s=>video.srcObject=s);
 
-/* ===============================
-   SCAN RESISTOR
-================================ */
-function scan(){
-  if(!cvReady) return;
+// Load AI Model
+(async()=>{
+  model = await tf.loadLayersModel("model/model.json");
+  console.log("✅ Model AI siap");
+})();
 
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
-  canvas.getContext("2d").drawImage(video,0,0);
+// Mapping warna
+const colors=["Hitam","Coklat","Merah","Oranye","Kuning","Hijau","Biru","Ungu"];
 
-  let src=cv.imread(canvas);
-  let hsv=new cv.Mat();
-  cv.cvtColor(src,hsv,cv.COLOR_RGBA2HSV);
+async function predictBand(img){
+  return tf.tidy(()=>{
+    let t = tf.browser.fromPixels(img)
+      .resizeNearestNeighbor([64,64])
+      .toFloat()
+      .div(255)
+      .expandDims(0);
 
-  /* 🔥 AUTO-CROP AREA TENGAH */
-  let cx=src.cols*0.15;
-  let cy=src.rows*0.4;
-  let cw=src.cols*0.7;
-  let ch=src.rows*0.25;
-  let roi=hsv.roi(new cv.Rect(cx,cy,cw,ch));
-
-  let bands=[];
-
-  const colors=[
-    {d:0, low:[0,0,0], high:[180,255,50]},      // hitam
-    {d:1, low:[5,80,40], high:[20,255,200]},    // coklat
-    {d:2, low:[0,120,120], high:[10,255,255]},  // merah
-    {d:3, low:[11,120,120], high:[25,255,255]}, // oranye
-    {d:4, low:[26,100,100], high:[35,255,255]}, // kuning
-    {d:5, low:[36,60,60], high:[85,255,255]},   // hijau
-    {d:6, low:[86,60,60], high:[125,255,255]},  // biru
-    {d:7, low:[126,50,50], high:[160,255,255]}  // ungu
-  ];
-
-  colors.forEach(c=>{
-    let mask=new cv.Mat();
-    cv.inRange(
-      roi,
-      new cv.Scalar(...c.low,0),
-      new cv.Scalar(...c.high,255),
-      mask
-    );
-
-    let cnts=new cv.MatVector();
-    let hier=new cv.Mat();
-    cv.findContours(mask,cnts,hier,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
-
-    for(let i=0;i<cnts.size();i++){
-      let r=cv.boundingRect(cnts.get(i));
-      let area=r.width*r.height;
-      let ratio=r.height/r.width;
-
-      if(area>300 && ratio>1.5 && ratio<6){
-        bands.push({x:r.x, digit:c.d});
-      }
-    }
-    mask.delete(); cnts.delete(); hier.delete();
+    return model.predict(t).argMax(-1).dataSync()[0];
   });
-
-  src.delete(); hsv.delete(); roi.delete();
-
-  if(bands.length<3){
-    valueEl.innerText="❌ Band tidak terbaca";
-    return;
-  }
-
-  bands.sort((a,b)=>a.x-b.x);
-
-  let value=(bands[0].digit*10+bands[1].digit)
-            *Math.pow(10,bands[2].digit);
-
-  valueEl.innerText =
-    value>=1e6 ? (value/1e6)+" MΩ" :
-    value>=1e3 ? (value/1e3)+" kΩ" :
-    value+" Ω";
 }
 
-scanBtn.onclick=scan;
+scanBtn.onclick = async ()=>{
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video,0,0);
+
+  // AUTO CROP TENGAH (resistor area)
+  const w = canvas.width;
+  const h = canvas.height;
+  const crop = ctx.getImageData(w*0.2,h*0.4,w*0.6,h*0.2);
+
+  // POTONG 3 BAGIAN (3 band)
+  const bandW = crop.width/3;
+  let digits=[];
+
+  for(let i=0;i<3;i++){
+    let band = document.createElement("canvas");
+    band.width = bandW;
+    band.height = crop.height;
+    band.getContext("2d").putImageData(crop, -i*bandW, 0);
+
+    digits.push(await predictBand(band));
+  }
+
+  const value = (digits[0]*10+digits[1]) * Math.pow(10,digits[2]);
+  valueEl.innerText =
+    value>=1e6 ? value/1e6+" MΩ" :
+    value>=1e3 ? value/1e3+" kΩ" :
+    value+" Ω";
+};
 </script>
 </body>
 </html>
