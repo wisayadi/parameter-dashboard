@@ -136,9 +136,11 @@ function scan(){
 
   const src = cv.imread(canvas);
   const hsv = new cv.Mat();
-  cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
-  cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);
-
+ /* cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
+  cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);*/
+  
+// PAKAI INI
+cv.cvtColor(src, hsv, cv.COLOR_RGBA2HSV);
   let bands = [];
 
   const colors = [
@@ -153,12 +155,16 @@ function scan(){
 
   colors.forEach(c=>{
     const mask = new cv.Mat();
-    cv.inRange(
+   /* cv.inRange(
       hsv,
       new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.low),
       new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.high),
       mask
-    );
+    );*/
+    let low  = new cv.Scalar(c.low[0],  c.low[1],  c.low[2],  0);
+let high = new cv.Scalar(c.high[0], c.high[1], c.high[2], 255);
+
+cv.inRange(hsv, low, high, mask);
 
     const contours = new cv.MatVector();
     const hierarchy = new cv.Mat();
