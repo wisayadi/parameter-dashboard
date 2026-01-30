@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Resistor Color Band Scanner</title>
+<title>Resistor Color Band Scanner PRO</title>
 
 <style>
 body{
@@ -18,7 +18,7 @@ body{
 }
 .app{
   width:94%;
-  max-width:400px;
+  max-width:420px;
   background:#0f172a;
   border-radius:18px;
   padding:12px;
@@ -28,7 +28,7 @@ h1{
   text-align:center;
   color:#38bdf8;
 }
-video,canvas{
+video{
   width:100%;
   border-radius:14px;
   border:2px solid #00ffcc;
@@ -56,30 +56,20 @@ button{
 }
 </style>
 
-<!-- ===============================
-     OPENCV MODULE (WAJIB DI SINI)
-================================= -->
 <script>
-let cvReady = false;
-
-var Module = {
-  onRuntimeInitialized() {
-    cvReady = true;
-    console.log("✅ OpenCV siap");
-    const btn = document.getElementById("scanBtn");
-    btn.disabled = false;
-    btn.innerText = "SCAN RESISTOR";
+let cvReady=false;
+var Module={
+  onRuntimeInitialized(){
+    cvReady=true;
+    scanBtn.disabled=false;
+    scanBtn.innerText="SCAN RESISTOR";
   }
-};
+}
 </script>
-
-<!-- OpenCV -->
 <script src="https://docs.opencv.org/4.x/opencv.js"></script>
-
 </head>
 
 <body>
-
 <div class="app">
 <h1>📷 Resistor Color Band Scanner</h1>
 
@@ -95,108 +85,93 @@ var Module = {
 </div>
 
 <script>
-const video   = document.getElementById("video");
-const canvas  = document.getElementById("canvas");
-const valueEl = document.getElementById("value");
+const video=document.getElementById("video");
+const canvas=document.getElementById("canvas");
+const valueEl=document.getElementById("value");
+const scanBtn=document.getElementById("scanBtn");
+
+navigator.mediaDevices.getUserMedia({
+  video:{facingMode:"environment"}
+}).then(s=>video.srcObject=s);
 
 /* ===============================
-   INIT CAMERA
-================================ */
-async function initCamera(){
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:{ ideal:"environment" } }
-    });
-    video.srcObject = stream;
-    await video.play();
-    console.log("📷 Kamera aktif");
-  }catch(e){
-    alert("❌ Kamera gagal diakses");
-  }
-}
-
-initCamera();
-
-/* ===============================
-   SCAN FUNCTION
+   SCAN RESISTOR
 ================================ */
 function scan(){
   if(!cvReady) return;
 
-  if(video.videoWidth === 0){
-    alert("📷 Kamera belum siap");
-    return;
-  }
+  canvas.width=video.videoWidth;
+  canvas.height=video.videoHeight;
+  canvas.getContext("2d").drawImage(video,0,0);
 
-  canvas.width  = video.videoWidth;
-  canvas.height = video.videoHeight;
+  let src=cv.imread(canvas);
+  let hsv=new cv.Mat();
+  cv.cvtColor(src,hsv,cv.COLOR_RGBA2HSV);
 
-  const ctx = canvas.getContext("2d");
-  ctx.drawImage(video,0,0);
+  /* 🔥 AUTO-CROP AREA TENGAH */
+  let cx=src.cols*0.15;
+  let cy=src.rows*0.4;
+  let cw=src.cols*0.7;
+  let ch=src.rows*0.25;
+  let roi=hsv.roi(new cv.Rect(cx,cy,cw,ch));
 
-  const src = cv.imread(canvas);
-  const hsv = new cv.Mat();
- /* cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
-  cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);*/
-  
-// PAKAI INI
-cv.cvtColor(src, hsv, cv.COLOR_RGBA2HSV);
-  let bands = [];
+  let bands=[];
 
-  const colors = [
-    {digit:1, low:[10,80,40], high:[20,255,200]},
-    {digit:2, low:[0,120,70], high:[10,255,255]},
-    {digit:3, low:[11,120,120], high:[20,255,255]},
-    {digit:4, low:[21,100,100], high:[35,255,255]},
-    {digit:5, low:[36,50,50], high:[85,255,255]},
-    {digit:6, low:[86,50,50], high:[125,255,255]},
-    {digit:7, low:[126,50,50], high:[150,255,255]}
+  const colors=[
+    {d:0, low:[0,0,0], high:[180,255,50]},      // hitam
+    {d:1, low:[5,80,40], high:[20,255,200]},    // coklat
+    {d:2, low:[0,120,120], high:[10,255,255]},  // merah
+    {d:3, low:[11,120,120], high:[25,255,255]}, // oranye
+    {d:4, low:[26,100,100], high:[35,255,255]}, // kuning
+    {d:5, low:[36,60,60], high:[85,255,255]},   // hijau
+    {d:6, low:[86,60,60], high:[125,255,255]},  // biru
+    {d:7, low:[126,50,50], high:[160,255,255]}  // ungu
   ];
 
   colors.forEach(c=>{
-    const mask = new cv.Mat();
-   /* cv.inRange(
-      hsv,
-      new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.low),
-      new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.high),
+    let mask=new cv.Mat();
+    cv.inRange(
+      roi,
+      new cv.Scalar(...c.low,0),
+      new cv.Scalar(...c.high,255),
       mask
-    );*/
-    let low  = new cv.Scalar(c.low[0],  c.low[1],  c.low[2],  0);
-let high = new cv.Scalar(c.high[0], c.high[1], c.high[2], 255);
+    );
 
-cv.inRange(hsv, low, high, mask);
+    let cnts=new cv.MatVector();
+    let hier=new cv.Mat();
+    cv.findContours(mask,cnts,hier,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
 
-    const contours = new cv.MatVector();
-    const hierarchy = new cv.Mat();
-    cv.findContours(mask,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
+    for(let i=0;i<cnts.size();i++){
+      let r=cv.boundingRect(cnts.get(i));
+      let area=r.width*r.height;
+      let ratio=r.height/r.width;
 
-    for(let i=0;i<contours.size();i++){
-      const r = cv.boundingRect(contours.get(i));
-      if(r.height > r.width*2){
-        bands.push({x:r.x, digit:c.digit});
+      if(area>300 && ratio>1.5 && ratio<6){
+        bands.push({x:r.x, digit:c.d});
       }
     }
-    mask.delete(); contours.delete(); hierarchy.delete();
+    mask.delete(); cnts.delete(); hier.delete();
   });
 
-  src.delete(); hsv.delete();
+  src.delete(); hsv.delete(); roi.delete();
 
-  if(bands.length < 3){
-    valueEl.innerText = "❌ Band tidak terbaca";
+  if(bands.length<3){
+    valueEl.innerText="❌ Band tidak terbaca";
     return;
   }
 
   bands.sort((a,b)=>a.x-b.x);
 
-  const R = bands[0].digit*10 + bands[1].digit;
-  const ohm = R * Math.pow(10,bands[2].digit);
+  let value=(bands[0].digit*10+bands[1].digit)
+            *Math.pow(10,bands[2].digit);
 
   valueEl.innerText =
-    ohm >= 1000 ? (ohm/1000)+" kΩ" : ohm+" Ω";
+    value>=1e6 ? (value/1e6)+" MΩ" :
+    value>=1e3 ? (value/1e3)+" kΩ" :
+    value+" Ω";
 }
 
-document.getElementById("scanBtn").onclick = scan;
+scanBtn.onclick=scan;
 </script>
-
 </body>
 </html>
