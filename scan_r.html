@@ -64,80 +64,76 @@ const canvas = document.getElementById("canvas");
 const valueEl = document.getElementById("value");
 const scanBtn = document.getElementById("scanBtn");
 
-let model;
-
-// Kamera
 navigator.mediaDevices.getUserMedia({
-  video:{facingMode:"environment"}
-}).then(s=>video.srcObject=s);
+  video:{ facingMode:"environment" }
+}).then(s => video.srcObject = s);
 
-// Load AI Model
-(async()=>{
-  model = await tf.loadLayersModel("model/model.json");
-  console.log("✅ Model AI siap");
-})();
+// === DATABASE WARNA RESISTOR ===
+const bands = [
+  {name:"Hitam", rgb:[0,0,0], value:0},
+  {name:"Coklat", rgb:[120,70,20], value:1},
+  {name:"Merah", rgb:[200,40,40], value:2},
+  {name:"Oranye", rgb:[255,130,0], value:3},
+  {name:"Kuning", rgb:[255,220,0], value:4},
+  {name:"Hijau", rgb:[0,160,80], value:5},
+  {name:"Biru", rgb:[40,80,200], value:6},
+  {name:"Ungu", rgb:[140,60,160], value:7}
+];
 
-// Mapping warna
-const colors=["Hitam","Coklat","Merah","Oranye","Kuning","Hijau","Biru","Ungu"];
-
-async function predictBand(img){
-  return tf.tidy(()=>{
-    let t = tf.browser.fromPixels(img)
-      .resizeNearestNeighbor([64,64])
-      .toFloat()
-      .div(255)
-      .expandDims(0);
-
-    return model.predict(t).argMax(-1).dataSync()[0];
-  });
+function dist(a,b){
+  return Math.sqrt(
+    (a[0]-b[0])**2 +
+    (a[1]-b[1])**2 +
+    (a[2]-b[2])**2
+  );
 }
 
-scanBtn.onclick = async ()=>{
-  if(!model){
-    alert("Model AI belum siap");
-    return;
+function detectColor(r,g,b){
+  let min = 999999;
+  let sel = bands[0];
+  for(let c of bands){
+    let d = dist([r,g,b], c.rgb);
+    if(d < min){ min = d; sel = c; }
   }
+  return sel;
+}
 
+scanBtn.onclick = ()=>{
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video,0,0);
 
-  // DEBUG canvas tampak
-  canvas.hidden = false;
+  // strip tengah
+  const y = canvas.height * 0.45;
+  const h = canvas.height * 0.12;
+  const x = canvas.width * 0.2;
+  const w = canvas.width * 0.6;
 
-  // Area fokus MANUAL (lebih masuk akal)
-  const cx = canvas.width * 0.25;
-  const cy = canvas.height * 0.45;
-  const cw = canvas.width * 0.5;
-  const ch = canvas.height * 0.15;
-
+  const img = ctx.getImageData(x,y,w,h);
+  const bandW = w/3;
   let digits = [];
 
   for(let i=0;i<3;i++){
-    let band = document.createElement("canvas");
-    band.width = 64;
-    band.height = 64;
-    let bctx = band.getContext("2d");
-
-    bctx.drawImage(
-      canvas,
-      cx + i*(cw/3), cy, cw/3, ch,
-      0, 0, 64, 64
-    );
-
-    const d = await predictBand(band);
-    digits.push(d);
+    let r=0,g=0,b=0,cnt=0;
+    for(let px=i*bandW; px<(i+1)*bandW; px+=4){
+      let idx = (Math.floor(px) * 4);
+      r += img.data[idx];
+      g += img.data[idx+1];
+      b += img.data[idx+2];
+      cnt++;
+    }
+    r/=cnt; g/=cnt; b/=cnt;
+    let c = detectColor(r,g,b);
+    digits.push(c.value);
   }
 
-  const value =
-    (digits[0]*10 + digits[1]) * Math.pow(10, digits[2]);
-
+  const val = (digits[0]*10 + digits[1]) * Math.pow(10,digits[2]);
   valueEl.innerText =
-    value>=1e6 ? value/1e6+" MΩ" :
-    value>=1e3 ? value/1e3+" kΩ" :
-    value+" Ω";
+    val>=1e6 ? val/1e6+" MΩ" :
+    val>=1e3 ? val/1e3+" kΩ" :
+    val+" Ω";
 };
-</script>
+  </script>
 </body>
 </html>
