@@ -59,7 +59,7 @@ button{
 </div>
 
 <script>
-const video = document.getElementById("video");
+/**const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const valueEl = document.getElementById("value");
 const scanBtn = document.getElementById("scanBtn");
@@ -155,6 +155,122 @@ scanBtn.onclick = ()=>{
     value>=1e6 ? (value/1e6).toFixed(1)+" MΩ" :
     value>=1e3 ? (value/1e3).toFixed(1)+" kΩ" :
     value+" Ω";
+};**/
+  
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const valueEl = document.getElementById("value");
+
+navigator.mediaDevices.getUserMedia({
+  video:{ facingMode:"environment" }
+}).then(s => video.srcObject = s);
+
+/* ===== MODEL WARNA PRO++ ===== */
+const COLOR_MODEL = {
+  0:{n:"Hitam", h:[0,360], s:[0,30], v:[0,40]},
+  1:{n:"Coklat", h:[10,30], s:[40,80], v:[40,80]},
+  2:{n:"Merah", h:[350,10], s:[60,100], v:[50,100]},
+  3:{n:"Oranye", h:[15,40], s:[70,100], v:[70,100]},
+  4:{n:"Kuning", h:[35,65], s:[70,100], v:[70,100]},
+  5:{n:"Hijau", h:[70,150], s:[40,100], v:[40,100]},
+  6:{n:"Biru", h:[180,260], s:[40,100], v:[30,100]},
+  7:{n:"Ungu", h:[260,330], s:[40,100], v:[30,100]}
+};
+
+/* ===== UTIL ===== */
+function rgb2hsv(r,g,b){
+  r/=255; g/=255; b/=255;
+  let max=Math.max(r,g,b), min=Math.min(r,g,b);
+  let h,s,v=max;
+  let d=max-min;
+  s=max===0?0:d/max;
+  if(max===min) h=0;
+  else{
+    switch(max){
+      case r: h=(g-b)/d+(g<b?6:0); break;
+      case g: h=(b-r)/d+2; break;
+      case b: h=(r-g)/d+4; break;
+    }
+    h*=60;
+  }
+  return [h,s*100,v*100];
+}
+
+function isTolerance(hsv){
+  return (hsv[1]<25 && hsv[2]>70) || hsv[2]<35;
+}
+
+function classify(hsv){
+  for(let k in COLOR_MODEL){
+    let c=COLOR_MODEL[k];
+    let h=hsv[0], s=hsv[1], v=hsv[2];
+
+    let hOK = c.h[0]<=c.h[1]
+      ? h>=c.h[0]&&h<=c.h[1]
+      : h>=c.h[0]||h<=c.h[1];
+
+    if(hOK && s>=c.s[0]&&s<=c.s[1] && v>=c.v[0]&&v<=c.v[1])
+      return parseInt(k);
+  }
+  return null;
+}
+
+/* ===== SCAN ===== */
+document.getElementById("scanBtn").onclick=()=>{
+  canvas.width=video.videoWidth;
+  canvas.height=video.videoHeight;
+  let ctx=canvas.getContext("2d");
+  ctx.drawImage(video,0,0);
+
+  let img=ctx.getImageData(0,0,canvas.width,canvas.height);
+
+  let rx=canvas.width*0.28;
+  let ry=canvas.height*0.46;
+  let rw=canvas.width*0.44;
+  let rh=canvas.height*0.1;
+
+  let bands=[];
+
+  for(let i=0;i<4;i++){
+    let xs=rx+i*(rw/4);
+    let samples=[];
+
+    for(let y=ry;y<ry+rh;y+=3){
+      for(let x=xs;x<xs+rw/4;x+=3){
+        let id=(y*img.width+x)*4;
+        let r=img.data[id], g=img.data[id+1], b=img.data[id+2];
+        if(r+g+b<120||r+g+b>700) continue;
+        samples.push(rgb2hsv(r,g,b));
+      }
+    }
+
+    if(samples.length){
+      let avg=samples.reduce((a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]]);
+      avg=avg.map(v=>v/samples.length);
+      if(!isTolerance(avg)) bands.push(avg);
+    }
+  }
+
+  if(bands.length<3){
+    valueEl.innerText="SCAN ULANG";
+    return;
+  }
+
+  let d0=classify(bands[0]);
+  let d1=classify(bands[1]);
+  let mul=classify(bands[2]);
+
+  if(d0===null||d1===null||mul===null){
+    valueEl.innerText="TIDAK VALID";
+    return;
+  }
+
+  let val=(d0*10+d1)*Math.pow(10,mul);
+
+  valueEl.innerText=
+    val>=1e6?(val/1e6).toFixed(2)+" MΩ":
+    val>=1e3?(val/1e3).toFixed(2)+" kΩ":
+    val+" Ω";
 };
   </script>
 </body>
