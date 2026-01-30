@@ -93,30 +93,46 @@ async function predictBand(img){
 }
 
 scanBtn.onclick = async ()=>{
+  if(!model){
+    alert("Model AI belum siap");
+    return;
+  }
+
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   const ctx = canvas.getContext("2d");
   ctx.drawImage(video,0,0);
 
-  // AUTO CROP TENGAH (resistor area)
-  const w = canvas.width;
-  const h = canvas.height;
-  const crop = ctx.getImageData(w*0.2,h*0.4,w*0.6,h*0.2);
+  // DEBUG canvas tampak
+  canvas.hidden = false;
 
-  // POTONG 3 BAGIAN (3 band)
-  const bandW = crop.width/3;
-  let digits=[];
+  // Area fokus MANUAL (lebih masuk akal)
+  const cx = canvas.width * 0.25;
+  const cy = canvas.height * 0.45;
+  const cw = canvas.width * 0.5;
+  const ch = canvas.height * 0.15;
+
+  let digits = [];
 
   for(let i=0;i<3;i++){
     let band = document.createElement("canvas");
-    band.width = bandW;
-    band.height = crop.height;
-    band.getContext("2d").putImageData(crop, -i*bandW, 0);
+    band.width = 64;
+    band.height = 64;
+    let bctx = band.getContext("2d");
 
-    digits.push(await predictBand(band));
+    bctx.drawImage(
+      canvas,
+      cx + i*(cw/3), cy, cw/3, ch,
+      0, 0, 64, 64
+    );
+
+    const d = await predictBand(band);
+    digits.push(d);
   }
 
-  const value = (digits[0]*10+digits[1]) * Math.pow(10,digits[2]);
+  const value =
+    (digits[0]*10 + digits[1]) * Math.pow(10, digits[2]);
+
   valueEl.innerText =
     value>=1e6 ? value/1e6+" MΩ" :
     value>=1e3 ? value/1e3+" kΩ" :
