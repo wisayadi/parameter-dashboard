@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Resistor Color Band Scanner</title>
 
-<!-- OpenCV -->
-<script src="https://docs.opencv.org/4.x/opencv.js"></script>
-
 <style>
 body{
   margin:0;
@@ -51,13 +48,34 @@ video,canvas{
 button{
   width:100%;
   margin-top:10px;
-  padding:10px;
+  padding:12px;
   border:none;
   border-radius:12px;
   background:linear-gradient(90deg,#00ffcc,#00bfa5);
   font-weight:bold;
 }
 </style>
+
+<!-- ===============================
+     OPENCV MODULE (WAJIB DI SINI)
+================================= -->
+<script>
+let cvReady = false;
+
+var Module = {
+  onRuntimeInitialized() {
+    cvReady = true;
+    console.log("✅ OpenCV siap");
+    const btn = document.getElementById("scanBtn");
+    btn.disabled = false;
+    btn.innerText = "SCAN RESISTOR";
+  }
+};
+</script>
+
+<!-- OpenCV -->
+<script src="https://docs.opencv.org/4.x/opencv.js"></script>
+
 </head>
 
 <body>
@@ -65,7 +83,6 @@ button{
 <div class="app">
 <h1>📷 Resistor Color Band Scanner</h1>
 
-<!-- FIX: playsinline + muted -->
 <video id="video" autoplay playsinline muted></video>
 <canvas id="canvas" hidden></canvas>
 
@@ -74,19 +91,16 @@ button{
   <div class="value" id="value">—</div>
 </div>
 
-  <!-- <button onclick="scan()">SCAN RESISTOR</button>
-</div> -->
-  <button id="scanBtn" onclick="scan()" disabled>⏳ Loading OpenCV...</button>
+<button id="scanBtn" disabled>⏳ Loading OpenCV...</button>
+</div>
 
 <script>
-let video   = document.getElementById("video");
-let canvas  = document.getElementById("canvas");
-let valueEl = document.getElementById("value");
-
-let cvReady = false;
+const video   = document.getElementById("video");
+const canvas  = document.getElementById("canvas");
+const valueEl = document.getElementById("value");
 
 /* ===============================
-   INIT CAMERA (HP FRIENDLY)
+   INIT CAMERA
 ================================ */
 async function initCamera(){
   try{
@@ -94,81 +108,51 @@ async function initCamera(){
       video:{ facingMode:{ ideal:"environment" } }
     });
     video.srcObject = stream;
-    video.onloadedmetadata = () => video.play();
+    await video.play();
+    console.log("📷 Kamera aktif");
   }catch(e){
-    alert("❌ Kamera tidak bisa diakses");
+    alert("❌ Kamera gagal diakses");
   }
 }
-  Module.onRuntimeInitialized = () => {
-  cvReady = true;
-  document.getElementById("scanBtn").disabled = false;
-  document.getElementById("scanBtn").innerText = "SCAN RESISTOR";
-};
 
-/* ===============================
-   OPENCV READY CALLBACK
-================================ */
-/*function onOpenCvReady(){
-  cvReady = true;
-  console.log("✅ OpenCV siap");
-}
-
-/* OpenCV runtime hook */
-/*if(typeof cv !== "undefined"){
-  cv['onRuntimeInitialized'] = onOpenCvReady;
-}*/
-  
-let cvReady = false;
-
-var Module = {
-  onRuntimeInitialized() {
-    cvReady = true;
-    console.log("✅ OpenCV siap digunakan");
-    document.querySelector("button").innerText = "SCAN RESISTOR";
-  }
-};
-
-/* Start camera */
 initCamera();
 
 /* ===============================
    SCAN FUNCTION
 ================================ */
 function scan(){
-  if(!cvReady){
-    alert("⏳ OpenCV belum siap");
-    return;
-  }
+  if(!cvReady) return;
+
   if(video.videoWidth === 0){
-    alert("📷 Kamera belum aktif");
+    alert("📷 Kamera belum siap");
     return;
   }
 
   canvas.width  = video.videoWidth;
   canvas.height = video.videoHeight;
 
-  let ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d");
   ctx.drawImage(video,0,0);
 
-  let src = cv.imread(canvas);
-  let hsv = new cv.Mat();
+  const src = cv.imread(canvas);
+  const hsv = new cv.Mat();
   cv.cvtColor(src,hsv,cv.COLOR_RGBA2RGB);
   cv.cvtColor(hsv,hsv,cv.COLOR_RGB2HSV);
 
   let bands = [];
 
   const colors = [
-    {digit:1, low:[10,80,40],  high:[20,255,200]},  // brown
-    {digit:2, low:[0,120,70],  high:[10,255,255]},  // red
-    {digit:3, low:[11,120,120],high:[20,255,255]},  // orange
-    {digit:4, low:[21,100,100],high:[35,255,255]},  // yellow
-    {digit:5, low:[36,50,50],  high:[85,255,255]},  // green
-    {digit:6, low:[86,50,50],  high:[125,255,255]}, // blue
-    {digit:7, low:[126,50,50], high:[150,255,255]}  // violet
+    {digit:1, low:[10,80,40], high:[20,255,200]},
+    {digit:2, low:[0,120,70], high:[10,255,255]},
+    {digit:3, low:[11,120,120], high:[20,255,255]},
+    {digit:4, low:[21,100,100], high:[35,255,255]},
+    {digit:5, low:[36,50,50], high:[85,255,255]},
+    {digit:6, low:[86,50,50], high:[125,255,255]},
+    {digit:7, low:[126,50,50], high:[150,255,255]}
   ];
 
   colors.forEach(c=>{
-    let mask = new cv.Mat();
+    const mask = new cv.Mat();
     cv.inRange(
       hsv,
       new cv.Mat(hsv.rows,hsv.cols,hsv.type(),c.low),
@@ -176,14 +160,14 @@ function scan(){
       mask
     );
 
-    let contours = new cv.MatVector();
-    let hierarchy = new cv.Mat();
+    const contours = new cv.MatVector();
+    const hierarchy = new cv.Mat();
     cv.findContours(mask,contours,hierarchy,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE);
 
     for(let i=0;i<contours.size();i++){
-      let rect = cv.boundingRect(contours.get(i));
-      if(rect.height > rect.width * 2){
-        bands.push({ x: rect.x, digit: c.digit });
+      const r = cv.boundingRect(contours.get(i));
+      if(r.height > r.width*2){
+        bands.push({x:r.x, digit:c.digit});
       }
     }
     mask.delete(); contours.delete(); hierarchy.delete();
@@ -196,15 +180,16 @@ function scan(){
     return;
   }
 
-  bands.sort((a,b)=>a.x - b.x);
+  bands.sort((a,b)=>a.x-b.x);
 
-  let R = bands[0].digit * 10 + bands[1].digit;
-  let multiplier = Math.pow(10, bands[2].digit);
-  let ohm = R * multiplier;
+  const R = bands[0].digit*10 + bands[1].digit;
+  const ohm = R * Math.pow(10,bands[2].digit);
 
   valueEl.innerText =
     ohm >= 1000 ? (ohm/1000)+" kΩ" : ohm+" Ω";
 }
+
+document.getElementById("scanBtn").onclick = scan;
 </script>
 
 </body>
